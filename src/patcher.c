@@ -41,10 +41,10 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     const uint8_t* block = cache_search(gp);
     if (block == NULL) {
         warning("PATCHER::NOT_FOUND %lx", gp);
-        block = get_host() + get_gp();
+        block = get_host() + get_hp();
         decode(gp);
     }
-    int32_t offset = (uint64_t)block - sc->pc;
+    int32_t offset = (uint64_t)block - sc->pc + 4;
     print("offset: %i", offset);
     *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
     #endif
