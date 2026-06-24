@@ -14,6 +14,13 @@ void execute(int block) {
     __builtin___clear_cache(code, end);
     void(*exec)(void) = code;
     #if defined(__aarch64__) || defined(_M_ARM64)
+    MOV X21, get_guest();
+    __asm__ volatile(
+        "mov x21, %0\n"       // X21 = guest_ptr
+        :
+        : "r" (guest_ptr)
+        : "x21", "cc", "memory"
+    );
     exec();
     #endif
     success("execution");

@@ -12,7 +12,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     print("RCX: %lX", sc->regs[3]);
     print("RDX: %lX", sc->regs[2]);
     print("RBX: %lX", sc->regs[14]);
-    print("RSP: %lX", sc->regs[31]);
+    print("RSP: %lX", sc->sp);
     print("RBP: %lX", sc->regs[15]);
     print("RSI: %lX", sc->regs[1]);
     print("RDI: %lX", sc->regs[9]);
