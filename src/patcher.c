@@ -48,6 +48,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     print("offset: %i", offset);
     *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
     cache_flush(jump->block);
+    success("patching");
     #endif
 }
 
