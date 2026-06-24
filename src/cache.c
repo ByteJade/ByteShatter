@@ -124,10 +124,11 @@ uint8_t* cache_search(uint32_t gp) {
     return NULL;
 }
 JumpUnit* cache_get_jump(uint16_t jump_id) {
+    jump_id--;
     if (jump_id >= jp) {
         panic("CACHE::JUMPS::BAD_ID");
     }
-    return jumps_cache + jump_id - 1;
+    return jumps_cache + jump_id;
 }
 CacheUnit* cache_get_block(uint16_t block_id) {
     if (block_id >= bp) {
