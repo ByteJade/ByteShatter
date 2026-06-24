@@ -44,7 +44,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
         block = get_host() + get_gp();
         decode(gp);
     }
-    int32_t offset = (uint64_t)block - sc->rip;
+    int32_t offset = (uint64_t)block - sc->pc;
     print("offset: %i", offset);
     *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
     #endif
