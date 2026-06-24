@@ -1,8 +1,10 @@
 #include "patcher.h"
 #include "cache.h"
 #include "core.h"
+#include "memory.h"
+#include "decoder.h"
 #include <signal.h>
-#include <stdlib.h>
+#include <stdint.h>
 
 void handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
@@ -24,14 +26,27 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     print("R13: %lX", sc->regs[17]);
     print("R14: %lX", sc->regs[18]);
     print("R15: %lX", sc->regs[19]);
-    uint32_t instruction = *((uint8_t*)sc->pc);
-    uint16_t code = (instruction >> 5) & 0xFFFF;
-    if (code == 0) {
+
+    uint32_t* code = (uint32_t*)sc->pc;
+    uint32_t instruction = *code;
+    uint16_t ret = (instruction >> 5) & 0xFFFF;
+    if (ret == 0) {
         panic("Unknown instruction");
     }
-    print("code: %x", code);
-    JumpUnit* jump = cache_get_jump(code);
+    print("ret: %x", ret);
+    JumpUnit* jump = cache_get_jump(ret);
+    CacheUnit* cahce = cache_get_block(jump->block);
     print("jump: %i", jump->guest_off);
+    uint32_t gp = cahce->gp + jump->guest_off;
+    const uint8_t* block = cache_search(gp);
+    if (block == NULL) {
+        warning("PATCHER::NOT_FOUND %lx", gp);
+        block = get_host() + get_gp();
+        decode(gp);
+    }
+    int32_t offset = (uint64_t)block - sc->rip;
+    print("offset: %i", offset);
+    *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
     #endif
 }
 
