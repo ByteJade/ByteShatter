@@ -137,6 +137,12 @@ CacheUnit* cache_get_block(uint16_t block_id) {
     return blocks_cache + block_id;
 }
 
+void cache_flush(uint16_t block_id) {
+    CacheUnit* unit = blocks_cache + block_id;
+    void* code = get_host() + unit->hp;
+    uint32_t size = unit->offsets[unit->offsetssz-1].hoff+4;
+    __builtin___clear_cache(code, code + size);
+}
 uint32_t cache_usage() {
     return bp * sizeof(CacheUnit) + jp * sizeof(JumpUnit);
 }

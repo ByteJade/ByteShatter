@@ -44,6 +44,8 @@ JumpUnit* cache_get_jump(uint16_t jump_id);
 /* get pointer to block data */
 CacheUnit* cache_get_block(uint16_t block_id);
 
+/* update code after patching */
+void cache_flush(uint16_t block_id);
 /* how much memory used */
 uint32_t cache_usage();
 /* show recompiled blocks */
