@@ -1,6 +1,7 @@
 #include "encoder.h"
 #include "core.h"
 #include "memory.h"
+#include "cache.h"
 #include "dlmanager.h"
 #include "arm64emitter.h"
 
@@ -46,7 +47,7 @@ void encode(X64_instruction* buf) {
             }
         } break;
         case JE:{
-            emit_brk(0);
+            emit_brk(cache_jump_point(JE, buf->imm0));
         } break;
         case CALL:{
             if (buf->optype1 == REG) {

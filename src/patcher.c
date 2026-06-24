@@ -5,9 +5,9 @@
 #include <stdlib.h>
 
 void handler(int sig, siginfo_t* info, void* ucontext) {
-    #if defined(__aarch64__) || defined(_M_ARM64)
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
+    #if defined(__aarch64__) || defined(_M_ARM64)
     print("RAX: %lX", sc->regs[0]);
     print("RCX: %lX", sc->regs[3]);
     print("RDX: %lX", sc->regs[2]);
@@ -24,8 +24,15 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     print("R13: %lX", sc->regs[17]);
     print("R14: %lX", sc->regs[18]);
     print("R15: %lX", sc->regs[19]);
+    uint32_t instruction = *((uint8_t*)sc->pc);
+    uint16_t code = (instruction >> 5) & 0xFFFF;
+    if (code == 0) {
+        panic("Unknown instruction");
+    }
+    print("code: %x", code)
+    JumpUnit* jump = cache_get_jump(code);
+    print("jump: %i", jump->guest_off);
     #endif
-    exit(0);
 }
 
 void patcher_init() {

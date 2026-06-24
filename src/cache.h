@@ -12,7 +12,6 @@ typedef struct {
     uint16_t block;
     int16_t guest_off;
     uint8_t type;
-    uint8_t host_off;
 } JumpUnit;
 
 typedef struct {

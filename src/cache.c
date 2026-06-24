@@ -89,11 +89,9 @@ uint16_t cache_jump_point(uint8_t type, int offset) {
     uint16_t block = bp - 1;
     jump->type = type;
     jump->block = block;
-    // where is this in the host (relative to the block)
-    jump->host_off = get_hp() - blocks_cache[block].hp;
     // where to jump (relative to the start of the block)
     jump->guest_off = get_gp() - blocks_cache[block].gp + offset;
-    return jp++;
+    return ++jp;
 }
 uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
     gp -= cache->gp;
@@ -129,7 +127,7 @@ JumpUnit* cache_get_jump(uint16_t jump_id) {
     if (jump_id >= jp) {
         panic("CACHE::JUMPS::BAD_ID");
     }
-    return jumps_cache + jump_id;
+    return jumps_cache + jump_id - 1;
 }
 CacheUnit* cache_get_block(uint16_t block_id) {
     if (block_id >= bp) {
