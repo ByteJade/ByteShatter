@@ -10,16 +10,15 @@ void execute(int block) {
     CacheUnit* unit = cache_get_block(block);
     void* code = get_host() + unit->hp;
     uint32_t size = unit->offsets[unit->offsetssz-1].hoff+4;
+    uint64_t gp = (uint64_t)get_guest();
     void* end = code + size;
     __builtin___clear_cache(code, end);
     void(*exec)(void) = code;
     #if defined(__aarch64__) || defined(_M_ARM64)
-    MOV X21, get_guest();
     __asm__ volatile(
-        "mov x21, %0\n"       // X21 = guest_ptr
-        :
-        : "r" (guest_ptr)
-        : "x21", "cc", "memory"
+        "mov x21, %0\n"
+        : : "r" (gp)
+        : "x21", "memory"
     );
     exec();
     #endif
