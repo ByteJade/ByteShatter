@@ -47,6 +47,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     int32_t offset = (uint64_t)block - sc->pc - 4;
     print("offset: %i", offset);
     *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
+    cache_flush(jump->block);
     #endif
 }
 
