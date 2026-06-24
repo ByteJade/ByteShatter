@@ -29,7 +29,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     if (code == 0) {
         panic("Unknown instruction");
     }
-    print("code: %x", code)
+    print("code: %x", code);
     JumpUnit* jump = cache_get_jump(code);
     print("jump: %i", jump->guest_off);
     #endif
