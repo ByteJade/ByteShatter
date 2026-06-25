@@ -5,6 +5,7 @@
 #include "cache.h"
 #include "dlmanager.h"
 #include "arm64emitter.h"
+#include <stdint.h>
 
 void encode(X64_instruction* buf) {
     switch (buf->type) {
@@ -27,13 +28,26 @@ void encode(X64_instruction* buf) {
                 emit_mov_reg(buf->op0.reg, buf->op1.reg);
             } else if (buf->op1.type == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
-                if (offset > UINT16_MAX || offset < 0) panic("DECODER::ILLEGAL_OFFSET");
+                if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
                     emit_movz(buf->op0.reg, offset, 0);
                     emit_add_reg(buf->op0.reg, buf->op0.reg, RIP);
                     emit_ldr_reg(buf->op0.reg, buf->op0.reg, 0);
                 } else {
-                    warning("DECODER::ILLEGAL_RIP");
+                    warning("ENCODER::ILLEGAL_RIP");
+                    emit_brk(0);
+                }
+            }
+        } break;
+        case LEA:{
+            if (buf->op1.type == (MEM|IMM)) {
+                int32_t offset = get_gp() + buf->op1.imm;
+                if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
+                if (is_external_offset(offset)) {
+                    emit_movz(SC1, offset, 0);
+                    emit_add_reg(buf->op0.reg, SC1, RIP);
+                } else {
+                    warning("ENCODER::ILLEGAL_RIP");
                     emit_brk(0);
                 }
             }
@@ -48,9 +62,34 @@ void encode(X64_instruction* buf) {
                 emit_eor_reg(buf->op0.reg, buf->op0.reg, buf->op1.reg);
             }
         } break;
+        case AND:{
+            if (buf->op0.type == REG && buf->op1.type == IMM) {
+                uint64_t imm = buf->op1.imm;
+                if (buf->op0.reg == RSP) {
+                    buf->op1.reg = SC1;
+                    emit_mov_reg(SC1, RSP);
+                } else {
+                    buf->op1.reg = buf->op0.reg;
+                }
+                if (imm == 0xFFFFFFFFFFFFFFF0) {
+                    emit_and_imm(buf->op0.reg, buf->op1.reg, 0b01111100111011);
+                } else {
+                    emit_and_imm(buf->op0.reg, buf->op1.reg, imm);
+                }
+            }
+        } break;
         case POP:{
             if (buf->op0.type == REG) {
                 emit_pop_reg(buf->op0.reg);
+            }
+        } break;
+        case PUSH:{
+            if (buf->op0.type == REG) {
+                if (buf->op0.reg == RSP) {
+                    buf->op0.reg = SC1;
+                    emit_mov_reg(SC1, RSP);
+                }
+                emit_push_reg(buf->op0.reg);
             }
         } break;
         case JE:{
@@ -60,8 +99,17 @@ void encode(X64_instruction* buf) {
             if (buf->op0.type == REG) {
                 emit_blr_reg(buf->op0.reg);
             } else {
-                warning("DECODER::ILLEGAL_CALL");
-                emit_brk(0);
+                int32_t offset = get_gp() + buf->op0.imm;
+                if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
+                if (is_external_offset(offset)) {
+                    emit_movz(SC1, offset, 0);
+                    emit_add_reg(SC1, SC1, RIP);
+                    emit_ldr_reg(SC1, SC1, 0);
+                } else {
+                    warning("ENCODER::ILLEGAL_RIP");
+                    emit_brk(0);
+                }
+                emit_blr_reg(SC1);
             }
         } break;
         case RET:{
