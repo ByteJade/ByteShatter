@@ -46,6 +46,16 @@ void encode(X64_instruction* buf) {
                 emit_tst_reg(buf->reg0, buf->reg1);
             }
         } break;
+        case XOR:{
+            if (buf->optype0 == REG && buf->optype1 == REG) {
+                emit_eor_reg(buf->reg0, buf->reg0, buf->reg1);
+            }
+        } break;
+        case POP:{
+            if (buf->optype0 == REG) {
+                emit_pop_reg(buf->reg0);
+            }
+        } break;
         case JE:{
             emit_brk(cache_jump_point(JE, buf->imm0));
         } break;

@@ -32,6 +32,9 @@ void emit_tst_reg(uint8_t rn, uint8_t rm) {
 void emit_blr_reg(uint8_t rn) {
     emit32(0xD63F0000 | (x64_regs[rn] << 5));
 }
+void emit_pop_reg(uint8_t rn) {
+    emit32(0xF8400000 | (x64_regs[rn] << 5) | 31);
+}
 void emit_brk(uint16_t imm16) {
     emit32(0xD4200000 | (imm16 << 5));
 }

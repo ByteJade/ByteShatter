@@ -28,15 +28,15 @@ int main(int argc, char** argv) {
     
     decode(exe->init);
     success("decode init");
+    cache_print();
     execute(0);
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
-    cache_print();
     cache_clear();
     decode(exe->elf->header.e_entry);
     success("decode _start");
+    cache_print();
     execute(0);
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
-    cache_print();
     cache_clear();
 
     loader_close_elf(exe);

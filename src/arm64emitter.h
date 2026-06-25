@@ -13,6 +13,7 @@ void emit_ldr_reg(uint8_t rt, uint8_t rn, int16_t offset);
 void emit_mov_reg(uint8_t rd, uint8_t rn);
 void emit_tst_reg(uint8_t rn, uint8_t rm);
 void emit_blr_reg(uint8_t rn);
+void emit_pop_reg(uint8_t rn);
 void emit_brk(uint16_t imm16);
 void emit_ret();
 
