@@ -15,111 +15,95 @@ int64_t fetch_imm8() {
 int64_t fetch_imm32() {
     return (int64_t)(int32_t)fetch32();
 }
-void decode_sib() {
+void decode_sib(Operand* op) {
     uint8_t sib = fetch8();
     uint8_t base = sib&7;
-    buf.optype1 |= IDX;
-    buf.scale = sib>>6;
-    buf.idx = (sib>>3)&7;
-    if (base == 0b101 && (buf.optype1&IMM) == 0) {
-        buf.optype1 |= IMM;
-        buf.imm1 = fetch_imm32();
+    op->type |= IDX;
+    op->scale = sib>>6;
+    op->idx = (sib>>3)&7;
+    if (base == 0b101 && (op->type&IMM) == 0) {
+        op->type |= IMM;
+        op->imm = fetch_imm32();
     } else {
-        buf.optype1 |= BASE;
-        buf.reg1 = base;
+        op->type |= BASE;
+        op->reg = base;
     }
 }
-void decode_reg(uint8_t reg) {
-    buf.optype0 = REG;
-    buf.reg0 = (reg >> 3)&7;
+void decode_reg(Operand* op, uint8_t reg) {
+    op->type = REG;
+    op->reg = (reg >> 3)&7;
 }
-void decode_rm(uint8_t modrm) {
+void decode_rm(Operand* op, uint8_t modrm) {
     uint8_t mod = modrm >> 6;
     uint8_t rm = modrm & 7;
     if (mod < 3) {
-        buf.optype1 = MEM;
+        op->type = MEM;
         if (mod == 1) {
-            buf.optype1 |= IMM;
-            buf.imm1 = fetch_imm8();
+            op->type |= IMM;
+            op->imm = fetch_imm8();
         } else if (mod == 2) {
-            buf.optype1 |= IMM;
-            buf.imm1 = fetch_imm32();
+            op->type |= IMM;
+            op->imm = fetch_imm32();
         }
         if (mod == 0 && rm == 0b101) {
-            buf.optype1 |= IMM;
-            buf.imm1 = fetch_imm32();
+            op->type |= IMM;
+            op->imm = fetch_imm32();
         } else if (rm == 0b100) {
-            decode_sib();
+            decode_sib(op);
         } else {
-            buf.optype1 |= BASE;
-            buf.reg1 = rm;
+            op->type |= BASE;
+            op->reg = rm;
         }
     } else {
-        buf.optype1 = REG;
-        buf.reg1 = rm;
+        op->type = REG;
+        op->reg = rm;
     }
 }
 void decode_regrm() {
     uint8_t byte = fetch8();
-    decode_reg(byte);
-    decode_rm(byte);
+    decode_reg(&buf.op0, byte);
+    decode_rm(&buf.op1, byte);
 }
 
-void print_reg() {
-    if (buf.optype0 == REG) {
+void print_op(Operand* op) {
+    if (op->type == REG) {
         if (buf.size == 64) {
-            printf("r%s ", regs[buf.reg0]);
+            printf("r%s ", regs[op->reg]);
         } else {
-            printf("e%s ", regs[buf.reg0]);
+            printf("e%s ", regs[op->reg]);
         }
-    } else {
-        printf("%lx ", buf.imm0);
-    }
-}
-void print_rm() {
-    if (buf.optype1 == REG) {
-        if (buf.size == 64) {
-            printf("r%s ", regs[buf.reg1]);
-        } else {
-            printf("e%s ", regs[buf.reg1]);
-        }
+    } else if (op->type == IMM) {
+        printf("%lx ", op->imm);
     } else {
         printf("[ ");
-        if (buf.optype1&BASE) {
-            printf("r%s + ", regs[buf.reg1]);
+        if (op->type&BASE) {
+            printf("r%s + ", regs[op->reg]);
         }
-        if (buf.optype1&IDX) {
-            printf("r%s ", regs[buf.idx]);
-            if (buf.scale == 1) {
+        if (op->type&IDX) {
+            printf("r%s ", regs[op->idx]);
+            if (op->scale == 1) {
                 printf("* 2 ");
-            } else if (buf.scale == 2) {
+            } else if (op->scale == 2) {
                 printf("* 4 ");
-            } else if (buf.scale == 3) {
+            } else if (op->scale == 3) {
                 printf("* 8 ");
             }
         }
-        if (buf.optype1&IMM) {
-            if (buf.optype1 == (MEM|IMM)) {
+        if (op->type&IMM) {
+            if (op->type == (MEM|IMM)) {
                 printf("rip ");
             }
-            printf("+ %lx ", buf.imm1);
+            printf("+ %lx ", op->imm);
         }
         printf("] ");
     }
 }
 void print_instr() {
     printf("%s ", types[buf.type]);
-    if (buf.reverse) {
-        if (buf.opcount > 0)
-            print_rm();
-        if (buf.opcount > 1)
-            print_reg();
-    } else {
-        if (buf.opcount > 0)
-            print_reg();
-        if (buf.opcount > 1)
-            print_rm();
-    }
+    if (buf.opcount > 0)
+        print_op(&buf.op0);
+    if (buf.opcount > 1)
+        print_op(&buf.op1);
     printf("\n");
 }
 int decode_instruction() {
@@ -152,32 +136,32 @@ int decode_instruction() {
             buf.reverse = 0;
             buf.opcount = 1;
             buf.type = PUSH;
-            buf.optype0 = REG;
-            buf.reg0 = byte&0x7;
+            buf.op0.type = REG;
+            buf.op0.reg = byte&0x7;
             break;
         case 0x5E:
             buf.size = 64;
             buf.reverse = 0;
             buf.opcount = 1;
             buf.type = POP;
-            buf.optype0 = REG;
-            buf.reg0 = 6;
+            buf.op0.type = REG;
+            buf.op0.reg = 6;
             break;
         case 0x74:
             buf.reverse = 0;
             buf.opcount = 1;
             buf.type = JE;
-            buf.optype0 = IMM;
-            buf.imm0 = fetch_imm8();
+            buf.op0.type = IMM;
+            buf.op0.imm = fetch_imm8();
             ret = JE;
             break;
         case 0x83: {
             buf.reverse = 1;
             buf.opcount = 2;
             uint8_t modrm = fetch8();
-            buf.optype0 = IMM;
-            buf.imm0 = fetch_imm8();
-            decode_rm(modrm);
+            buf.op0.type = IMM;
+            buf.op0.imm = fetch_imm8();
+            decode_rm(&buf.op1, modrm);
             switch ((modrm >> 3)&7) {
                 case 0: buf.type = ADD; break;
                 case 1: break; // or
@@ -228,7 +212,7 @@ int decode_instruction() {
             buf.reverse = 1;
             buf.opcount = 1;
             uint8_t modrm = fetch8();
-            decode_rm(modrm);
+            decode_rm(&buf.op1, modrm);
             switch ((modrm >> 3)&7) {
                 case 0: buf.type = ADD; break; // inc
                 case 1: buf.type = SUB; break; // dec
@@ -244,9 +228,14 @@ int decode_instruction() {
     }
     if (rex) {
         if (rex&8) buf.size = 64;
-        if (rex&4) buf.reg0 += 8;
-        if (rex&2) buf.idx += 8;
-        if (rex&1) buf.reg1 += 8;
+        if (rex&4) buf.op0.reg += 8;
+        if (rex&2) buf.op1.idx += 8;
+        if (rex&1) buf.op1.reg += 8;
+    }
+    if (buf.reverse) {
+        Operand tmp = buf.op0;
+        buf.op0 = buf.op1;
+        buf.op1 = tmp;
     }
     print_instr();
     encode(&buf);

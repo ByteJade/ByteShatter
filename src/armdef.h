@@ -4,21 +4,20 @@
 #include "stdint.h"
 
 typedef struct {
+    uint8_t type;
+    uint8_t reg;
+    uint8_t idx;
+    uint8_t scale;
+    int64_t imm;
+} Operand;
+typedef struct {
     uint8_t size;
     uint8_t type;
     uint8_t reverse;
     uint8_t opcount;
 
-    uint8_t optype0;
-    uint8_t reg0;
-    uint8_t optype1;
-    uint8_t reg1;
-
-    uint8_t idx;
-    uint8_t scale;
-
-    int64_t imm0;
-    int64_t imm1;
+    Operand op0;
+    Operand op1;
 } X64_instruction;
 
 static const char* types[] = {
