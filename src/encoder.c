@@ -73,12 +73,6 @@ void encode(X64_instruction* buf) {
         case AND:{
             if (buf->op0.type == REG && buf->op1.type == IMM) {
                 uint64_t imm = buf->op1.imm;
-                if (buf->op0.reg == RSP) {
-                    buf->op1.reg = SC1;
-                    emit_mov_reg(SC1, RSP);
-                } else {
-                    buf->op1.reg = buf->op0.reg;
-                }
                 if (imm == 0xFFFFFFFFFFFFFFF0) {
                     emit_and_imm(buf->op0.reg, buf->op1.reg, 0b01111100111011);
                 } else {
@@ -93,10 +87,6 @@ void encode(X64_instruction* buf) {
         } break;
         case PUSH:{
             if (buf->op0.type == REG) {
-                if (buf->op0.reg == RSP) {
-                    buf->op0.reg = SC1;
-                    emit_mov_reg(SC1, RSP);
-                }
                 emit_push_reg(buf->op0.reg);
             }
         } break;
