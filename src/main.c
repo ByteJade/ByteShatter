@@ -13,17 +13,17 @@ void execute(int block) {
     cache_flush(block);
     uint64_t gp = (uint64_t)get_guest();
     uint32_t offset = cache_get_block(block)->hp;
-    void(*exec)(void) = (void*)get_host() + offset;
+    void* exec = get_host() + offset;
     void* sp = get_sp();
     #if defined(__aarch64__) || defined(_M_ARM64)
     __asm__ volatile(
         "mov x21, %0\n"
-        "mov x18, %1\n"
+        "mov x28, %1\n"
         "stp x29, x30, [sp, #-16]!"
-        : : "r" (gp), "r" (sp)
-        : "x21", "x28", "memory"
+        "blr %3"
+        : : "r" (gp), "r" (sp), "r" (exec)
+        : "x21", "x28", "x29", "x30", "memory"
     );
-    exec();
     #endif
     success("execution");
 }
