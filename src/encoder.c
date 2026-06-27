@@ -35,7 +35,7 @@ void encode(X64_instruction* buf) {
                     emit_ldr_reg(buf->op0.reg, buf->op0.reg, 0);
                 } else {
                     warning("ENCODER::ILLEGAL_RIP");
-                    emit_brk(cache_patch_point(LEA, buf->op0.reg, buf->op1.imm));
+                    //emit_brk(cache_patch_point(LEA, buf->op0.reg, buf->op1.imm));
                 }
             }
         } break;
