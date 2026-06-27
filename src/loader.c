@@ -146,12 +146,12 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
     
                 if (sym_addr) {
                     *patch = (Elf64_Addr)sym_addr;
-                    //printf("GLOB_DAT: %s -> %p\n", sym_name, sym_addr);
+                    printf("GLOB_DAT: %s -> %p\n", sym_name, sym_addr);
                 } else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK) {
                     *patch = 0;
-                    //printf("GLOB_DAT: %s -> 0 (weak)\n", sym_name);
+                    printf("GLOB_DAT: %s -> 0 (weak)\n", sym_name);
                 } else {
-                    //printf("ERROR: undefined symbol %s\n", sym_name);
+                    warning("LOADER::UNDEFINED_SYMBOL %s", sym_name);
                     *patch = 0;
                 }
             } break;
