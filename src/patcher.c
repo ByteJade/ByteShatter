@@ -20,7 +20,7 @@ void print_cpu(struct sigcontext* sc) {
     print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
     #endif
 }
-
+void brk(void) {return;};
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
@@ -68,6 +68,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     cache_flush(patch->block);
     #endif
     success("patching");
+    brk();
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
