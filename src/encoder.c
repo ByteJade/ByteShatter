@@ -117,13 +117,15 @@ void encode(X64_instruction* buf) {
         } break;
         case CALL:{
             if (buf->op0.type == REG) {
-                emit_push_reg(X30);
+                // stp x29, x30, [sp, #-16]!
+                emit32(0xA9BF7BFD);
                 emit_blr_reg(buf->op0.reg);
-                emit_pop_reg(X30);
+                // ldp x29, x30, [sp], #16
+                emit32(0xA8C17BFD);
             } else if (buf->op0.type == IMM) {
-                emit_push_reg(X30);
+                emit32(0xA9BF7BFD);
                 emit_brk(cache_patch_point(CALL, 0, buf->op0.imm));
-                emit_pop_reg(X30);
+                emit32(0xA8C17BFD);
             } else {
                 int32_t offset = get_gp() + buf->op0.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
