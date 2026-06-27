@@ -39,10 +39,10 @@ void emit_br_reg(uint8_t rn) {
     emit32(0xD61F0000 | (x64_regs[rn] << 5));
 }
 void emit_pop_reg(uint8_t rn) {
-    emit32(0xf8408780 | x64_regs[rn]);
+    emit32(0xf8408640 | x64_regs[rn]);
 }
 void emit_push_reg(uint8_t rn) {
-    emit32(0xf81f8f80 | x64_regs[rn]);
+    emit32(0xf81f8e40 | x64_regs[rn]);
 }
 void emit_brk(uint16_t imm16) {
     emit32(0xD4200000 | (imm16 << 5));
