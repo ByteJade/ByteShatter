@@ -127,7 +127,7 @@ uint8_t* cache_search(uint32_t gp) {
 PatchUnit* cache_get_patch(uint16_t patch_id) {
     patch_id--;
     if (patch_id >= pp) {
-        panic("CACHE::JUMPS::BAD_ID");
+        panic("CACHE::PATCH::BAD_ID %x", patch_id);
     }
     return jumps_cache + patch_id;
 }
