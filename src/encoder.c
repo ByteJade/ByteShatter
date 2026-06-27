@@ -117,10 +117,10 @@ void encode(X64_instruction* buf) {
         } break;
         case CALL:{
             if (buf->op0.type == REG) {
-                emit_push_reg(X30);
+                //emit_push_reg(X30);
                 emit_blr_reg(buf->op0.reg);
             } else if (buf->op0.type == IMM) {
-                emit_push_reg(X30);
+                //emit_push_reg(X30);
                 emit_brk(cache_patch_point(CALL, 0, buf->op0.imm));
             } else {
                 int32_t offset = get_gp() + buf->op0.imm;
@@ -143,7 +143,7 @@ void encode(X64_instruction* buf) {
         } break;
         case RET:{
             // ldp x29, x30, [sp], #16
-            emit_pop_reg(X30);
+            //emit_pop_reg(X30);
             emit_ret();
         } break;
         default:
