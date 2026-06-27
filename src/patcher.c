@@ -15,7 +15,7 @@ void print_cpu(struct sigcontext* sc) {
     print("RDX: %lX", sc->regs[2]);
     print("RBX: %lX", sc->regs[14]);
     print("RSP: %lX", sc->regs[28]);
-    print("RBP: %lX", sc->regs[15]);
+    print("RBP: %lX", sc->regs[29]);
     print("RSI: %lX", sc->regs[1]);
     print("RDI: %lX", sc->regs[9]);
     print("R8:  %lX", sc->regs[4]);
