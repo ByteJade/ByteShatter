@@ -20,7 +20,7 @@ void execute(int block) {
         "mov x21, %0\n"
         "mov x28, %1\n"
         "stp x29, x30, [sp, #-16]!"
-        "blr %3"
+        "blr %2"
         : : "r" (gp), "r" (sp), "r" (exec)
         : "x21", "x28", "x29", "x30", "memory"
     );
