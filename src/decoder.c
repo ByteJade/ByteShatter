@@ -80,7 +80,7 @@ void print_op(Operand* op) {
             printf("r%s + ", regs[op->reg]);
         }
         if (op->type&IDX) {
-            printf("r%s ", regs[op->idx]);
+            printf("r%s + ", regs[op->idx]);
             if (op->scale == 1) {
                 printf("* 2 ");
             } else if (op->scale == 2) {
@@ -91,9 +91,9 @@ void print_op(Operand* op) {
         }
         if (op->type&IMM) {
             if (op->type == (MEM|IMM)) {
-                printf("rip ");
+                printf("rip + ");
             }
-            printf("+ %lx ", op->imm);
+            printf("%lx ", op->imm);
         }
         printf("] ");
     }
