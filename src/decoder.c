@@ -136,14 +136,21 @@ int decode_instruction() {
             buf.opcount = 1;
             buf.type = PUSH;
             buf.op0.type = REG;
-            buf.op0.reg = byte&0x7;
+            buf.op0.reg = byte - 0x50;
             break;
+        case 0x58:
+        case 0x59:
+        case 0x5A:
+        case 0x5B:
+        case 0x5C:
+        case 0x5D:
         case 0x5E:
+        case 0x5F:
             buf.size = 64;
             buf.opcount = 1;
             buf.type = POP;
             buf.op0.type = REG;
-            buf.op0.reg = 6;
+            buf.op0.reg = byte - 0x58;
             break;
         case 0x74:
             buf.opcount = 1;
