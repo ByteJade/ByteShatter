@@ -102,8 +102,9 @@ void encode(X64_instruction* buf) {
                 int32_t offset = get_gp() + buf->op0.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
-                    emit_mov_reg(SC1, RIP);
-                    emit_ldr_reg(SC1, SC1, offset);
+                    emit_movz(SC1, offset, 0);
+                    emit_add_reg(SC1, SC1, RIP);
+                    emit_ldr_reg(SC1, SC1, 0);
                     // wrapper
                     emit_mov_reg(RAX, RDI);
                 } else {
@@ -123,8 +124,9 @@ void encode(X64_instruction* buf) {
                 int32_t offset = get_gp() + buf->op0.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
-                    emit_mov_reg(SC1, RIP);
-                    emit_ldr_reg(SC1, SC1, offset);
+                    emit_movz(SC1, offset, 0);
+                    emit_add_reg(SC1, SC1, RIP);
+                    emit_ldr_reg(SC1, SC1, 0);
                     // wrapper
                     emit_mov_reg(RAX, RDI);
                     // for testing purposes only!
