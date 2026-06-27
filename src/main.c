@@ -58,6 +58,7 @@ int main(int argc, char** argv, const char** envp) {
     cahce_init();
     stack_init();
     set_envp(envp);
+    load_library("ld-linux-aarch64.so.1");
     ExeMeta* exe = load_object(argv[argc-1]);
     init_stack(exe, argv[argc-1]);
     decode(exe->init);
