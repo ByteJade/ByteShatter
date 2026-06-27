@@ -39,7 +39,8 @@ void emit_pop_reg(uint8_t rn) {
     emit32(0xF84087E0 | x64_regs[rn]);
 }
 void emit_push_reg(uint8_t rn) {
-    emit32(0xF8008FE0 | x64_regs[rn]);
+    emit_sub_imm(RSP, RSP, 8);
+    emit32(0xf90003e0 | x64_regs[rn]);
 }
 void emit_brk(uint16_t imm16) {
     emit32(0xD4200000 | (imm16 << 5));
