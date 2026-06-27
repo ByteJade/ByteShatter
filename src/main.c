@@ -19,6 +19,7 @@ void execute(int block) {
     __asm__ volatile(
         "mov x21, %0\n"
         "mov x18, %1\n"
+        "stp x29, x30, [sp, #-16]!"
         : : "r" (gp), "r" (sp)
         : "x21", "x28", "memory"
     );
