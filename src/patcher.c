@@ -91,4 +91,5 @@ void patcher_init() {
     };
     sigaction(SIGTRAP, &sa_trap, 0);
     sigaction(SIGSEGV, &sa_segv, 0);
+    sigaction(SIGILL, &sa_segv, 0);
 }
