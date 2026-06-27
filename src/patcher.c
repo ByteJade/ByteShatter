@@ -64,7 +64,6 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     }
     cache_flush(patch->block);
     success("patching");
-    cache_print();
     #endif
 }
 

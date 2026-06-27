@@ -99,9 +99,6 @@ void encode(X64_instruction* buf) {
             emit_brk(cache_patch_point(JE, 0, buf->op0.imm));
         } break;
         case CALL:{
-            // wrapper
-            emit_mov_reg(RAX, RDI);
-            //emit_pop_reg(AR7);
             if (buf->op0.type == REG) {
                 emit_blr_reg(buf->op0.reg);
             } else {
@@ -111,6 +108,9 @@ void encode(X64_instruction* buf) {
                     emit_movz(SC1, offset, 0);
                     emit_add_reg(SC1, SC1, RIP);
                     emit_ldr_reg(SC1, SC1, 0);
+                    // wrapper
+                    emit_mov_reg(RAX, RDI);
+                    //emit_pop_reg(AR7);
                 } else {
                     warning("ENCODER::ILLEGAL_RIP");
                     emit_brk(0);
