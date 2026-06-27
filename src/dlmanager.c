@@ -79,6 +79,9 @@ void load_library(const char* filename) {
             return;
         }
     }
+    libs[libs_count].name = NULL;
+    libs[libs_count].data = dlopen(NULL, RTLD_LAZY);
+    libs_count++;
     warning("No library: %s", filename);
 }
 void* get_symbol(const char* symname) {
