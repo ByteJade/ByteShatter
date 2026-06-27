@@ -213,6 +213,14 @@ int decode_instruction() {
             buf.op0.type = IMM;
             buf.op0.imm = fetch32();
             break;
+        case 0xC7:
+            reverse = 1;
+            buf.opcount = 2;
+            buf.type = MOV;
+            decode_rm(&buf.op1, fetch8());
+            buf.op0.type = IMM;
+            buf.op0.imm = fetch32();
+            break;
         case 0xC3:
         case 0xF4: // actualy hlt
             buf.opcount = 0;
