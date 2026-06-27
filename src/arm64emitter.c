@@ -41,9 +41,6 @@ void emit_pop_reg(uint8_t rn) {
 void emit_push_reg(uint8_t rn) {
     emit32(0xF81F0FE0 | x64_regs[rn]);
 }
-void emit_adrp_reg(uint8_t rn) {
-    emit32(0xF00000E0 | x64_regs[rn]);
-}
 void emit_brk(uint16_t imm16) {
     emit32(0xD4200000 | (imm16 << 5));
 }

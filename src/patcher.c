@@ -34,10 +34,10 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
         panic("Unknown instruction");
     }
     print("ret: %x", ret);
-    PatchUnit* jump = cache_get_patch(ret);
-    CacheUnit* cahce = cache_get_block(jump->block);
-    print("jump: %i", jump->guest_off);
-    uint32_t gp = cahce->gp + jump->guest_off;
+    PatchUnit* patch = cache_get_patch(ret);
+    CacheUnit* cahce = cache_get_block(patch->block);
+    print("patch: %i", patch->guest_off);
+    uint32_t gp = cahce->gp + patch->guest_off;
     const uint8_t* block = cache_search(gp);
     if (block == NULL) {
         warning("PATCHER::NOT_FOUND %lx", gp);
@@ -46,8 +46,17 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     }
     int32_t offset = (uint64_t)block - sc->pc - 4;
     print("offset: %i", offset);
-    *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
-    cache_flush(jump->block);
+    switch (patch->type) {
+        case JE:
+            *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
+            break;
+        case LEA:
+            *code = 0x10000000 | ((offset & 0x3) << 29) | ((offset & 0x1FFFFC) << 3) | x64_regs[patch->meta];
+            break;
+        default:
+            panic("PATCHER::UNCNOWN_PATCH");
+    }
+    cache_flush(patch->block);
     success("patching");
     #endif
 }

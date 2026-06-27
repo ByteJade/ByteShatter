@@ -35,6 +35,7 @@ void encode(X64_instruction* buf) {
                     emit_ldr_reg(buf->op0.reg, buf->op0.reg, 0);
                 } else {
                     warning("ENCODER::ILLEGAL_RIP");
+                    emit_brk(0);
                     //emit_brk(cache_patch_point(LEA, buf->op0.reg, buf->op1.imm));
                 }
             }
@@ -48,7 +49,8 @@ void encode(X64_instruction* buf) {
                     emit_add_reg(buf->op0.reg, SC1, RIP);
                 } else {
                     // order_decoding(offset, get_hp());
-                    emit_adrp_reg(buf->op0.reg);
+                    // emit_adrp_reg(buf->op0.reg);
+                    emit_brk(0);
                     warning("ENCODER::ILLEGAL_RIP");
                 }
             }
