@@ -27,8 +27,8 @@ int main(int argc, char** argv) {
     
     decode(exe->init);
     success("decode init");
-    cache_print();
     execute(0);
+    cache_print();
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
     cache_clear();
     decode(exe->elf->header.e_entry);
