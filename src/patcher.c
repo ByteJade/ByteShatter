@@ -50,7 +50,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
         block = get_host() + get_hp();
         decode(gp);
     }
-    int32_t offset = (uint64_t)block - sc->pc - 4;
+    int32_t offset = (uint64_t)block - sc->pc;
     print("offset: %i", offset);
     switch (patch->type) {
         case JE:
