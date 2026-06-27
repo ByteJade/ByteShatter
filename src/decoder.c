@@ -232,9 +232,9 @@ int decode_instruction() {
                 case 0: buf.type = ADD; break; // inc
                 case 1: buf.type = SUB; break; // dec
                 case 2:
-                case 3: buf.type = CALL; ret = CALL; break; // call
+                case 3: buf.type = CALL; break; // call
                 case 4:
-                case 5: break; // jmps
+                case 5: buf.type = JMP; ret = JMP; break; // jmps
                 case 6: buf.type = PUSH; break; // push
             }
         } break;
@@ -264,7 +264,7 @@ void decode(uint32_t gp) {
     while (1) {
         cache_block_point();
         uint8_t jump_type = decode_instruction();
-        if (jump_type == RET) break;
+        if (jump_type == RET || jump_type == JMP) break;
     }
     cache_block_end();
 }

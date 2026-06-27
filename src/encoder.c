@@ -103,6 +103,9 @@ void encode(X64_instruction* buf) {
         case JE:{
             emit_brk(cache_patch_point(JE, 0, buf->op0.imm));
         } break;
+        case JMP:{
+            emit_brk(cache_patch_point(JMP, 0, buf->op0.imm));
+        } break;
         case CALL:{
             if (buf->op0.type == REG) {
                 emit_blr_reg(buf->op0.reg);
