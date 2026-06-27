@@ -192,7 +192,7 @@ int decode_instruction() {
             decode_regrm();
             break;
         case 0xB8:
-            buf.opcount = 1;
+            buf.opcount = 2;
             buf.type = MOV;
             buf.op0.type = REG;
             buf.op0.reg = RAX;
