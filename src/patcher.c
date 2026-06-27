@@ -30,6 +30,7 @@ void print_cpu(struct sigcontext* sc) {
     int Z = (sc->pstate >> 30) & 1;  
     int C = (sc->pstate >> 29) & 1;
     int V = (sc->pstate >> 28) & 1;
+    print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
     #endif
 }
 

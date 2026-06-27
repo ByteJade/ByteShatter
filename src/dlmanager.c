@@ -1,6 +1,8 @@
 #include "dlmanager.h"
 #include "loader.h"
 #include "core.h"
+#include "memory.h"
+#include <stdint.h>
 #include <string.h>
 #include <dlfcn.h>
 
@@ -45,6 +47,7 @@ int is_external_offset(uint32_t offset) {
             }else {
                 print("→ internal data");
             }
+            print("in %x: %x", offset, *(uint64_t*)(get_guest()+offset));
             return 0;
         }
     }
