@@ -32,7 +32,9 @@ int is_external_offset(uint32_t offset) {
     ElfMeta* elf = exe->elf;
     for (int i = 0; i < elf->header.e_shnum; i++) {
         Elf64_Shdr* header = elf->sheaders + i;
-        if (offset >= header->sh_addr && offset < header->sh_addr + header->sh_size) {
+        uint64_t start = header->sh_addr;
+        uint64_t end = start + header->sh_size;
+        if (offset >= start && offset < end) {
             const char* shname = elf->shstrtab + header->sh_name;
             print("in %x: %lx", offset, *(uint64_t*)(exe->base+offset));
             if (strcmp(shname, ".got") == 0 ||
@@ -61,7 +63,9 @@ ExeMeta* load_object(const char* filename) {
 }
 void load_library(const char* filename) {
     for (int i = 0; i < libs_count; i++) {
-        if (strcmp(filename, libs[i].name) == 0) return;
+        if (strcmp(filename, libs[i].name) == 0) { 
+            return;
+        }
     }
     void* lib = NULL;
     for (int i = 0; ld_paths[i]; i++) {
@@ -72,21 +76,16 @@ void load_library(const char* filename) {
         );
         lib = dlopen(fullpath, RTLD_LAZY | RTLD_GLOBAL);
         if (lib) {
-            success("load: %s\n", fullpath);
+            success("load: %s", fullpath);
             libs[libs_count].name = strdup(filename);
             libs[libs_count].data = lib;
             libs_count++;
             return;
         }
     }
-    libs[libs_count].name = NULL;
-    libs[libs_count].data = dlopen(NULL, RTLD_LAZY);
-    libs_count++;
     warning("No library: %s", filename);
 }
 void* get_symbol(const char* symname) {
-    void* sym = dlsym(NULL, symname);
-    if (sym) return sym;
     for (int i = 0; i < libs_count; i++) {
         void* sym = dlsym(libs[i].data, symname);
         if (sym) return sym;
