@@ -141,7 +141,7 @@ CacheUnit* cache_get_block(uint16_t block_id) {
 void cache_flush(uint16_t block_id) {
     CacheUnit* unit = blocks_cache + block_id;
     void* code = get_host() + unit->hp;
-    uint32_t size = unit->offsets[unit->offsetssz-1].hoff+4;
+    uint32_t size = unit->offsets[unit->offsetssz-1].hoff+16;
     print("flush cache %x-%x", unit->hp, unit->hp+size);
     __builtin___clear_cache(code, code + size);
 }
@@ -152,7 +152,7 @@ void cache_print() {
     print("Cache:");
     for (int i = 0; i < bp; i++) {
         CacheUnit* unit = blocks_cache + i;
-        uint32_t size = unit->offsets[unit->offsetssz-1].hoff/4+1;
+        uint32_t size = unit->offsets[unit->offsetssz-1].hoff/4+4;
         print("\n%lX Block: %i %i", unit->hp, i, size);
         uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
         for (int x = 0; x < size; x++) {
