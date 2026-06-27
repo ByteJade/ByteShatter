@@ -9,6 +9,7 @@
 
 void print_cpu(struct sigcontext* sc) {
     #if defined(__aarch64__) || defined(_M_ARM64)
+    print("PC: %lX", sc->pc);
     print("RAX: %lX", sc->regs[0]);
     print("RCX: %lX", sc->regs[3]);
     print("RDX: %lX", sc->regs[2]);
