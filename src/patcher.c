@@ -60,6 +60,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
     cache_flush(patch->block);
     #endif
+    cache_get_patch(0);
     success("patching");
 }
 
