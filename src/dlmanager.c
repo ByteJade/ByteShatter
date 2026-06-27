@@ -70,7 +70,7 @@ void load_library(const char* filename) {
             fullpath, sizeof(fullpath),
             "%s/%s", ld_paths[i], filename
         );
-        lib = dlopen(fullpath, RTLD_NOW);
+        lib = dlopen(fullpath, RTLD_NOW | RTLD_GLOBAL);
         if (lib) {
             success("load: %s\n", fullpath);
             libs[libs_count].name = strdup(filename);
