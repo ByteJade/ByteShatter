@@ -13,7 +13,6 @@ typedef struct {
 typedef struct {
     uint8_t size;
     uint8_t type;
-    uint8_t reverse;
     uint8_t opcount;
 
     Operand op0;

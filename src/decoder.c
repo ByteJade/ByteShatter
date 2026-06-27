@@ -110,7 +110,7 @@ int decode_instruction() {
     int ret = 0;
     uint8_t byte = fetch8();
     uint8_t rex = 0;
-    buf.reverse = 0;
+    int reverse = 0;
     buf.size = 32;
     if (byte >> 4 == 0x4) {
         rex = byte & 0xF;
@@ -153,7 +153,7 @@ int decode_instruction() {
             ret = JE;
             break;
         case 0x83: {
-            buf.reverse = 1;
+            reverse = 1;
             buf.opcount = 2;
             uint8_t modrm = fetch8();
             buf.op0.type = IMM;
@@ -176,7 +176,7 @@ int decode_instruction() {
             decode_regrm();
             break;
         case 0x89:
-            buf.reverse = 1;
+            reverse = 1;
             buf.opcount = 2;
             buf.type = MOV;
             decode_regrm();
@@ -209,7 +209,7 @@ int decode_instruction() {
             return 0;
         case 0xff: {
             buf.size = 64;
-            buf.reverse = 1;
+            reverse = 1;
             buf.opcount = 1;
             uint8_t modrm = fetch8();
             decode_rm(&buf.op1, modrm);
@@ -232,7 +232,7 @@ int decode_instruction() {
         if (rex&2) buf.op1.idx += 8;
         if (rex&1) buf.op1.reg += 8;
     }
-    if (buf.reverse) {
+    if (reverse) {
         Operand tmp = buf.op0;
         buf.op0 = buf.op1;
         buf.op1 = tmp;
