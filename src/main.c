@@ -18,7 +18,7 @@ void execute(int block) {
     #if defined(__aarch64__) || defined(_M_ARM64)
     __asm__ volatile(
         "mov x21, %0\n"
-        "mov x28, %1\n"
+        "mov x18, %1\n"
         : : "r" (gp), "r" (sp)
         : "x21", "x28", "memory"
     );
