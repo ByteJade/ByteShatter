@@ -20,27 +20,10 @@ void execute(int block) {
         "mov x21, %0\n"
         "mov x28, %1\n"
         : : "r" (gp), "r" (sp)
-        : "x21", "memory"
+        : "x21", "x28", "memory"
     );
     exec();
     #endif
-    success("execution");
-}
-void execute_stack(int block) {
-    cache_flush(block);
-    uint64_t gp = (uint64_t)get_guest();
-    uint32_t offset = cache_get_block(block)->hp;
-    void* exec = get_host() + offset;
-    /*#if defined(__aarch64__) || defined(_M_ARM64)
-    __asm__ volatile(
-        "mov x21, %0\n"
-        "mov sp, %1\n"
-        "br %2"
-        : : "r" (gp), "r" (sp), "r" (exec)
-        : "x21", "sp", "memory"
-    );
-    exec();
-    #endif*/
     success("execution");
 }
 void init_stack(ExeMeta* exe, const char* name) {
