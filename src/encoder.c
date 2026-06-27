@@ -107,8 +107,6 @@ void encode(X64_instruction* buf) {
                     emit_ldr_reg(SC1, SC1, 0);
                     // wrapper
                     emit_mov_reg(RAX, RDI);
-                    // for testing purposes only!
-                    emit_pop_reg(AR7);
                 } else {
                     warning("ENCODER::ILLEGAL_RIP");
                     emit_brk(0);
