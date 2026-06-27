@@ -7,6 +7,7 @@
 #include <stdint.h>
 
 void execute(int block) {
+    cache_flush(block);
     uint64_t gp = (uint64_t)get_guest();
     uint32_t offset = cache_get_block(block)->hp;
     void(*exec)(void) = (void*)get_host() + offset;
