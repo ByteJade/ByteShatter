@@ -35,7 +35,7 @@ int is_external_offset(uint32_t offset) {
         Elf64_Shdr* header = elf->sheaders + i;
         if (offset >= header->sh_addr && offset < header->sh_addr + header->sh_size) {
             const char* shname = elf->shstrtab + header->sh_name;
-            *(uint64_t*)(get_guest()+offset) = 1;
+            *(uint64_t*)(get_guest()+offset) = 4;
             print("in %x: %x", offset, *(uint64_t*)(get_guest()+offset));
             if (strcmp(shname, ".got") == 0 ||
                      strcmp(shname, ".got.plt") == 0 ||
