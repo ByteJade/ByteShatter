@@ -71,6 +71,14 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             print("patch LEA");
             *code = 0x14000000 | (offset & 0x3FFFFFF);
             break;
+        case JMP:
+            print("patch LEA");
+            *code = 0x14000000 | (offset & 0x3FFFFFF);
+            break;
+        case CALL:
+            print("patch LEA");
+            *code = 0x94000000 | (offset & 0x3FFFFFF);
+            break;
         default:
             panic("PATCHER::UNCNOWN_PATCH");
     }
