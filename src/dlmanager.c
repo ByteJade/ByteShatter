@@ -6,14 +6,14 @@
 #include <dlfcn.h>
 
 static const char* ld_paths[] = {
-    "./",
-    "/lib/",
-    "/lib64/",
-    "/usr/lib/",
-    "/usr/lib64/",
-    "/lib/aarch64-linux-gnu/",
+    ".",
+    "/lib",
+    "/lib64",
+    "/usr/lib",
+    "/usr/lib64",
+    "/lib/aarch64-linux-gnu",
 #ifdef __ANDROID__
-    "/data/data/com.termux/files/usr/lib/",
+    "/data/data/com.termux/files/usr/lib",
 #endif
     NULL
 };
@@ -68,15 +68,17 @@ void load_library(const char* filename) {
         char fullpath[1024];
         snprintf(
             fullpath, sizeof(fullpath),
-            "%s%s", ld_paths[i], filename
+            "%s/%s", ld_paths[i], filename
         );
         lib = dlopen(fullpath, RTLD_NOW);
         if (lib) {
-            printf("load: %s\n", fullpath);
+            success("load: %s\n", fullpath);
             libs[libs_count].name = strdup(filename);
             libs[libs_count].data = lib;
             libs_count++;
             return;
+        } else {
+            printf("dlopen error: %s\n", dlerror());
         }
     }
     warning("No library: %s", filename);
