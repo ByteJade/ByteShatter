@@ -7,9 +7,7 @@
 #include <signal.h>
 #include <stdint.h>
 
-void handler(int sig, siginfo_t* info, void* ucontext) {
-    ucontext_t* ctx = (ucontext_t*)ucontext;
-    struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
+void print_cpu(struct sigcontext* sc) {
     #if defined(__aarch64__) || defined(_M_ARM64)
     print("RAX: %lX", sc->regs[0]);
     print("RCX: %lX", sc->regs[3]);
@@ -31,8 +29,14 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     int Z = (sc->pstate >> 30) & 1;  
     int C = (sc->pstate >> 29) & 1;
     int V = (sc->pstate >> 28) & 1;
-    print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
+    #endif
+}
 
+void brk_handler(int sig, siginfo_t* info, void* ucontext) {
+    ucontext_t* ctx = (ucontext_t*)ucontext;
+    struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
+    print_cpu(sc);
+    #if defined(__aarch64__) || defined(_M_ARM64)
     uint32_t* code = (uint32_t*)sc->pc;
     uint32_t instruction = *code;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
@@ -63,14 +67,28 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
             panic("PATCHER::UNCNOWN_PATCH");
     }
     cache_flush(patch->block);
+    #endif
     success("patching");
+}
+void segv_handler(int sig, siginfo_t* info, void* ucontext) {
+    ucontext_t* ctx = (ucontext_t*)ucontext;
+    struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
+    print_cpu(sc);
+    cache_print();
+    #if defined(__aarch64__) || defined(_M_ARM64)
+    uint32_t* code = (uint32_t*)sc->pc;
+    panic("segfault: %x", *code);
     #endif
 }
-
 void patcher_init() {
-    struct sigaction sa = {
-        .sa_sigaction = handler,
+    struct sigaction sa_trap = {
+        .sa_sigaction = brk_handler,
         .sa_flags = SA_SIGINFO,
     };
-    sigaction(SIGTRAP, &sa, 0);
+    struct sigaction sa_segv = {
+        .sa_sigaction = segv_handler,
+        .sa_flags = SA_SIGINFO,
+    };
+    sigaction(SIGTRAP, &sa_trap, 0);
+    sigaction(SIGSEGV, &sa_segv, 0);
 }
