@@ -125,6 +125,11 @@ int decode_instruction() {
             buf.type = XOR;
             decode_regrm();
             break;
+        case 0x3B:
+            buf.opcount = 2;
+            buf.type = CMP;
+            decode_regrm();
+            break;
         case 0x50:
         case 0x51:
         case 0x52:

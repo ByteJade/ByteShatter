@@ -13,6 +13,7 @@ TODO:
 - encoding NZCV flags for math ops
 - memory ops, like "add [rax], 0x2"
 - better "unhandled"
+- clean emitter
 */
 void encode(X64_instruction* buf) {
     switch (buf->type) {
@@ -152,6 +153,6 @@ void encode(X64_instruction* buf) {
             emit_ret();
         } break;
         default:
-            emit_brk(0);
+            panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
     }
 }
