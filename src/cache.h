@@ -12,7 +12,8 @@ typedef struct {
     uint16_t block;
     int16_t guest_off;
     uint8_t type;
-} JumpUnit;
+    uint8_t meta;
+} PatchUnit;
 
 typedef struct {
     OffsetUnit* offsets;
@@ -34,13 +35,13 @@ void cache_block_start();
 void cache_block_point();
 /* set end point of code block cache */
 void cache_block_end();
-/* save jump in cache for patching */
-uint16_t cache_jump_point(uint8_t type, int offset);
+/* save patch in cache for patching */
+uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset);
 
 /* get pointer to host instruction at guest pointer */
 uint8_t* cache_search(uint32_t gp);
-/* get pointer to jump data */
-JumpUnit* cache_get_jump(uint16_t jump_id);
+/* get pointer to patch data */
+PatchUnit* cache_get_patch(uint16_t patch_id);
 /* get pointer to block data */
 CacheUnit* cache_get_block(uint16_t block_id);
 

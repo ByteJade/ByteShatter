@@ -10,9 +10,9 @@
 #define MAX_OFFSETS 255
 
 CacheUnit* blocks_cache = NULL;
-JumpUnit* jumps_cache = NULL;
+PatchUnit* jumps_cache = NULL;
 uint16_t bp = 0;
-uint16_t jp = 0;
+uint16_t pp = 0;
 
 CacheUnit* last_block = NULL;
 OffsetUnit local_offsets[MAX_OFFSETS];
@@ -22,8 +22,8 @@ void cahce_init() {
     blocks_cache = (CacheUnit*) malloc(
         MAX_BLOCKS * sizeof(CacheUnit)
     );
-    jumps_cache = (JumpUnit*) malloc(
-        MAX_JUMPS * sizeof(JumpUnit)
+    jumps_cache = (PatchUnit*) malloc(
+        MAX_JUMPS * sizeof(PatchUnit)
     );
     success("cache init");
 }
@@ -42,7 +42,7 @@ void cache_clear() {
         if (unit->offsets) free(unit->offsets);
     }
     bp = 0;
-    jp = 0;
+    pp = 0;
 }
 void cache_block_start() {
     last_block = blocks_cache + bp;
@@ -79,19 +79,20 @@ void cache_block_end() {
     last_block->offsetssz = loffp;
     loffp = 0;
 }
-uint16_t cache_jump_point(uint8_t type, int offset) {
+uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset) {
     if (offset < INT16_MIN || offset > INT16_MAX) {
         /* I don't know yet how to
            work with such jumps */
         panic("CACHE::JUMPS::BAD_OFFSET");
     }
-    JumpUnit* jump = jumps_cache + jp;
+    PatchUnit* jump = jumps_cache + pp;
     uint16_t block = bp - 1;
     jump->type = type;
+    jump->meta = meta;
     jump->block = block;
     // where to jump (relative to the start of the block)
     jump->guest_off = get_gp() - blocks_cache[block].gp + offset;
-    return ++jp;
+    return ++pp;
 }
 uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
     gp -= cache->gp;
@@ -123,12 +124,12 @@ uint8_t* cache_search(uint32_t gp) {
     }
     return NULL;
 }
-JumpUnit* cache_get_jump(uint16_t jump_id) {
-    jump_id--;
-    if (jump_id >= jp) {
+PatchUnit* cache_get_jump(uint16_t patch_id) {
+    patch_id--;
+    if (patch_id >= pp) {
         panic("CACHE::JUMPS::BAD_ID");
     }
-    return jumps_cache + jump_id;
+    return jumps_cache + patch_id;
 }
 CacheUnit* cache_get_block(uint16_t block_id) {
     if (block_id >= bp) {
@@ -144,7 +145,7 @@ void cache_flush(uint16_t block_id) {
     __builtin___clear_cache(code, code + size);
 }
 uint32_t cache_usage() {
-    return bp * sizeof(CacheUnit) + jp * sizeof(JumpUnit);
+    return bp * sizeof(CacheUnit) + pp * sizeof(PatchUnit);
 }
 void cache_print() {
     print("Cache:");

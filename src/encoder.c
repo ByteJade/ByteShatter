@@ -35,7 +35,7 @@ void encode(X64_instruction* buf) {
                     emit_ldr_reg(buf->op0.reg, buf->op0.reg, 0);
                 } else {
                     warning("ENCODER::ILLEGAL_RIP");
-                    emit_brk(0);
+                    emit_brk(cache_patch_point(LEA, buf->op0.reg, buf->op1.imm));
                 }
             }
         } break;
@@ -47,8 +47,9 @@ void encode(X64_instruction* buf) {
                     emit_movz(SC1, offset, 0);
                     emit_add_reg(buf->op0.reg, SC1, RIP);
                 } else {
+                    // order_decoding(offset, get_hp());
+                    emit_adrp_reg(buf->op0.reg);
                     warning("ENCODER::ILLEGAL_RIP");
-                    emit_brk(0);
                 }
             }
         } break;
@@ -93,9 +94,12 @@ void encode(X64_instruction* buf) {
             }
         } break;
         case JE:{
-            emit_brk(cache_jump_point(JE, buf->op0.imm));
+            emit_brk(cache_patch_point(JE, 0, buf->op0.imm));
         } break;
         case CALL:{
+            // wrapper
+            emit_mov_reg(RAX, RDI);
+            //emit_pop_reg(AR7);
             if (buf->op0.type == REG) {
                 emit_blr_reg(buf->op0.reg);
             } else {
