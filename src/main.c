@@ -66,7 +66,7 @@ void init_stack(ExeMeta* exe, const char* name) {
         {AT_SYSINFO,   0},
         {AT_NULL,      0}
     };
-    set_auxv(auxv, sizeof(auxv) / sizeof(Elf64_auxv_t));
+    set_auxv(auxv, 20);
     push_argv(0);
     push_argv(name);
 }
