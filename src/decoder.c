@@ -191,6 +191,14 @@ int decode_instruction() {
             buf.type = LEA;
             decode_regrm();
             break;
+        case 0xB8:
+            buf.opcount = 1;
+            buf.type = MOV;
+            buf.op0.type = REG;
+            buf.op0.reg = RAX;
+            buf.op1.type = IMM;
+            buf.op1.imm = fetch32();
+            break;
         case 0xE8:
             buf.opcount = 1;
             buf.type = CALL;

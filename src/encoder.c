@@ -26,7 +26,15 @@ void encode(X64_instruction* buf) {
         case MOV:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
                 emit_mov_reg(buf->op0.reg, buf->op1.reg);
-            } else if (buf->op1.type == (MEM|IMM)) {
+            }else if (buf->op0.type == REG && buf->op1.type == IMM){
+                if (buf->op1.imm == 0) {
+                    emit_eor_reg(buf->op0.reg, buf->op0.reg, buf->op0.reg);
+                } else if (buf->op1.imm < INT16_MAX && buf->op1.imm > INT16_MIN) {
+                    emit_movz(buf->op0.reg, buf->op1.imm & 0xFFFF, 0);
+                } else if (buf->op1.imm < INT32_MAX && buf->op1.imm > INT32_MIN) {
+                    emit_movz(buf->op0.reg, buf->op1.imm & 0xFFFF, 16);
+                }
+            }else if (buf->op1.type == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
                 if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
