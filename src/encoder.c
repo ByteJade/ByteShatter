@@ -7,6 +7,13 @@
 #include "arm64emitter.h"
 #include <stdint.h>
 
+/*
+TODO:
+- encoding for 8, 16 and 32 bit instructions
+- encoding NZCV flags for math ops
+- memory ops, like "add [rax], 0x2"
+- better "unhandled"
+*/
 void encode(X64_instruction* buf) {
     switch (buf->type) {
         case SUB:{

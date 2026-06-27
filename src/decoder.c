@@ -108,15 +108,16 @@ void print_instr() {
 }
 int decode_instruction() {
     int ret = 0;
-    uint8_t byte = fetch8();
-    uint8_t rex = 0;
     int reverse = 0;
+    uint8_t rex = 0;
+    uint8_t byte = fetch8();
     buf.size = 32;
     if (byte >> 4 == 0x4) {
         rex = byte & 0xF;
         byte = fetch8();
     } else if (byte == 0x66) {
         buf.size = 16;
+        byte = fetch8();
     }
     switch (byte) {
         case 0x31:
@@ -229,8 +230,16 @@ int decode_instruction() {
             uint8_t modrm = fetch8();
             decode_rm(&buf.op1, modrm);
             switch ((modrm >> 3)&7) {
-                case 0: buf.type = ADD; break; // inc
-                case 1: buf.type = SUB; break; // dec
+                case 0:
+                    buf.type = ADD;
+                    buf.op0.type = IMM;
+                    buf.op0.imm = 1;
+                    break; // inc
+                case 1:
+                    buf.type = SUB;
+                    buf.op0.type = IMM;
+                    buf.op0.imm = 1;
+                    break; // dec
                 case 2:
                 case 3: buf.type = CALL; break; // call
                 case 4:
