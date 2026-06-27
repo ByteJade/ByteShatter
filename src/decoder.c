@@ -213,6 +213,13 @@ int decode_instruction() {
             buf.op0.type = IMM;
             buf.op0.imm = fetch32();
             break;
+        case 0xEb:
+            buf.opcount = 1;
+            buf.type = JMP;
+            ret = JMP;
+            buf.op0.type = IMM;
+            buf.op0.imm = fetch8();
+            break;
         case 0xC7:
             reverse = 1;
             buf.opcount = 2;
