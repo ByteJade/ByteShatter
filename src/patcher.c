@@ -60,10 +60,16 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     print("offset: %i", offset);
     switch (patch->type) {
         case JE:
+            print("patch JE");
             *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
             break;
         case LEA:
+            print("patch LEA");
             *code = 0x10000000 | ((offset & 0x3) << 29) | ((offset & 0x1FFFFC) << 3) | x64_regs[patch->meta];
+            break;
+        case JMP:
+            print("patch LEA");
+            *code = 0x14000000 | (offset & 0x3FFFFFF);
             break;
         default:
             panic("PATCHER::UNCNOWN_PATCH");
