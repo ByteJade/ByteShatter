@@ -86,6 +86,10 @@ void load_library(const char* filename) {
     warning("No library: %s", filename);
 }
 void* get_symbol(const char* symname) {
+    // damn __libc_start_main is not accepted to be used in aarch64
+    // so it's not here
+    void* sym = dlsym(RTLD_DEFAULT, symname);
+    if (sym) return sym;
     for (int i = 0; i < libs_count; i++) {
         void* sym = dlsym(libs[i].data, symname);
         if (sym) return sym;
