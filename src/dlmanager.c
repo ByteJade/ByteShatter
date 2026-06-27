@@ -11,7 +11,7 @@ static const char* ld_paths[] = {
     "/lib64/",
     "/usr/lib/",
     "/usr/lib64/",
-    "/lib/x86_64-linux-gnu/",
+    "/lib/aarch64-linux-gnu/",
 #ifdef __ANDROID__
     "/data/data/com.termux/files/usr/lib/",
 #endif
@@ -76,9 +76,10 @@ void load_library(const char* filename) {
             libs[libs_count].name = strdup(filename);
             libs[libs_count].data = lib;
             libs_count++;
-            break;
+            return;
         }
     }
+    warning("No library: %s", filename);
 }
 void* get_symbol(const char* symname) {
     for (int i = 0; i < libs_count; i++) {
