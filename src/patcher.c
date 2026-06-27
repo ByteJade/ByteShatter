@@ -57,7 +57,6 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
         default:
             panic("PATCHER::UNCNOWN_PATCH");
     }
-    *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
     cache_flush(patch->block);
     #endif
     success("patching");
