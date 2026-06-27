@@ -63,10 +63,10 @@ void init_stack(ExeMeta* exe, const char* name) {
         {AT_SECURE,    0},
         {AT_RANDOM, getauxval(AT_RANDOM)},
         {AT_HWCAP2,    2},
-        {AT_SYSINFO,   0},
+        //{AT_SYSINFO,   0},
         {AT_NULL,      0}
     };
-    set_auxv(auxv, 20);
+    set_auxv(auxv, 19);
     push_argv(0);
     push_argv(name);
 }
