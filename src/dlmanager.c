@@ -47,6 +47,7 @@ int is_external_offset(uint32_t offset) {
                 print("→ internal func");
             }else {
                 print("→ internal data");
+                return -1;
             }
             return 0;
         }
