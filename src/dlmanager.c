@@ -70,20 +70,20 @@ void load_library(const char* filename) {
             fullpath, sizeof(fullpath),
             "%s/%s", ld_paths[i], filename
         );
-        lib = dlopen(fullpath, RTLD_NOW | RTLD_GLOBAL);
+        lib = dlopen(fullpath, RTLD_LAZY | RTLD_GLOBAL);
         if (lib) {
             success("load: %s\n", fullpath);
             libs[libs_count].name = strdup(filename);
             libs[libs_count].data = lib;
             libs_count++;
             return;
-        } else {
-            printf("dlopen error: %s\n", dlerror());
         }
     }
     warning("No library: %s", filename);
 }
 void* get_symbol(const char* symname) {
+    void* sym = dlsym(NULL, symname);
+    if (sym) return sym;
     for (int i = 0; i < libs_count; i++) {
         void* sym = dlsym(libs[i].data, symname);
         if (sym) return sym;
