@@ -116,16 +116,12 @@ void encode(X64_instruction* buf) {
             
         } break;
         case CALL:{
+            emit32(0xA9BF7BFD);
             if (buf->op0.type == REG) {
                 // stp x29, x30, [sp, #-16]!
-                emit32(0xA9BF7BFD);
                 emit_blr_reg(buf->op0.reg);
-                // ldp x29, x30, [sp], #16
-                emit32(0xA8C17BFD);
             } else if (buf->op0.type == IMM) {
-                emit32(0xA9BF7BFD);
                 emit_brk(cache_patch_point(CALL, 0, buf->op0.imm));
-                emit32(0xA8C17BFD);
             } else {
                 int32_t offset = get_gp() + buf->op0.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
@@ -143,6 +139,7 @@ void encode(X64_instruction* buf) {
                 }
                 emit_blr_reg(SC1);
             }
+                emit32(0xA8C17BFD);
         } break;
         case RET:{
             emit_ret();
