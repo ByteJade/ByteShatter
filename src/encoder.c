@@ -135,10 +135,14 @@ void encode(X64_instruction* buf) {
                     warning("ENCODER::ILLEGAL_RIP");
                     emit_brk(0);
                 }
+                // stp x29, x30, [sp, #-16]!
+                emit32(0xA9BF7BFD);
                 emit_blr_reg(SC1);
             }
         } break;
         case RET:{
+            // ldp x29, x30, [sp], #16
+            emit32(0xA8C17BFD);
             emit_ret();
         } break;
         default:
