@@ -9,23 +9,10 @@
 
 void print_cpu(struct sigcontext* sc) {
     #if defined(__aarch64__) || defined(_M_ARM64)
-    print("PC: %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
-    print("RAX: %lX", sc->regs[0]);
-    print("RCX: %lX", sc->regs[3]);
-    print("RDX: %lX", sc->regs[2]);
-    print("RBX: %lX", sc->regs[14]);
-    print("RSP: %lX", sc->regs[28]);
-    print("RBP: %lX", sc->regs[29]);
-    print("RSI: %lX", sc->regs[1]);
-    print("RDI: %lX", sc->regs[9]);
-    print("R8:  %lX", sc->regs[4]);
-    print("R9:  %lX", sc->regs[5]);
-    print("R10: %lX", sc->regs[10]);
-    print("R11: %lX", sc->regs[11]);
-    print("R12: %lX", sc->regs[16]);
-    print("R13: %lX", sc->regs[17]);
-    print("R14: %lX", sc->regs[18]);
-    print("R15: %lX", sc->regs[19]);
+    print("PC:  %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
+    for (int i = 0; i < 16; i++) {
+        print("r%s: %lX", regs[i], sc->regs[x64_regs[i]]);
+    }
     int N = (sc->pstate >> 31) & 1;
     int Z = (sc->pstate >> 30) & 1;  
     int C = (sc->pstate >> 29) & 1;
