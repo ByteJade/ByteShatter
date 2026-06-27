@@ -3,6 +3,7 @@
 #include "core.h"
 #include "memory.h"
 #include "decoder.h"
+#include "armdef.h"
 #include <signal.h>
 #include <stdint.h>
 
