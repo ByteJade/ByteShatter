@@ -104,7 +104,28 @@ void encode(X64_instruction* buf) {
             emit_brk(cache_patch_point(JE, 0, buf->op0.imm));
         } break;
         case JMP:{
-            emit_brk(cache_patch_point(JMP, 0, buf->op0.imm));
+            if (buf->op0.type == REG) {
+                emit_br_reg(buf->op0.reg);
+            } else if (buf->op0.type == IMM) {
+                emit_brk(cache_patch_point(JMP, 0, buf->op0.imm));
+            } else {
+                int32_t offset = get_gp() + buf->op0.imm;
+                if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
+                if (is_external_offset(offset)) {
+                    emit_movz(SC1, offset, 0);
+                    emit_add_reg(SC1, SC1, RIP);
+                    emit_ldr_reg(SC1, SC1, 0);
+                    // wrapper
+                    emit_mov_reg(RAX, RDI);
+                    // for testing purposes only!
+                    emit_pop_reg(AR7);
+                } else {
+                    warning("ENCODER::ILLEGAL_RIP");
+                    emit_brk(0);
+                }
+                emit_br_reg(SC1);
+            }
+            
         } break;
         case CALL:{
             if (buf->op0.type == REG) {
@@ -113,7 +134,7 @@ void encode(X64_instruction* buf) {
                 emit_brk(cache_patch_point(CALL, 0, buf->op0.imm));
             } else {
                 int32_t offset = get_gp() + buf->op0.imm;
-                if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
+                if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
                     emit_movz(SC1, offset, 0);
                     emit_add_reg(SC1, SC1, RIP);
