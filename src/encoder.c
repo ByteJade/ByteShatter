@@ -98,6 +98,8 @@ void encode(X64_instruction* buf) {
         case CALL:{
             if (buf->op0.type == REG) {
                 emit_blr_reg(buf->op0.reg);
+            } else if (buf->op0.type == IMM) {
+                emit_brk(cache_patch_point(CALL, 0, buf->op0.imm));
             } else {
                 int32_t offset = get_gp() + buf->op0.imm;
                 if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
