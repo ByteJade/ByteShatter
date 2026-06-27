@@ -27,6 +27,11 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     print("R13: %lX", sc->regs[17]);
     print("R14: %lX", sc->regs[18]);
     print("R15: %lX", sc->regs[19]);
+    int N = (sc->pstate >> 31) & 1;
+    int Z = (sc->pstate >> 30) & 1;  
+    int C = (sc->pstate >> 29) & 1;
+    int V = (sc->pstate >> 28) & 1;
+    print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
 
     uint32_t* code = (uint32_t*)sc->pc;
     uint32_t instruction = *code;
@@ -59,6 +64,7 @@ void handler(int sig, siginfo_t* info, void* ucontext) {
     }
     cache_flush(patch->block);
     success("patching");
+    cache_print();
     #endif
 }
 
