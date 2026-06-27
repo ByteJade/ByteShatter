@@ -9,7 +9,7 @@
 
 void print_cpu(struct sigcontext* sc) {
     #if defined(__aarch64__) || defined(_M_ARM64)
-    print("PC: %lX", sc->pc);
+    print("PC: %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host);
     print("RAX: %lX", sc->regs[0]);
     print("RCX: %lX", sc->regs[3]);
     print("RDX: %lX", sc->regs[2]);
@@ -68,11 +68,11 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             *code = 0x10000000 | ((offset & 0x3) << 29) | ((offset & 0x1FFFFC) << 3) | x64_regs[patch->meta];
             break;
         case JMP:
-            print("patch LEA");
+            print("patch JMP");
             *code = 0x14000000 | (offset & 0x3FFFFFF);
             break;
         case CALL:
-            print("patch LEA");
+            print("patch CALL");
             *code = 0x94000000 | (offset & 0x3FFFFFF);
             break;
         default:
