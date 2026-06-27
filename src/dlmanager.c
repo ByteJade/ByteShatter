@@ -1,7 +1,6 @@
 #include "dlmanager.h"
 #include "loader.h"
 #include "core.h"
-#include "memory.h"
 #include <stdint.h>
 #include <string.h>
 #include <dlfcn.h>
