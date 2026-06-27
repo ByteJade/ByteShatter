@@ -110,6 +110,7 @@ int decode_instruction() {
     int ret = 0;
     uint8_t byte = fetch8();
     uint8_t rex = 0;
+    buf.reverse = 0;
     buf.size = 32;
     if (byte >> 4 == 0x4) {
         rex = byte & 0xF;
@@ -119,7 +120,6 @@ int decode_instruction() {
     }
     switch (byte) {
         case 0x31:
-            buf.reverse = 0;
             buf.opcount = 2;
             buf.type = XOR;
             decode_regrm();
@@ -133,7 +133,6 @@ int decode_instruction() {
         case 0x56:
         case 0x57:
             buf.size = 64;
-            buf.reverse = 0;
             buf.opcount = 1;
             buf.type = PUSH;
             buf.op0.type = REG;
@@ -141,14 +140,12 @@ int decode_instruction() {
             break;
         case 0x5E:
             buf.size = 64;
-            buf.reverse = 0;
             buf.opcount = 1;
             buf.type = POP;
             buf.op0.type = REG;
             buf.op0.reg = 6;
             break;
         case 0x74:
-            buf.reverse = 0;
             buf.opcount = 1;
             buf.type = JE;
             buf.op0.type = IMM;
@@ -174,7 +171,6 @@ int decode_instruction() {
             }
         } break;
         case 0x85:
-            buf.reverse = 0;
             buf.opcount = 2;
             buf.type = TST;
             decode_regrm();
@@ -186,19 +182,16 @@ int decode_instruction() {
             decode_regrm();
             break;
         case 0x8B:
-            buf.reverse = 0;
             buf.opcount = 2;
             buf.type = MOV;
             decode_regrm();
             break;
         case 0x8D:
-            buf.reverse = 0;
             buf.opcount = 2;
             buf.type = LEA;
             decode_regrm();
             break;
         case 0xE8:
-            buf.reverse = 0;
             buf.opcount = 1;
             buf.type = CALL;
             buf.op0.type = IMM;
