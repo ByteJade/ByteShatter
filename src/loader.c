@@ -57,8 +57,8 @@ void loader_close_exe(ExeMeta* exe) {
 }
 
 #define PAGE_SIZE 0x1000
-#define ALIGN_D(addr) addr & ~(PAGE_SIZE - 1)
-#define ALIGN_U(addr) (addr + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1)
+#define ALIGN_D(addr) (addr & ~(PAGE_SIZE - 1))
+#define ALIGN_U(addr) ((addr + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1))
 
 void loader_map_segments(ExeMeta* exe) {
     ElfMeta* elf = exe->elf;

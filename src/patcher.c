@@ -77,8 +77,12 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     cache_print();
     #if defined(__aarch64__) || defined(_M_ARM64)
     uint32_t* code = (uint32_t*)sc->pc;
-    panic("segfault: %x", *code);
+    #else
+    uint32_t* code = 0;
     #endif
+    if (code) {
+        panic("segfault: %x", *code);
+    } else panic("segfault");
 }
 void patcher_init() {
     struct sigaction sa_trap = {
