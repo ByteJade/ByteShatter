@@ -46,7 +46,7 @@ void init_stack(ExeMeta* exe, const char* name) {
         {AT_SECURE,    0},
         {AT_RANDOM, getauxval(AT_RANDOM)},
         {AT_HWCAP2,    2},
-        //{AT_SYSINFO,   0},
+        //{AT_SYSINFO,   0}, Android doesn't have this?
         {AT_NULL,      0}
     };
     set_auxv(auxv, 19);
@@ -66,11 +66,10 @@ int main(int argc, char** argv, const char** envp) {
     execute(0);
     cache_print();
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
-    cache_clear();
     decode(exe->elf->header.e_entry);
     success("decode _start");
-    cache_print();
     execute(0);
+    cache_print();
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
     cache_clear();
 

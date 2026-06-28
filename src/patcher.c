@@ -6,6 +6,7 @@
 #include "armdef.h"
 #include <signal.h>
 #include <stdint.h>
+#include <stdio.h>
 
 void print_cpu(struct sigcontext* sc) {
     #if defined(__aarch64__) || defined(_M_ARM64)
@@ -78,7 +79,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     #if defined(__aarch64__) || defined(_M_ARM64)
     uint32_t* code = (uint32_t*)sc->pc;
     #else
-    uint32_t* code = 0;
+    uint32_t* code = NULL;
     #endif
     if (code) {
         panic("segfault: %x", *code);
@@ -93,7 +94,7 @@ void patcher_init() {
         .sa_sigaction = segv_handler,
         .sa_flags = SA_SIGINFO,
     };
-    sigaction(SIGTRAP, &sa_trap, 0);
-    sigaction(SIGSEGV, &sa_segv, 0);
-    sigaction(SIGILL, &sa_segv, 0);
+    sigaction(SIGTRAP, &sa_trap, NULL);
+    sigaction(SIGSEGV, &sa_segv, NULL);
+    sigaction(SIGILL, &sa_segv, NULL);
 }
