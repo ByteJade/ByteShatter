@@ -22,14 +22,14 @@ void encode(X64_instruction* buf) {
                 emit_sub_reg(buf->op0.reg, buf->op0.reg, buf->op1.reg);
             else if (buf->op0.type == REG && buf->op1.type == IMM)
                 emit_sub_imm(buf->op0.reg, buf->op0.reg, buf->op1.imm);
-            else panic("unhandled subtraction type");
+            else panic("ENCODER::UNHANDLED_SUB");
         } break;
         case ADD:{
             if (buf->op0.type == REG && buf->op1.type == REG)
                 emit_add_reg(buf->op0.reg, buf->op0.reg, buf->op1.reg);
             else if (buf->op0.type == REG && buf->op1.type == IMM)
                 emit_add_imm(buf->op0.reg, buf->op0.reg, buf->op1.imm);
-            else panic("unhandled addition type");
+            else panic("ENCODER::UNHANDLED_ADD");
         } break;
         case MOV:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
@@ -53,7 +53,7 @@ void encode(X64_instruction* buf) {
                     warning("ENCODER::ILLEGAL_RIP");
                     emit_brk(0);
                 }
-            }
+            } else panic("ENCODER::UNHANDLED_MOV");
         } break;
         case LEA:{
             if (buf->op1.type == (MEM|IMM)) {
@@ -66,17 +66,17 @@ void encode(X64_instruction* buf) {
                     emit_brk(cache_patch_point(LEA, buf->op0.reg, buf->op1.imm));
                     warning("ENCODER::ILLEGAL_RIP");
                 }
-            }
+            } else panic("ENCODER::UNHANDLED_LEA");
         } break;
         case TST:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
                 emit_tst_reg(buf->op0.reg, buf->op1.reg);
-            }
+            } else panic("ENCODER::UNHANDLED_TST");
         } break;
         case XOR:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
                 emit_eor_reg(buf->op0.reg, buf->op0.reg, buf->op1.reg);
-            }
+            } else panic("ENCODER::UNHANDLED_XOR");
         } break;
         case AND:{
             if (buf->op0.type == REG && buf->op1.type == IMM) {
@@ -86,17 +86,17 @@ void encode(X64_instruction* buf) {
                 } else {
                     emit_and_imm(buf->op0.reg, buf->op1.reg, imm);
                 }
-            }
+            } else panic("ENCODER::UNHANDLED_AND");
         } break;
         case POP:{
             if (buf->op0.type == REG) {
                 emit_pop_reg(buf->op0.reg);
-            }
+            } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
             if (buf->op0.type == REG) {
                 emit_push_reg(buf->op0.reg);
-            }
+            } else panic("ENCODER::UNHANDLED_PUSH");
         } break;
         case JE:{
             emit_brk(cache_patch_point(JE, 0, buf->op0.imm));
@@ -147,11 +147,10 @@ void encode(X64_instruction* buf) {
                 }
                 emit_blr_reg(SC1);
             }
-                emit32(0xA8C17BFD);
+            emit32(0xA8C17BFD);
         } break;
-        case RET:{
-            emit_ret();
-        } break;
+        case RET: emit_ret(); break;
+        case EBR: emit_bti(); break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
     }

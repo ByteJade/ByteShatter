@@ -240,7 +240,9 @@ int decode_instr(X64_instruction* buf) {
         case 0xf3: // currently only endbr64 is used
             warning("DECODER::REP_PREFIX");
             fetch16(); fetch8(); // just skip
-            return 0;
+            buf->opcount = 0;
+            buf->type = EBR;
+            break;
         case 0xff: {
             buf->size = 64;
             reverse = 1;

@@ -39,5 +39,7 @@
     emit32(0xD4200000 | (imm16 << 5))
 #define emit_ret() \
     emit32(0xD65F03C0)
+#define emit_bti() \
+    emit32(0xD503245F)
 
 #endif

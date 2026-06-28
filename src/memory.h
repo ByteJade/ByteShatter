@@ -3,9 +3,7 @@
 
 #include <stdint.h>
 
-/* init memory manager */
 void memory_init(uint32_t guest_size);
-/* clear memory manager */
 void memory_fini();
 
 /* emit byte to host memory */
