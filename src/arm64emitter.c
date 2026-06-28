@@ -11,13 +11,13 @@ void emit_movz(uint8_t rd, uint16_t imm16, uint8_t shift) {
     emit32(0xD2800000 | (shift << 21) | (imm16 << 5) | x64_regs[rd]);
 }
 void emit_sub_imm(uint8_t rd, uint8_t rn, uint16_t imm) {
-    emit32(_construct_r_r_imm(0xD1000000, rn, rd, imm));
+    emit32(_construct_r_r_imm(0xD1000000, rd, rn, imm));
 }
 void emit_sub_reg(uint8_t rd, uint8_t rn, uint8_t rm) {
     emit32(_construct_r_r_r(0xCB000000, rd, rn, rm));
 }
 void emit_add_imm(uint8_t rd, uint8_t rn, uint16_t imm) {
-    emit32(_construct_r_r_imm(0x91000000, rn, rd, imm));
+    emit32(_construct_r_r_imm(0x91000000, rd, rn, imm));
 }
 void emit_add_reg(uint8_t rd, uint8_t rn, uint8_t rm) {
     emit32(_construct_r_r_r(0x8B000000, rd, rn, rm));
@@ -26,10 +26,10 @@ void emit_eor_reg(uint8_t rd, uint8_t rn, uint8_t rm) {
     emit32(_construct_r_r_r(0xCA000000, rd, rn, rm));
 }
 void emit_and_imm(uint8_t rd, uint8_t rn, uint16_t imm) {
-    emit32(_construct_r_r_imm(0x92000000, rn, rd, imm));
+    emit32(_construct_r_r_imm(0x92000000, rd, rn, imm));
 }
 void emit_ldr_reg(uint8_t rd, uint8_t rn, int16_t imm) {
-    emit32(_construct_r_r_imm(0xF9400000, rn, rd, imm));
+    emit32(_construct_r_r_imm(0xF9400000, rd, rn, imm));
 }
 void emit_tst_reg(uint8_t rn, uint8_t rm) {
     emit32(_construct_r_r_r(0xEA000000, XZR, rn, rm));
