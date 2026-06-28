@@ -68,7 +68,7 @@ int main(int argc, char** argv, const char** envp) {
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
     decode(exe->elf->header.e_entry);
     success("decode _start");
-    execute(0);
+    execute(1);
     cache_print();
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
     cache_clear();
