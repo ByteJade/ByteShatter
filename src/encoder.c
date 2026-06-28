@@ -33,7 +33,7 @@ void encode(X64_instruction* buf) {
         } break;
         case MOV:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
-                emit_mov_reg(buf->op0.reg, buf->op1.reg);
+                emit_add_imm(buf->op0.reg, buf->op1.reg, 0);
             }else if (buf->op0.type == REG && buf->op1.type == IMM){
                 if (buf->op1.imm == 0) {
                     emit_eor_reg(buf->op0.reg, buf->op0.reg, buf->op0.reg);
@@ -114,7 +114,7 @@ void encode(X64_instruction* buf) {
                     emit_add_reg(SC1, SC1, RIP);
                     emit_ldr_reg(SC1, SC1, 0);
                     // wrapper
-                    emit_mov_reg(RAX, RDI);
+                    emit_add_imm(RAX, RDI, 0);
                 } else {
                     warning("ENCODER::ILLEGAL_RIP");
                     emit_brk(0);
@@ -138,7 +138,7 @@ void encode(X64_instruction* buf) {
                     emit_add_reg(SC1, SC1, RIP);
                     emit_ldr_reg(SC1, SC1, 0);
                     // wrapper
-                    emit_mov_reg(RAX, RDI);
+                    emit_add_imm(RAX, RDI, 0);
                     // for testing purposes only!
                     emit_pop_reg(AR7);
                 } else {

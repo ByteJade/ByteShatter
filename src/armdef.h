@@ -52,7 +52,7 @@ enum mapped_registers {
     R12,R13,R14,R15,
 // tech
     SC1,SC2,RIP,X30,
-    AR7,AR8
+    AR7,AR8,XZR
 };
 static uint8_t x64_regs[] = {
     0,3,2,14,
@@ -60,7 +60,7 @@ static uint8_t x64_regs[] = {
     4,5,10,11,
     16,17,18,19,
     12, 13, 21, 30,
-    6, 7
+    6, 7, 31
 };
 
 #endif
