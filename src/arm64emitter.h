@@ -6,6 +6,7 @@
 
 #define SF 1<<31
 #define S 1<<29
+#define IMM12 0xFFF
 #define ADD_IMM 0x11000000
 #define ADD_REG 0x0B000000
 #define SUB_IMM 0x51000000

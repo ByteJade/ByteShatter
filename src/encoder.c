@@ -26,14 +26,14 @@ void encode(X64_instruction* buf) {
             if (t0 == REG && t1 == REG)
                 emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, r1));
             else if (t0 == REG && t1 == IMM)
-                emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->op1.imm));
+                emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->op1.imm&IMM12));
             else panic("ENCODER::UNHANDLED_SUB");
         } break;
         case ADD:{
             if (t0 == REG && t1 == REG)
                 emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, r1));
             else if (t0 == REG && t1 == IMM)
-                emit32(sf|_construct_r_r_imm(ADD_IMM|S, r0, r0, buf->op1.imm));
+                emit32(sf|_construct_r_r_imm(ADD_IMM|S, r0, r0, buf->op1.imm&IMM12));
             else panic("ENCODER::UNHANDLED_ADD");
         } break;
         case MOV:{
@@ -42,7 +42,7 @@ void encode(X64_instruction* buf) {
             }else if (t0 == REG && t1 == IMM){
                 int64_t imm = buf->op1.imm;
                 if (imm > INT16_MAX || imm < INT16_MIN) panic("ENCODER::ILLEGAL_IMM");
-                emit_movz(r0, imm & 0xFFFF, 0);
+                emit_movz(r0, imm & IMM12, 0);
             } else if (t1 == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
@@ -58,14 +58,14 @@ void encode(X64_instruction* buf) {
                 if (t1 == (MEM|REG)) {
                     emit_ldr_reg(r0, r1, 0);
                 } else if (t1 == (MEM|REG|IMM)) {
-                    emit_add_imm(SC1, r1, buf->op1.imm&0xFFFF);
+                    emit_add_imm(SC1, r1, buf->op1.imm&IMM12);
                     emit_ldr_reg(r0, SC1, 0);
                 } else panic("ENCODER::UNHANDLED_MOV");
             } else if (t0&MEM) {
                 if (t0 == (MEM|REG)) {
                     emit32(sf|_construct_r_r_imm(STR_REG, r1, r0, 0));
                 } else if (t0 == (MEM|REG|IMM)) {
-                    emit_add_imm(SC1, r0, buf->op0.imm&0xFFFF);
+                    emit_add_imm(SC1, r0, buf->op0.imm&IMM12);
                     emit32(sf|_construct_r_r_imm(STR_REG, r1, SC1, 0));
                 } else panic("ENCODER::UNHANDLED_MOV");
             } else panic("ENCODER::UNHANDLED_MOV");
