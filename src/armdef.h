@@ -34,9 +34,8 @@ static const char* regs[] = {
 typedef enum {
     REG = 0,
     MEM = 1,
-    BASE = 2,
-    IDX = 4,
-    IMM = 8,
+    IDX = 2,
+    IMM = 4,
 } OpTypes;
 
 typedef enum {

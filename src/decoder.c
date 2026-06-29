@@ -23,7 +23,7 @@ void decode_sib(Operand* op) {
         op->type |= IMM;
         op->imm = fetch_imm32();
     } else {
-        op->type |= BASE;
+        op->type |= REG;
         op->reg = base;
     }
 }
@@ -49,7 +49,7 @@ void decode_rm(Operand* op, uint8_t modrm) {
         } else if (rm == 0b100) {
             decode_sib(op);
         } else {
-            op->type |= BASE;
+            op->type |= REG;
             op->reg = rm;
         }
     } else {
@@ -74,7 +74,7 @@ void print_op(X64_instruction* buf, Operand* op) {
         printf("%lx ", op->imm);
     } else {
         printf("[ ");
-        if (op->type&BASE) {
+        if (op->type&REG) {
             printf("r%s + ", regs[op->reg]);
         }
         if (op->type&IDX) {

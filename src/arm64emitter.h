@@ -11,6 +11,8 @@
 #define SUB_IMM 0x51000000
 #define SUB_REG 0x4B000000
 #define EOR_REG 0x4A000000 // No Flags!
+#define AND_REG 0x0A000000 // No Flags!
+#define ANDS_REG 0x6A000000 // Only Flags!
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
@@ -33,8 +35,6 @@
     emit32(_construct_r_r_imm(0x92000000, rd, rn, imm))
 #define emit_ldr_reg(rd, rn, imm) \
     emit32(_construct_r_r_imm(0xF9400000, rd, rn, imm))
-#define emit_tst_reg(rn, rm) \
-    emit32(_construct_r_r_r(0xEA000000, XZR, rn, rm))
 #define emit_blr_reg(rn) \
     emit32(0xD63F0000 | (x64_regs[rn] << 5))
 #define emit_br_reg(rn) \
