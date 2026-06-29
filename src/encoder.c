@@ -43,6 +43,22 @@ void encode(X64_instruction* buf) {
                 int64_t imm = buf->op1.imm;
                 if (imm > INT16_MAX || imm < INT16_MIN) panic("ENCODER::ILLEGAL_IMM");
                 emit_movz(r0, imm & IMM12, 0);
+            } else if (t0 == (MEM|IMM)) {
+                int32_t offset = get_gp() + buf->op0.imm;
+                if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
+                if (is_external_offset(offset)) {
+                    emit_movz(SC1, offset, 0);
+                    emit_add_reg(SC1, SC1, RIP);
+                    if (t1 == REG)
+                        emit32(sf|_construct_r_r_imm(STR_REG, r1, SC1, 0));
+                    else {
+                        emit_movz(SC2, buf->op1.imm, 0);
+                        emit32(sf|_construct_r_r_imm(STR_REG, SC2, SC1, 0));
+                    }
+                } else {
+                    warning("ENCODER::ILLEGAL_RIP");
+                    emit_brk(0);
+                }
             } else if (t1 == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
