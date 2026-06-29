@@ -68,8 +68,8 @@ void encode(X64_instruction* buf) {
                     emit32(sf|_construct_r_r_imm(STR_REG, r1, r0, 0));
                 } else if (t0 == (MEM|REG|IMM)) {
                     if (buf->op1.imm > 0)
-                        emit_add_imm(SC1, r1, buf->op0.imm);
-                    else emit_sub_imm(SC1, r1, -buf->op0.imm);
+                        emit_add_imm(SC1, r0, buf->op0.imm);
+                    else emit_sub_imm(SC1, r0, -buf->op0.imm);
                     emit32(sf|_construct_r_r_imm(STR_REG, r1, SC1, 0));
                 } else panic("ENCODER::UNHANDLED_MOV");
             } else panic("ENCODER::UNHANDLED_MOV");
