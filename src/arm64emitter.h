@@ -4,6 +4,13 @@
 #include "memory.h"
 #include "armdef.h"
 
+#define SF 1<<31
+#define S 1<<29
+#define ADD_IMM 0x11000000
+#define ADD_REG 0x0B000000
+#define SUB_IMM 0x51000000
+#define SUB_REG 0x4B000000
+
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
 #define _construct_r_r_r(op, rd, rn, rm) \

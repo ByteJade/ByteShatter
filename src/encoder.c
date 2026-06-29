@@ -16,39 +16,41 @@ TODO:
 - clean emitter
 */
 void encode(X64_instruction* buf) {
+    uint8_t r0 = buf->op0.reg;
+    uint8_t r1 = buf->op1.reg;
     switch (buf->type) {
         case SUB:{
             if (buf->op0.type == REG && buf->op1.type == REG)
-                emit_sub_reg(buf->op0.reg, buf->op0.reg, buf->op1.reg);
+                emit_sub_reg(r0, r0, r1);
             else if (buf->op0.type == REG && buf->op1.type == IMM)
-                emit_sub_imm(buf->op0.reg, buf->op0.reg, buf->op1.imm);
+                emit_sub_imm(r0, r0, buf->op1.imm);
             else panic("ENCODER::UNHANDLED_SUB");
         } break;
         case ADD:{
             if (buf->op0.type == REG && buf->op1.type == REG)
-                emit_add_reg(buf->op0.reg, buf->op0.reg, buf->op1.reg);
+                emit_add_reg(r0, r0, r1);
             else if (buf->op0.type == REG && buf->op1.type == IMM)
-                emit_add_imm(buf->op0.reg, buf->op0.reg, buf->op1.imm);
+                emit_add_imm(r0, r0, buf->op1.imm);
             else panic("ENCODER::UNHANDLED_ADD");
         } break;
         case MOV:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
-                emit_add_imm(buf->op0.reg, buf->op1.reg, 0);
+                emit_add_imm(r0, r1, 0);
             }else if (buf->op0.type == REG && buf->op1.type == IMM){
                 if (buf->op1.imm == 0) {
-                    emit_eor_reg(buf->op0.reg, buf->op0.reg, buf->op0.reg);
+                    emit_eor_reg(r0, r0, r0);
                 } else if (buf->op1.imm < INT16_MAX && buf->op1.imm > INT16_MIN) {
-                    emit_movz(buf->op0.reg, buf->op1.imm & 0xFFFF, 0);
+                    emit_movz(r0, buf->op1.imm & 0xFFFF, 0);
                 } else if (buf->op1.imm < INT32_MAX && buf->op1.imm > INT32_MIN) {
-                    emit_movz(buf->op0.reg, buf->op1.imm & 0xFFFF, 16);
+                    emit_movz(r0, buf->op1.imm & 0xFFFF, 16);
                 }
             }else if (buf->op1.type == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
                 if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
-                    emit_movz(buf->op0.reg, offset, 0);
-                    emit_add_reg(buf->op0.reg, buf->op0.reg, RIP);
-                    emit_ldr_reg(buf->op0.reg, buf->op0.reg, 0);
+                    emit_movz(r0, offset, 0);
+                    emit_add_reg(r0, r0, RIP);
+                    emit_ldr_reg(r0, r0, 0);
                 } else {
                     warning("ENCODER::ILLEGAL_RIP");
                     emit_brk(0);
@@ -61,41 +63,41 @@ void encode(X64_instruction* buf) {
                 if (offset > UINT16_MAX || offset < 0) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
                     emit_movz(SC1, offset, 0);
-                    emit_add_reg(buf->op0.reg, SC1, RIP);
+                    emit_add_reg(r0, SC1, RIP);
                 } else {
-                    emit_brk(cache_patch_point(LEA, buf->op0.reg, buf->op1.imm));
+                    emit_brk(cache_patch_point(LEA, r0, buf->op1.imm));
                     warning("ENCODER::ILLEGAL_RIP");
                 }
             } else panic("ENCODER::UNHANDLED_LEA");
         } break;
         case TST:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
-                emit_tst_reg(buf->op0.reg, buf->op1.reg);
+                emit_tst_reg(r0, r1);
             } else panic("ENCODER::UNHANDLED_TST");
         } break;
         case XOR:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
-                emit_eor_reg(buf->op0.reg, buf->op0.reg, buf->op1.reg);
+                emit_eor_reg(r0, r0, r1);
             } else panic("ENCODER::UNHANDLED_XOR");
         } break;
         case AND:{
             if (buf->op0.type == REG && buf->op1.type == IMM) {
                 uint64_t imm = buf->op1.imm;
                 if (imm == 0xFFFFFFFFFFFFFFF0) {
-                    emit_and_imm(buf->op0.reg, buf->op1.reg, 0b01111100111011);
+                    emit_and_imm(r0, r1, 0b01111100111011);
                 } else {
-                    emit_and_imm(buf->op0.reg, buf->op1.reg, imm);
+                    emit_and_imm(r0, r1, imm);
                 }
             } else panic("ENCODER::UNHANDLED_AND");
         } break;
         case POP:{
             if (buf->op0.type == REG) {
-                emit_pop_reg(buf->op0.reg);
+                emit_pop_reg(r0);
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
             if (buf->op0.type == REG) {
-                emit_push_reg(buf->op0.reg);
+                emit_push_reg(r0);
             } else panic("ENCODER::UNHANDLED_PUSH");
         } break;
         case JE:{
@@ -103,7 +105,7 @@ void encode(X64_instruction* buf) {
         } break;
         case JMP:{
             if (buf->op0.type == REG) {
-                emit_br_reg(buf->op0.reg);
+                emit_br_reg(r0);
             } else if (buf->op0.type == IMM) {
                 emit_brk(cache_patch_point(JMP, 0, buf->op0.imm));
             } else {
@@ -127,7 +129,7 @@ void encode(X64_instruction* buf) {
             emit32(0xA9BF7BFD);
             if (buf->op0.type == REG) {
                 // stp x29, x30, [sp, #-16]!
-                emit_blr_reg(buf->op0.reg);
+                emit_blr_reg(r0);
             } else if (buf->op0.type == IMM) {
                 emit_brk(cache_patch_point(CALL, 0, buf->op0.imm));
             } else {

@@ -37,7 +37,8 @@ typedef enum {
     BASE = 2,
     IDX = 4,
     IMM = 8,
-} OpOTypeTypes;
+} OpTypes;
+
 typedef enum {
     MOV, ADD, SUB, TST,
     JE, CALL, RET, XOR,
