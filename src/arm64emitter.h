@@ -13,6 +13,7 @@
 #define EOR_REG 0x4A000000 // No Flags!
 #define AND_REG 0x0A000000 // No Flags!
 #define ANDS_REG 0x6A000000 // Only Flags!
+#define STR_REG 0xB9000000
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])

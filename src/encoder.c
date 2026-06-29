@@ -57,6 +57,16 @@ void encode(X64_instruction* buf) {
             } else if (t1&MEM) {
                 if (t1 == (MEM|REG)) {
                     emit_ldr_reg(r0, r1, 0);
+                } else if (t1 == (MEM|REG|IMM)) {
+                    emit_add_imm(SC1, r1, buf->op1.imm&0xFFFF);
+                    emit_ldr_reg(r0, SC1, 0);
+                } else panic("ENCODER::UNHANDLED_MOV");
+            } else if (t0&MEM) {
+                if (t0 == (MEM|REG)) {
+                    emit32(sf|_construct_r_r_imm(STR_REG, r1, r0, 0));
+                } else if (t0 == (MEM|REG|IMM)) {
+                    emit_add_imm(SC1, r0, buf->op0.imm&0xFFFF);
+                    emit32(sf|_construct_r_r_imm(STR_REG, r1, SC1, 0));
                 } else panic("ENCODER::UNHANDLED_MOV");
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;
