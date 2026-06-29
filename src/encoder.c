@@ -22,16 +22,16 @@ void encode(X64_instruction* buf) {
     switch (buf->type) {
         case SUB:{
             if (buf->op0.type == REG && buf->op1.type == REG)
-                emit_sub_reg(r0, r0, r1);
+                emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, r1));
             else if (buf->op0.type == REG && buf->op1.type == IMM)
-                emit_sub_imm(r0, r0, buf->op1.imm);
+                emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->op1.imm));
             else panic("ENCODER::UNHANDLED_SUB");
         } break;
         case ADD:{
             if (buf->op0.type == REG && buf->op1.type == REG)
-                emit_add_reg(r0, r0, r1);
+                emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, r1));
             else if (buf->op0.type == REG && buf->op1.type == IMM)
-                emit_add_imm(r0, r0, buf->op1.imm);
+                emit32(sf|_construct_r_r_imm(ADD_IMM|S, r0, r0, buf->op1.imm));
             else panic("ENCODER::UNHANDLED_ADD");
         } break;
         case MOV:{
@@ -78,7 +78,7 @@ void encode(X64_instruction* buf) {
         } break;
         case XOR:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
-                emit32(sf|_construct_r_r_r(EOR_REG|S, r0, r0, r1));
+                emit32(sf|_construct_r_r_r(EOR_REG, r0, r0, r1));
             } else panic("ENCODER::UNHANDLED_XOR");
         } break;
         case AND:{
