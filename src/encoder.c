@@ -18,6 +18,7 @@ TODO:
 void encode(X64_instruction* buf) {
     uint8_t r0 = buf->op0.reg;
     uint8_t r1 = buf->op1.reg;
+    uint32_t sf = (buf->size == 64) * SF;
     switch (buf->type) {
         case SUB:{
             if (buf->op0.type == REG && buf->op1.type == REG)
@@ -77,7 +78,7 @@ void encode(X64_instruction* buf) {
         } break;
         case XOR:{
             if (buf->op0.type == REG && buf->op1.type == REG) {
-                emit_eor_reg(r0, r0, r1);
+                emit32(sf|_construct_r_r_r(EOR_REG|S, r0, r0, r1));
             } else panic("ENCODER::UNHANDLED_XOR");
         } break;
         case AND:{
