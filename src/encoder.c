@@ -15,6 +15,27 @@ TODO:
 - better "unhandled"
 - clean emitter
 */
+void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
+    if (buf->op0.type == REG) {
+        emit32(code | (x64_regs[buf->op0.reg] << 5));
+    } else if (buf->op0.type == IMM) {
+        emit_brk(cache_patch_point(type, 0, buf->op0.imm));
+    } else if (buf->op0.type == (MEM|IMM)) {
+        int32_t offset = get_gp() + buf->op0.imm;
+        if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
+        if (is_external_offset(offset)) {
+            emit_movz(SC1, offset, 0);
+            emit_add_reg(SC1, SC1, RIP);
+            emit_ldr_reg(SC1, SC1, 0);
+            // wrapper
+            emit_add_imm(RAX, RDI, 0);
+        } else {
+            warning("ENCODER::ILLEGAL_RIP");
+            emit_brk(0);
+        }
+        emit32(code | (x64_regs[SC1] << 5));
+    }
+}
 void encode(X64_instruction* buf) {
     uint8_t r0 = buf->op0.reg;
     uint8_t r1 = buf->op1.reg;
@@ -144,51 +165,11 @@ void encode(X64_instruction* buf) {
             emit_brk(cache_patch_point(JE, 0, buf->op0.imm));
         } break;
         case JMP:{
-            if (t0 == REG) {
-                emit_br_reg(r0);
-            } else if (t0 == IMM) {
-                emit_brk(cache_patch_point(JMP, 0, buf->op0.imm));
-            } else {
-                int32_t offset = get_gp() + buf->op0.imm;
-                if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
-                if (is_external_offset(offset)) {
-                    emit_movz(SC1, offset, 0);
-                    emit_add_reg(SC1, SC1, RIP);
-                    emit_ldr_reg(SC1, SC1, 0);
-                    // wrapper
-                    emit_add_imm(RAX, RDI, 0);
-                } else {
-                    warning("ENCODER::ILLEGAL_RIP");
-                    emit_brk(0);
-                }
-                emit_br_reg(SC1);
-            }
-            
+            emit_branch(buf, BR_REG, JMP);
         } break;
         case CALL:{
             emit32(0xA9BF7BFD);
-            if (t0 == REG) {
-                // stp x29, x30, [sp, #-16]!
-                emit_blr_reg(r0);
-            } else if (t0 == IMM) {
-                emit_brk(cache_patch_point(CALL, 0, buf->op0.imm));
-            } else {
-                int32_t offset = get_gp() + buf->op0.imm;
-                if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
-                if (is_external_offset(offset)) {
-                    emit_movz(SC1, offset, 0);
-                    emit_add_reg(SC1, SC1, RIP);
-                    emit_ldr_reg(SC1, SC1, 0);
-                    // wrapper
-                    emit_add_imm(RAX, RDI, 0);
-                    // for testing purposes only!
-                    emit_pop_reg(AR7);
-                } else {
-                    warning("ENCODER::ILLEGAL_RIP");
-                    emit_brk(0);
-                }
-                emit_blr_reg(SC1);
-            }
+            emit_branch(buf, BLR_REG, CALL);
             emit32(0xA8C17BFD);
         } break;
         case RET: emit_ret(); break;

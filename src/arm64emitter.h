@@ -15,6 +15,10 @@
 #define AND_REG 0x0A000000 // No Flags!
 #define ANDS_REG 0x6A000000 // Only Flags!
 #define STR_REG 0xB9000000
+#define BR_IMM 0x14000000
+#define BR_REG 0xD61F0000
+#define BLR_IMM 0x94000000
+#define BLR_REG 0xD63F0000
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])

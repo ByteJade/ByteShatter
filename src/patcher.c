@@ -57,11 +57,11 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             break;
         case JMP:
             print("patch JMP");
-            *code = 0x14000000 | ((offset/4) & 0x3FFFFFF);
+            *code = BR_IMM | ((offset/4) & 0x3FFFFFF);
             break;
         case CALL:
             print("patch CALL");
-            *code = 0x94000000 | ((offset/4) & 0x3FFFFFF);
+            *code = BLR_IMM | ((offset/4) & 0x3FFFFFF);
             break;
         default:
             panic("PATCHER::UNCNOWN_PATCH");
