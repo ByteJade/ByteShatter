@@ -90,7 +90,6 @@ void encode(X64_instruction* buf) {
                     emit32(sf|_construct_r_r_imm(STR_REG, SC2, SC1, 0));
                 } else {
                     emit_add_signed(SC2, SC2, buf->op1.imm);
-                    emit_movz(SC2, buf->op1.imm&0xFFFF, 0);
                     emit32(sf|_construct_r_r_imm(STR_REG, SC2, SC1, 0));
                 }
             } else panic("ENCODER::UNHANDLED_ADD");
