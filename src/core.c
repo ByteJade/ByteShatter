@@ -1,5 +1,4 @@
 #include "core.h"
-#include "cache.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,7 +20,6 @@ void log_message(LogLevel level, const char* format, ...) {
     printf("\033[0m\n");
     
     if (level == LOG_PANIC) {
-        cache_print();
         exit(0);
     }
 }
