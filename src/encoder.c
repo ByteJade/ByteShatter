@@ -109,7 +109,7 @@ void encode(X64_instruction* buf) {
                 }
                 emit32(sf|_construct_r_r_imm(LDR_REG, r0, SC1, 0));
             } else if (t0&MEM) {
-                if (t1 == (MEM|IMM)) {
+                if (t0 == (MEM|IMM)) {
                     emit_rip_decode(buf->op0.imm);
                 } else {
                     emit_address_decode(&buf->op0);
