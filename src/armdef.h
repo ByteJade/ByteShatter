@@ -33,10 +33,10 @@ static const char* regs[] = {
     "12", "13", "14", "15",
 };
 typedef enum {
-    REG = 0,
-    MEM = 1,
-    IDX = 2,
-    IMM = 4,
+    REG = 1,
+    MEM = 2,
+    IDX = 4,
+    IMM = 8,
 } OpTypes;
 
 typedef enum {
