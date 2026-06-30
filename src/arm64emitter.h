@@ -21,7 +21,7 @@
 #define BLR_REG 0xD63F0000
 #define BLT_IMM 0x5400000B
 #define SXTW_REG 0x93407C00
-#define LSL_IMM 0x53107800
+#define LSL_IMM 0xD370F800
 #define LDR_REG 0xB9400000
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
@@ -29,6 +29,8 @@
 #define _construct_r_r_r(op, rd, rn, rm) \
     ((op) | (x64_regs[rm] << 16) | (x64_regs[rn] << 5) | x64_regs[rd])
 
+#define emit_lsl_imm(rd, rn, shift) \
+    emit32(0x9B2B0C00 | (((64 - shift) % 64) << 16) | ((63 - shift) << 10) | (rn << 5) | rd)
 #define emit_movz(rd, imm, shift) \
     emit32(0xD2800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
 #define emit_sub_imm(rd, rn, imm) \
@@ -59,5 +61,4 @@
     emit32(0xD65F03C0)
 #define emit_bti() \
     emit32(0xD503245F)
-
 #endif
