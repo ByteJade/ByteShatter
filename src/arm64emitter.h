@@ -22,6 +22,7 @@
 #define BLT_IMM 0x5400000B
 #define SXTW_REG 0x93407C00
 #define LSL_IMM 0xD37ffC00
+#define LDR_REG 0xB9400000
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
