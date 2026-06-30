@@ -75,7 +75,8 @@ void print_op(X64_instruction* buf, Operand* op) {
     } else {
         printf("[ ");
         if (op->type&REG) {
-            printf("r%s + ", regs[op->reg]);
+            printf("r%s ", regs[op->reg]);
+            if ((op->type&IDX) || (op->type&IMM)) printf("+ ");
         }
         if (op->type&IDX) {
             printf("r%s ", regs[op->idx]);
