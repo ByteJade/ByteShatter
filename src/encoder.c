@@ -78,14 +78,9 @@ void encode(X64_instruction* buf) {
             } else if (t1 == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
-                if (is_external_offset(offset)) {
-                    emit_movz(r0, offset, 0);
-                    emit_add_reg(r0, r0, RIP);
-                    emit_ldr_reg(r0, r0, 0);
-                } else {
-                    warning("ENCODER::ILLEGAL_RIP");
-                    emit_brk(0);
-                }
+                emit_movz(r0, offset, 0);
+                emit_add_reg(r0, r0, RIP);
+                emit_ldr_reg(r0, r0, 0);
             } else if (t1&MEM) {
                 if (t1 == (MEM|REG)) {
                     emit_ldr_reg(r0, r1, 0);
@@ -127,6 +122,13 @@ void encode(X64_instruction* buf) {
         case CMP:{
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, r0, r1));
+            } else if (t1 == (MEM|IMM)) {
+                int32_t offset = get_gp() + buf->op1.imm;
+                if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
+                emit_movz(SC1, offset, 0);
+                emit_add_reg(SC1, SC1, RIP);
+                emit_ldr_reg(SC1, SC1, 0);
+                emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, r0, SC1));
             } else panic("ENCODER::UNHANDLED_CMP");
         } break;
         case XOR:{
