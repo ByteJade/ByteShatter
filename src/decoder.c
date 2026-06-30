@@ -236,6 +236,10 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch32();
             break;
+        case 0xC9:
+            buf->opcount = 0;
+            buf->type = LEAVE;
+            break;
         case 0xC3:
         case 0xF4: // actualy hlt
             buf->opcount = 0;
