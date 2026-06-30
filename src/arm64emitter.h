@@ -22,7 +22,8 @@
 #define BLT_IMM 0x5400000B
 #define SXTW_REG 0x93407C00
 #define LSL_IMM 0xD370F800
-#define LDR_REG 0xB9400000
+#define LDR32_REG 0xB9400000
+#define LDR64_REG 0xF9400000
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
@@ -46,7 +47,7 @@
 #define emit_and_imm(rd, rn, imm) \
     emit32(_construct_r_r_imm(0x92000000, rd, rn, imm))
 #define emit_ldr_reg(rd, rn, imm) \
-    emit32(_construct_r_r_imm(0xF9400000, rd, rn, imm))
+    emit32(_construct_r_r_imm(LDR64_REG, rd, rn, imm))
 #define emit_blr_reg(rn) \
     emit32(0xD63F0000 | (x64_regs[rn] << 5))
 #define emit_br_reg(rn) \

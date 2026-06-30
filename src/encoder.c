@@ -105,7 +105,8 @@ void encode(X64_instruction* buf) {
                 emit_movz(r0, imm & IMM12, 0);
             } else if (t1&MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(sf|_construct_r_r_imm(LDR_REG, r0, SC1, 0));
+                if (sf) emit32(_construct_r_r_imm(LDR64_REG, r0, SC1, 0));
+                else emit32(_construct_r_r_imm(LDR32_REG, r0, SC1, 0));
             } else if (t0&MEM) {
                 emit_address_decode(&buf->op0);
                 if (t1 == REG)
