@@ -190,7 +190,7 @@ int decode_instr(X64_instruction* buf) {
                 case 4: buf->type = AND; break;
                 case 5: buf->type = SUB; break;
                 case 6: buf->type = XOR; break;
-                case 7: break; // cmp
+                case 7: buf->type = CMP; break; // cmp
             }
         } break;
         case 0x85:
