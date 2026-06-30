@@ -51,13 +51,13 @@ void emit_address_decode(Operand* op) {
         return;
     }
     if (t&IDX) {
-        emit32(_construct_r_r_imm(ADD_IMM, SC1, op->idx, 0));
+        emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->idx, 0));
         if (op->scale) {
-            emit32((LSL_IMM) | ((17 - op->scale) << 16) | (x64_regs[SC1] << 5) | x64_regs[SC1]);
+            emit32((SF|LSL_IMM) | ((17 - op->scale) << 16) | (x64_regs[SC1] << 5) | x64_regs[SC1]);
         }
     }
     if (t&REG) {
-        emit32(_construct_r_r_r(ADD_REG, SC1, SC1, op->reg));
+        emit32(_construct_r_r_r(SF|ADD_REG, SC1, SC1, op->reg));
     }
     if (t&IMM) {
         emit_add_signed(SC1, SC1, op->imm);
