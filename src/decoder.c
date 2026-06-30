@@ -119,6 +119,12 @@ int decode_instr(X64_instruction* buf) {
         byte = fetch8();
     }
     switch (byte) {
+        case 0x01:
+            reverse = 1;
+            buf->opcount = 2;
+            buf->type = ADD;
+            decode_regrm(buf);
+            break;
         case 0x31:
             buf->opcount = 2;
             buf->type = XOR;
