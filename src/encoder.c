@@ -53,7 +53,7 @@ void emit_address_decode(Operand* op) {
     if (t&IDX) {
         emit32(_construct_r_r_imm(ADD_IMM, SC1, op->idx, 0));
         if (op->scale) {
-            emit32(_construct_r_r_imm(LSL_IMM, SC1, SC1, op->scale));
+            emit32((LSL_IMM) | ((17 - op->scale) << 16) | (x64_regs[SC1] << 5) | x64_regs[SC1]);
         }
     }
     if (t&REG) {
