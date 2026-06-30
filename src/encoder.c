@@ -158,8 +158,9 @@ void encode(X64_instruction* buf) {
                 emit_push_reg(r0);
             } else panic("ENCODER::UNHANDLED_PUSH");
         } break;
+        case JL:
         case JE:{
-            emit_brk(cache_patch_point(JE, 0, buf->op0.imm));
+            emit_brk(cache_patch_point(buf->type, 0, buf->op0.imm));
         } break;
         case JMP:{
             emit_branch(buf, BR_REG, JMP);

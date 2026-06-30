@@ -19,6 +19,7 @@
 #define BR_REG 0xD61F0000
 #define BLR_IMM 0x94000000
 #define BLR_REG 0xD63F0000
+#define BLT_IMM 0x5400000B
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])

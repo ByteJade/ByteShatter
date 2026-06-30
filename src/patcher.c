@@ -48,6 +48,10 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     int32_t offset = (uint64_t)block - sc->pc;
     print("offset: %i", offset);
     switch (patch->type) {
+        case JL:
+            print("patch JE");
+            *code = BLT_IMM | ((offset & 0x7FFFF) << 3);
+            break;
         case JE:
             print("patch JE");
             *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
