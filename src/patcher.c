@@ -49,12 +49,12 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     print("offset: %i", offset);
     switch (patch->type) {
         case JL:
-            print("patch JE");
-            *code = BLT_IMM | ((offset & 0x7FFFF) << 3);
+            print("patch JL");
+            *code = BLT_IMM | (((offset/4) & 0x7FFFF) << 3);
             break;
         case JE:
             print("patch JE");
-            *code = 0x54000000 | ((offset & 0x7FFFF) << 3);
+            *code = 0x54000000 | (((offset/4) & 0x7FFFF) << 3);
             break;
         case LEA:
             print("patch LEA");
