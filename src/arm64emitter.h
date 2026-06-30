@@ -30,7 +30,7 @@
     ((op) | (x64_regs[rm] << 16) | (x64_regs[rn] << 5) | x64_regs[rd])
 
 #define emit_lsl_imm(rd, rn, shift) \
-    emit32(0x9B2B0C00 | (((64 - shift) % 64) << 16) | ((63 - shift) << 10) | (rn << 5) | rd)
+    emit32(0xD3400000 | ((-(shift) & 0x3F) << 16) | (((63 - shift) & 0x3F) << 10) |  (x64_regs[rn] << 5) | x64_regs[rd])
 #define emit_movz(rd, imm, shift) \
     emit32(0xD2800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
 #define emit_sub_imm(rd, rn, imm) \
