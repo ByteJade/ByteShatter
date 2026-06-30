@@ -44,7 +44,7 @@ void cache_clear() {
     bp = 0;
     pp = 0;
 }
-void cache_block_start() {
+uint16_t cache_block_start() {
     last_block = blocks_cache + bp;
     last_block->gp = get_gp();
     last_block->hp = get_hp();
@@ -52,6 +52,7 @@ void cache_block_start() {
     if (bp >= MAX_BLOCKS) {
         panic("CACHE::BLOCKS::OVERFLOW");
     }
+    return bp-1;
 }
 void cache_block_point() {
     uint16_t goff = get_gp() - last_block->gp;

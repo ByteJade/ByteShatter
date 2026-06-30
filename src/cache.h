@@ -29,7 +29,7 @@ void cahce_fini();
 /* clear all data */
 void cache_clear();
 /* set start point of code block cache */
-void cache_block_start();
+uint16_t cache_block_start();
 /* set instruction point in block  
    needed for jumping inside */
 void cache_block_point();

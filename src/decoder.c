@@ -292,7 +292,7 @@ int decode_instr(X64_instruction* buf) {
 void decode(uint32_t gp) {
     print("Start decode %x", gp);
     set_gp(gp);
-    cache_block_start();
+    uint16_t block = cache_block_start();
     while (1) {
         cache_block_point();
         X64_instruction buf;
@@ -302,4 +302,5 @@ void decode(uint32_t gp) {
         if (jump_type == RET || jump_type == JMP) break;
     }
     cache_block_end();
+    cache_flush(block);
 }
