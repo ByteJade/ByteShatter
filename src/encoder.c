@@ -162,6 +162,9 @@ void encode(X64_instruction* buf) {
             emit_add_imm(RSP, RBP, 0);
             emit_pop_reg(RBP);
         } break;
+        case CLTQ: {
+            emit32(SXTW_REG | (x64_regs[r0] << 5) | x64_regs[r0]);
+        } break;
         case JL:
         case JE:{
             emit_brk(cache_patch_point(buf->type, 0, buf->op0.imm));

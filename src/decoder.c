@@ -207,6 +207,12 @@ int decode_instr(X64_instruction* buf) {
             buf->type = LEA;
             decode_regrm(buf);
             break;
+        case 0x98:
+            buf->opcount = 1;
+            buf->type = CLTQ;
+            buf->op0.type = REG;
+            buf->op0.reg = RAX;
+            break;
         case 0xB8:
             buf->opcount = 2;
             buf->type = MOV;
