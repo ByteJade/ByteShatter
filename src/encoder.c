@@ -89,11 +89,11 @@ void encode(X64_instruction* buf) {
                 emit_ldr_reg(SC2, SC1, 0);
                 if (t1 == REG) {
                     emit32(sf|_construct_r_r_r(ADD_REG|S, SC2, SC2, r1));
-                    emit32(sf|_construct_r_r_imm(STR_REG, SC2, SC1, 0));
                 } else {
                     emit_add_signed(SC2, SC2, buf->op1.imm);
-                    emit32(sf|_construct_r_r_imm(STR_REG, SC2, SC1, 0));
                 }
+                if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, SC2, SC1, 0));
+                else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
             } else panic("ENCODER::UNHANDLED_ADD");
         } break;
         case MOV:{
@@ -109,11 +109,13 @@ void encode(X64_instruction* buf) {
                 else emit32(_construct_r_r_imm(LDR32_REG, r0, SC1, 0));
             } else if (t0&MEM) {
                 emit_address_decode(&buf->op0);
-                if (t1 == REG)
-                    emit32(sf|_construct_r_r_imm(STR_REG, r1, SC1, 0));
-                else {
+                if (t1 == REG){
+                    if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, r1, SC1, 0));
+                    else emit32(sf|_construct_r_r_imm(STR32_REG, r1, SC1, 0));
+                } else {
                     emit_movz(SC2, buf->op1.imm, 0);
-                    emit32(sf|_construct_r_r_imm(STR_REG, SC2, SC1, 0));
+                    if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, SC2, SC1, 0));
+                    else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
                 }
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;

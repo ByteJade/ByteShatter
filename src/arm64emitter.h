@@ -14,7 +14,6 @@
 #define EOR_REG 0x4A000000 // No Flags!
 #define AND_REG 0x0A000000 // No Flags!
 #define ANDS_REG 0x6A000000 // Only Flags!
-#define STR_REG 0xB9000000
 #define BR_IMM 0x14000000
 #define BR_REG 0xD61F0000
 #define BLR_IMM 0x94000000
@@ -24,6 +23,8 @@
 #define LSL_IMM 0xD370F800
 #define LDR32_REG 0xB9400000
 #define LDR64_REG 0xF9400000
+#define STR32_REG 0xB9000000
+#define STR64_REG 0xF9000000  
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
