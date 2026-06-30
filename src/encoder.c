@@ -112,6 +112,16 @@ void encode(X64_instruction* buf) {
                     emit_brk(cache_patch_point(LEA, r0, buf->op1.imm));
                     warning("ENCODER::ILLEGAL_RIP");
                 }
+            } else if (t1&MEM) {
+                if (t1 == (MEM|IDX|IMM)) {
+                    emit_add_imm(r0, buf->op1.idx, 0);
+                    if (buf->op1.scale) {
+                        emit32(_construct_r_r_imm(LSL_IMM, r0, r0, buf->op1.scale));
+                    }
+                    if (buf->op1.imm > 0)
+                        emit_add_imm(r0, r0, buf->op1.imm);
+                    else emit_sub_imm(r0, r0, -buf->op1.imm);
+                } else panic("ENCODER::UNHANDLED_LEA");
             } else panic("ENCODER::UNHANDLED_LEA");
         } break;
         case TST:{
