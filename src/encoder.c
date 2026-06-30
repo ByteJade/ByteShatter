@@ -43,6 +43,13 @@ void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
 }
 void emit_address_decode(Operand* op) {
     uint8_t t = op->type;
+    if (t == (MEM|IMM)) {
+        int32_t offset = get_gp() + op->imm;
+        if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
+        emit_movz(SC1, offset, 0);
+        emit_add_reg(SC1, SC1, RIP);
+        return;
+    }
     if (t&IDX) {
         emit32(_construct_r_r_imm(ADD_IMM, SC1, op->idx, 0));
         if (op->scale) {
@@ -55,12 +62,6 @@ void emit_address_decode(Operand* op) {
     if (t&IMM) {
         emit_add_signed(SC1, SC1, op->imm);
     }
-}
-void emit_rip_decode(int32_t imm) {
-    int32_t offset = get_gp() + imm;
-    if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
-    emit_movz(SC1, offset, 0);
-    emit_add_reg(SC1, SC1, RIP);
 }
 void encode(X64_instruction* buf) {
     uint8_t r0 = buf->op0.reg;
@@ -81,8 +82,8 @@ void encode(X64_instruction* buf) {
                 emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, r1));
             else if (t0 == REG && t1 == IMM)
                 emit_add_signed(r0, r0, buf->op1.imm);
-            else if (t0 == (MEM|IMM)) {
-                emit_rip_decode(buf->op0.imm);
+            else if (t0&MEM) {
+                emit_address_decode(&buf->op0);
                 emit_ldr_reg(SC2, SC1, 0);
                 if (t1 == REG) {
                     emit32(sf|_construct_r_r_r(ADD_REG|S, SC2, SC2, r1));
@@ -102,18 +103,10 @@ void encode(X64_instruction* buf) {
                 if (imm > INT16_MAX || imm < INT16_MIN) panic("ENCODER::ILLEGAL_IMM");
                 emit_movz(r0, imm & IMM12, 0);
             } else if (t1&MEM) {
-                if (t1 == (MEM|IMM)) {
-                    emit_rip_decode(buf->op1.imm);
-                } else {
-                    emit_address_decode(&buf->op1);
-                }
+                emit_address_decode(&buf->op1);
                 emit32(sf|_construct_r_r_imm(LDR_REG, r0, SC1, 0));
             } else if (t0&MEM) {
-                if (t0 == (MEM|IMM)) {
-                    emit_rip_decode(buf->op0.imm);
-                } else {
-                    emit_address_decode(&buf->op0);
-                }
+                emit_address_decode(&buf->op0);
                 if (t1 == REG)
                     emit32(sf|_construct_r_r_imm(STR_REG, r1, SC1, 0));
                 else {
@@ -146,8 +139,8 @@ void encode(X64_instruction* buf) {
         case CMP:{
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, r0, r1));
-            } else if (t1 == (MEM|IMM)) {
-                emit_rip_decode(buf->op1.imm);
+            } else if (t1&MEM) {
+                emit_address_decode(&buf->op1);
                 emit_ldr_reg(SC1, SC1, 0);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, r0, SC1));
             } else panic("ENCODER::UNHANDLED_CMP");
