@@ -7,7 +7,7 @@
 #include "armdef.h"
 #include <signal.h>
 #include <stdint.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 void print_cpu(struct sigcontext* sc) {
     #if defined(__aarch64__) || defined(_M_ARM64)
@@ -69,7 +69,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             *code = BLR_IMM | ((offset/4) & 0x3FFFFFF);
             break;
         default:
-            panic("PATCHER::UNCNOWN_PATCH");
+            panic("PATCHER::UNKNOWN_PATCH");
     }
     cache_flush(patch->block);
     #endif
@@ -90,6 +90,13 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         panic("segfault: %x", *code);
     } else panic("segfault");
 }
+void segi_handler(int sig, siginfo_t* info, void* ucontext) {
+    ucontext_t* ctx = (ucontext_t*)ucontext;
+    struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
+    print_cpu(sc);
+    cache_print();
+    exit(0);
+}
 void patcher_init() {
     struct sigaction sa_trap = {
         .sa_sigaction = brk_handler,
@@ -99,7 +106,12 @@ void patcher_init() {
         .sa_sigaction = segv_handler,
         .sa_flags = SA_SIGINFO,
     };
+    struct sigaction sa_segi = {
+        .sa_sigaction = segi_handler,
+        .sa_flags = SA_SIGINFO,
+    };
     sigaction(SIGTRAP, &sa_trap, NULL);
     sigaction(SIGSEGV, &sa_segv, NULL);
     sigaction(SIGILL, &sa_segv, NULL);
+    sigaction(SIGINT, &sa_segi, NULL);
 }
