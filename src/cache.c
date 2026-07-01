@@ -17,6 +17,7 @@ uint16_t pp = 0;
 CacheUnit* last_block = NULL;
 OffsetUnit local_offsets[MAX_OFFSETS];
 uint8_t loffp = 0;
+uint32_t offset_usage = 0;
 
 void cahce_init() {
     blocks_cache = (CacheUnit*) malloc(
@@ -59,6 +60,7 @@ void cache_block_point() {
     uint16_t hogg = get_hp() - last_block->hp;
     local_offsets[loffp].goff = goff;
     local_offsets[loffp].hoff = hogg;
+    offset_usage += sizeof(OffsetUnit);
     loffp++;
     if (loffp >= MAX_OFFSETS) {
         warning("CACHE::OFFSET::OVERFLOW");
@@ -147,7 +149,7 @@ void cache_flush(uint16_t block_id) {
     __builtin___clear_cache(code, code + size);
 }
 uint32_t cache_usage() {
-    return bp * sizeof(CacheUnit) + pp * sizeof(PatchUnit);
+    return bp * sizeof(CacheUnit) + pp * sizeof(PatchUnit) + offset_usage;
 }
 void cache_print() {
     print("Cache:");
