@@ -10,7 +10,6 @@
 #include <unistd.h>
 
 void execute(int block) {
-    cache_flush(block);
     uint64_t gp = (uint64_t)get_guest();
     uint32_t offset = cache_get_block(block)->hp;
     void(*exec)(void) = (void*)get_host() + offset;
@@ -52,6 +51,7 @@ void init_stack(ExeMeta* exe, const char* name) {
     set_auxv(auxv, 19);
     push_argv(0);
     push_argv(name);
+    push_argc();
 }
 int main(int argc, char** argv, const char** envp) {
     patcher_init();

@@ -28,6 +28,9 @@ void stack_fini() {
     munmap(stack, STACK_SIZE);
 }
 
+void push_argc() {
+    *(--sp) = argc;
+}
 void push_argv(const char* arg) {
     if (arg) {
         *(--sp) = (uint64_t)dp;
@@ -63,9 +66,5 @@ void set_envp(const char** envp) {
 }
 
 void* get_sp() {
-    if ((uint64_t)sp % 16 != 0) {
-        *(--sp) = 0;
-    }
-    *(--sp) = argc;
     return sp;
 }
