@@ -63,7 +63,9 @@ void emit_address_decode(Operand* op) {
         }
     }else {
         if (t&IMM) {
-            emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, op->imm));
+            if (op->imm >= 0)
+                emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, op->imm));
+            else emit32(_construct_r_r_imm(SF|SUB_IMM, SC1, op->reg, -op->imm));
         } else {
             emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, 0));
         }
