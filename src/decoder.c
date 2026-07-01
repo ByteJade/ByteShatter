@@ -180,9 +180,9 @@ int decode_instr(X64_instruction* buf) {
             reverse = 1;
             buf->opcount = 2;
             uint8_t modrm = fetch8();
+            decode_rm(&buf->op1, modrm);
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
-            decode_rm(&buf->op1, modrm);
             switch ((modrm >> 3)&7) {
                 case 0: buf->type = ADD; break;
                 case 1: break; // or
