@@ -318,6 +318,8 @@ void decode(uint32_t gp) {
         print_instr(&buf);
         encode(&buf);
         if (jump_type == RET || jump_type == JMP) break;
+        const uint8_t* block = cache_search(get_gp());
+        if (block) warning("DECODER::DUPLICATION");
     }
     cache_block_end();
     cache_flush(block);
