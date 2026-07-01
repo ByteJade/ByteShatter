@@ -52,17 +52,21 @@ void emit_address_decode(Operand* op) {
     }
     if (t&IDX) {
         emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->idx, 0));
-        if (op->scale) {
+        if (op->scale != 0) {
             emit_lsl_imm(SC1, SC1, op->scale);
         }
         if (t&REG) {
             emit32(_construct_r_r_r(SF|ADD_REG, SC1, SC1, op->reg));
         }
+        if ((t&IMM) && op->imm != 0) {
+            emit_add_signed(SC1, SC1, op->imm);
+        }
     }else {
-        emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, 0));
-    }
-    if (t&IMM) {
-        emit_add_signed(SC1, SC1, op->imm);
+        if (t&IMM) {
+            emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, op->imm));
+        } else {
+            emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, 0));
+        }
     }
 }
 void encode(X64_instruction* buf) {
