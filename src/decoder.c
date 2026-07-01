@@ -318,6 +318,10 @@ void decode(uint32_t gp) {
         print_instr(&buf);
         encode(&buf);
         if (jump_type == RET || jump_type == JMP) break;
+        /*
+        TODO: Static analysis of block jumps. 
+        Cache lookups are resource-intensive.
+        */
         const uint8_t* block = cache_search(get_gp());
         if (block) {
             int32_t offset = (uint64_t)block - (uint64_t)(get_host()+get_hp());
