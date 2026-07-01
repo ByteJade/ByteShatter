@@ -320,9 +320,9 @@ void decode(uint32_t gp) {
         if (jump_type == RET || jump_type == JMP) break;
         const uint8_t* block = cache_search(get_gp());
         if (block) {
-            warning("DECODER::DUPLICATION");
-            cache_block_point();
             int32_t offset = (uint64_t)block - get_hp();
+            warning("DECODER::DUPLICATION %i", offset);
+            cache_block_point();
             emit32(0x14000000 | ((offset/4) & 0x3FFFFFF));
             break;
         }
