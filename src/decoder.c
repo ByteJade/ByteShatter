@@ -154,6 +154,12 @@ int decode_instr(X64_instruction* buf) {
                     panic("DECODER::UNKNOWN_0F_SYMBOL: %X", modrm);
             }
             break;
+        case 0x29:
+            reverse = 1;
+            buf->opcount = 2;
+            buf->type = SUB;
+            decode_regrm(buf);
+            break;
         case 0x31:
             buf->opcount = 2;
             buf->type = XOR;
