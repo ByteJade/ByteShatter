@@ -34,7 +34,6 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
             emit_brk(0);
         }
     }
-    if (type == CALL) emit_add_imm(RAX, RDI, 0);
 }
 void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
     if (imm > 0)
@@ -209,6 +208,7 @@ void encode(X64_instruction* buf) {
         case CALL:{
             emit32(0xA9BF7BFD);
             emit_branch(buf, BLR_REG, CALL);
+            emit_add_imm(RAX, RDI, 0);
             emit32(0xA8C17BFD);
         } break;
         case RET: emit_ret(); break;
