@@ -104,6 +104,7 @@ void encode(X64_instruction* buf) {
             if (t0 == REG && t1 == IMM)
                 emit_lsl_imm(SC1, SC1, buf->op1.imm);
             else panic("ENCODER::UNHANDLED_SHL");
+            break;
         }
         case MOV:{
             if (t0 == REG && t1 == REG) {
