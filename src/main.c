@@ -50,7 +50,7 @@ void init_stack(ExeMeta* exe, int argc, char** argv) {
     };
     set_auxv(auxv, 19);
     push_argv(0);
-    for (int i = argc; i > 0; i--) {
+    for (int i = argc-1; i > 0; i--) {
         push_argv(argv[i]);
     }
     push_argc();
