@@ -207,6 +207,7 @@ void encode(X64_instruction* buf) {
         } break;
         case RET: emit_ret(); break;
         case EBR: /*emit_bti();*/ break;
+        case NOP: break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
     }
