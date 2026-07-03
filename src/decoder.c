@@ -313,7 +313,7 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.imm = fetch_imm8();
             switch ((modrm >> 3)&7) {
                 case 4: buf->type = SHL; break;
-                case 7: buf->type = SHR; break;
+                case 5: buf->type = SHR; break;
                 default: panic("DECODER::UNKNOWN_C1_SYMBOL: %X", modrm);
             }
         } break;
