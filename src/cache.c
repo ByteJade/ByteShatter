@@ -58,6 +58,11 @@ uint16_t cache_block_start() {
 void cache_block_point() {
     uint16_t goff = get_gp() - last_block->gp;
     uint16_t hogg = get_hp() - last_block->hp;
+    if (goff > UINT8_MAX || hogg > UINT8_MAX) {
+        warning("CACHE::BLOCKS::BAD_OFFSET");
+        cache_block_end();
+        cache_block_start();
+    }
     local_offsets[loffp].goff = goff;
     local_offsets[loffp].hoff = hogg;
     offset_usage += sizeof(OffsetUnit);
@@ -66,12 +71,6 @@ void cache_block_point() {
         warning("CACHE::OFFSET::OVERFLOW");
         cache_block_end();
         cache_block_start();
-    }
-    if (goff > UINT8_MAX || hogg > UINT8_MAX) {
-        /* I don't yet know how to
-           invalidate an instruction that
-           has gone beyond the limit */
-        panic("CACHE::BLOCKS::BAD_OFFSET");
     }
 }
 void cache_block_end() {
