@@ -34,7 +34,7 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
             emit_brk(0);
         }
     }
-    if (code == CALL) emit_add_imm(RAX, RDI, 0);
+    if (type == CALL) emit_add_imm(RAX, RDI, 0);
 }
 void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
     if (imm > 0)
