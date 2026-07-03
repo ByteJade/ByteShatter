@@ -126,6 +126,12 @@ int decode_instr(X64_instruction* buf) {
     } else if (byte == 0x66) {
         buf->size = 16;
         byte = fetch8();
+    } else if (byte == 0x64) {
+        // TLS read. I don't know what to do
+        decode_instr(buf);
+        buf->opcount = 0;
+        buf->type = NOP;
+        return ret;
     }
     switch (byte) {
         case 0x01:
@@ -278,7 +284,7 @@ int decode_instr(X64_instruction* buf) {
         case 0x90: 
             buf->opcount = 0;
             buf->type = NOP;
-            break; // just NOP
+            break;
         case 0x98:
             buf->opcount = 1;
             buf->type = CLTQ;
