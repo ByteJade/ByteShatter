@@ -126,6 +126,29 @@ int decode_instr(X64_instruction* buf) {
             buf->type = ADD;
             decode_regrm(buf);
             break;
+        case 0x0F:
+            buf->opcount = 1;
+            uint8_t modrm = fetch8();
+            switch (modrm) {
+                case 0x84:
+                    buf->type = JE;
+                    buf->op0.type = IMM;
+                    buf->op0.imm = fetch_imm32();
+                    break;
+                case 0x85:
+                    buf->type = JNE;
+                    buf->op0.type = IMM;
+                    buf->op0.imm = fetch_imm32();
+                    break;
+                case 0x8D:
+                    buf->type = JGE;
+                    buf->op0.type = IMM;
+                    buf->op0.imm = fetch_imm32();
+                    break;
+                default:
+                    panic("DECODER::UNKNOWN_0F_SYMBOL: %X", modrm);
+            }
+            break;
         case 0x31:
             buf->opcount = 2;
             buf->type = XOR;
