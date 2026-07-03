@@ -261,6 +261,7 @@ int decode_instr(X64_instruction* buf) {
             buf->type = LEA;
             decode_regrm(buf);
             break;
+        case 0x90: break; // just NOP
         case 0x98:
             buf->opcount = 1;
             buf->type = CLTQ;
