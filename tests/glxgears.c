@@ -15,33 +15,8 @@ static void usage()
 
 int main(int argc, char *argv[])
 {
-    int i;
-    for (i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-display") == 0) {
-            printf("DISPLAY\n");
-        }
-        else if (strcmp(argv[i], "-info") == 0) {
-            printf("INFO\n");
-        }
-        else if (strcmp(argv[i], "-stereo") == 0) {
-            printf("STEREO\n");
-        }
-        else if (i < argc-1 && strcmp(argv[i], "-samples") == 0) {
-            printf("SAMPLES\n");
-        }
-        else if (strcmp(argv[i], "-fullscreen") == 0) {
-            printf("FULLSCREEN\n");
-        }
-        else if (i < argc-1 && strcmp(argv[i], "-geometry") == 0) {
-            printf("GEOMETRY\n");
-        }
-        else if (i < argc-1 && strcmp(argv[i], "-framerate") == 0) {
-            printf("FRAMERATE\n");
-        }
-        else {
-            usage();
-            return -1;
-        }
+    if (strcmp(argv[argc-1], "-display") == 0) {
+        printf("DISPLAY\n");
     }
     return 0;
 }
