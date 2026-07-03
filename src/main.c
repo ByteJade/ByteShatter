@@ -25,7 +25,7 @@ void execute(int block) {
     #endif
     success("execution");
 }
-void init_stack(ExeMeta* exe, const char* name) {
+void init_stack(ExeMeta* exe, int argc, char** argv) {
     Elf64_auxv_t auxv[] = {
         {AT_SYSINFO_EHDR, 0},
         {AT_MINSIGSTKSZ, 0x5f0},
@@ -50,7 +50,9 @@ void init_stack(ExeMeta* exe, const char* name) {
     };
     set_auxv(auxv, 19);
     push_argv(0);
-    push_argv(name);
+    for (int i = 1; i < argc; i++) {
+        push_argv(argv[i]);
+    }
     push_argc();
 }
 int main(int argc, char** argv, const char** envp) {
@@ -60,7 +62,7 @@ int main(int argc, char** argv, const char** envp) {
     set_envp(envp);
     load_library("default.so.1");
     ExeMeta* exe = load_object(argv[argc-1]);
-    init_stack(exe, argv[argc-1]);
+    init_stack(exe, argc, argv);
     decode(exe->init);
     success("decode init");
     execute(0);
