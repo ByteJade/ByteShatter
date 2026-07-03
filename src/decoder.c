@@ -170,6 +170,12 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
             break;
+        case 0x75:
+            buf->opcount = 1;
+            buf->type = JNE;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm8();
+            break;
         case 0x7C:
             buf->opcount = 1;
             buf->type = JL;
@@ -227,19 +233,19 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = REG;
             buf->op0.reg = RAX;
             buf->op1.type = IMM;
-            buf->op1.imm = fetch32();
+            buf->op1.imm = fetch_imm32();
             break;
         case 0xE8:
             buf->opcount = 1;
             buf->type = CALL;
             buf->op0.type = IMM;
-            buf->op0.imm = fetch32();
+            buf->op0.imm = fetch_imm32();
             break;
         case 0xE9:
             buf->opcount = 1;
             buf->type = JMP;
             buf->op0.type = IMM;
-            buf->op0.imm = fetch32();
+            buf->op0.imm = fetch_imm32();
             break;
         case 0xEb:
             buf->opcount = 1;
@@ -254,7 +260,7 @@ int decode_instr(X64_instruction* buf) {
             buf->type = MOV;
             decode_rm(&buf->op1, fetch8());
             buf->op0.type = IMM;
-            buf->op0.imm = fetch32();
+            buf->op0.imm = fetch_imm32();
             break;
         case 0xC9:
             buf->opcount = 0;
