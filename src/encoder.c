@@ -151,6 +151,10 @@ void encode(X64_instruction* buf) {
                 emit_address_decode(&buf->op1);
                 emit_ldr_reg(SC1, SC1, 0);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, r0, SC1));
+            } else if (t0&MEM) {
+                emit_address_decode(&buf->op0);
+                emit_ldr_reg(SC1, SC1, 0);
+                emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, SC1, r1));
             } else panic("ENCODER::UNHANDLED_CMP");
         } break;
         case XOR:{
