@@ -76,7 +76,7 @@ void print_op(X64_instruction* buf, Operand* op) {
         printf("[ ");
         if (op->type&REG) {
             printf("r%s ", regs[op->reg]);
-            if ((op->type&IDX) || (op->type&IMM)) printf("+ ");
+            if (op->type&IDX) printf("+ ");
         }
         if (op->type&IDX) {
             printf("r%s ", regs[op->idx]);
@@ -87,13 +87,13 @@ void print_op(X64_instruction* buf, Operand* op) {
             } else if (op->scale == 3) {
                 printf("* 8 ");
             }
-            printf("+ ");
         }
         if (op->type&IMM) {
             if (op->type == (MEM|IMM)) {
-                printf("rip + ");
+                printf("rip ");
             }
-            printf("%lx ", op->imm);
+            if (op->imm > 0) printf("+ %lx ", op->imm);
+            if (op->imm < 0) printf("- %lx ", -op->imm);
         }
         printf("] ");
     }
