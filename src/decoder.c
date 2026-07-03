@@ -131,6 +131,12 @@ int decode_instr(X64_instruction* buf) {
             buf->type = XOR;
             decode_regrm(buf);
             break;
+        case 0x39:
+            reverse = 1;
+            buf->opcount = 2;
+            buf->type = CMP;
+            decode_regrm(buf);
+            break;
         case 0x3B:
             buf->opcount = 2;
             buf->type = CMP;
