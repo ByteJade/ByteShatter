@@ -62,7 +62,15 @@ void decode_regrm(X64_instruction* buf) {
     decode_reg(&buf->op0, byte);
     decode_rm(&buf->op1, byte);
 }
-
+void decode_shift_table(X64_instruction* buf, uint8_t modrm) {
+    uint8_t shift = (modrm >> 3)&7;
+    switch (shift) {
+        case 4: buf->type = SHL; break;
+        case 5: buf->type = SHR; break;
+        case 7: buf->type = SAR; break;
+        default: panic("DECODER::UNKNOWN_SHIFT_SYMBOL: %X", shift);
+    }
+}
 void print_op(X64_instruction* buf, Operand* op) {
     if (op->type == REG) {
         if (buf->size == 64) {
@@ -304,6 +312,15 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch8();
             break;
+        case 0xD1:{
+            reverse = 1;
+            buf->opcount = 2;
+            uint8_t modrm = fetch8();
+            decode_rm(&buf->op1, modrm);
+            buf->op0.type = IMM;
+            buf->op0.imm = 1;
+            decode_shift_table(buf, modrm);
+        } break;
         case 0xC1:{
             reverse = 1;
             buf->opcount = 2;
@@ -311,12 +328,7 @@ int decode_instr(X64_instruction* buf) {
             decode_rm(&buf->op1, modrm);
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
-            switch ((modrm >> 3)&7) {
-                case 4: buf->type = SHL; break;
-                case 5: buf->type = SHR; break;
-                case 7: buf->type = SAR; break;
-                default: panic("DECODER::UNKNOWN_C1_SYMBOL: %X", modrm);
-            }
+            decode_shift_table(buf, modrm);
         } break;
         case 0xC7:
             reverse = 1;
