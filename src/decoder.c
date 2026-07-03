@@ -314,6 +314,7 @@ int decode_instr(X64_instruction* buf) {
             switch ((modrm >> 3)&7) {
                 case 4: buf->type = SHL; break;
                 case 5: buf->type = SHR; break;
+                case 6: buf->type = SAR; break;
                 default: panic("DECODER::UNKNOWN_C1_SYMBOL: %X", modrm);
             }
         } break;
