@@ -68,7 +68,29 @@ void emit_address_decode(Operand* op) {
         }
     }
 }
+void encode8bit(X64_instruction* buf) {
+    uint8_t r0 = buf->op0.reg;
+    uint8_t r1 = buf->op1.reg;
+    uint8_t t0 = buf->op0.type;
+    uint8_t t1 = buf->op1.type;
+    switch (buf->type) {
+        case MOV: {
+            if (t0&MEM) {
+                emit_address_decode(&buf->op0);
+                if (t1 == REG){
+                    emit32(_construct_r_r_imm(STR8_REG, r1, SC1, 0));
+                } else {
+                    emit_movz(SC2, buf->op1.imm, 0);
+                    emit32(_construct_r_r_imm(STR8_REG, SC2, SC1, 0));
+                }
+            } else panic("ENCODER::UNHANDLED_MOV");
+        } break;
+        default:
+            panic("ENCODER::UNKNOWN_8BIT_INSTRUCTION: %x", buf->type);
+    }
+}
 void encode(X64_instruction* buf) {
+    if (buf->size == 8) encode8bit(buf);
     uint8_t r0 = buf->op0.reg;
     uint8_t r1 = buf->op1.reg;
     uint8_t t0 = buf->op0.type;

@@ -336,6 +336,15 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.imm = fetch_imm8();
             decode_shift_table(buf, modrm);
         } break;
+        case 0xC6:
+            reverse = 1;
+            buf->size = 8;
+            buf->opcount = 2;
+            buf->type = MOV;
+            decode_rm(&buf->op1, fetch8());
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm8();
+            break;
         case 0xC7:
             reverse = 1;
             buf->opcount = 2;
