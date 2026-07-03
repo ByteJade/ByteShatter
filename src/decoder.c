@@ -235,6 +235,12 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch32();
             break;
+        case 0xE9:
+            buf->opcount = 1;
+            buf->type = JMP;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch32();
+            break;
         case 0xEb:
             buf->opcount = 1;
             buf->type = JMP;
