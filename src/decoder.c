@@ -190,28 +190,14 @@ int decode_instr(X64_instruction* buf) {
             buf->type = CMP;
             decode_regrm(buf);
             break;
-        case 0x50:
-        case 0x51:
-        case 0x52:
-        case 0x53:
-        case 0x54:
-        case 0x55:
-        case 0x56:
-        case 0x57:
+        case 0x50 ... 0x57:
             buf->size = 64;
             buf->opcount = 1;
             buf->type = PUSH;
             buf->op0.type = REG;
             buf->op0.reg = byte - 0x50;
             break;
-        case 0x58:
-        case 0x59:
-        case 0x5A:
-        case 0x5B:
-        case 0x5C:
-        case 0x5D:
-        case 0x5E:
-        case 0x5F:
+        case 0x58 ... 0x5F:
             buf->size = 64;
             buf->opcount = 1;
             buf->type = POP;
@@ -291,11 +277,11 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = REG;
             buf->op0.reg = RAX;
             break;
-        case 0xB8:
+        case 0xB8 ... 0xBE:
             buf->opcount = 2;
             buf->type = MOV;
             buf->op0.type = REG;
-            buf->op0.reg = RAX;
+            buf->op0.reg = byte - 0xB8;
             buf->op1.type = IMM;
             buf->op1.imm = fetch_imm32();
             break;
