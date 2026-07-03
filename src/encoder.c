@@ -102,7 +102,7 @@ void encode(X64_instruction* buf) {
         } break;
         case SHL:{
             if (t0 == REG && t1 == IMM)
-                emit_lsl_imm(SC1, SC1, buf->op1.imm);
+                emit_lsl_imm(r0, r1, buf->op1.imm);
             else panic("ENCODER::UNHANDLED_SHL");
             break;
         }
