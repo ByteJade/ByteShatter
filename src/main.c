@@ -5,26 +5,11 @@
 #include "decoder.h"
 #include "patcher.h"
 #include "stack.h"
+#include "executer.h"
 #include <stdint.h>
 #include <sys/auxv.h>
 #include <unistd.h>
 
-void execute(int block) {
-    uint64_t gp = (uint64_t)get_guest();
-    uint32_t offset = cache_get_block(block)->hp;
-    void(*exec)(void) = (void*)get_host() + offset;
-    uint64_t* sp = get_sp();
-    #if defined(__aarch64__) || defined(_M_ARM64)
-    __asm__ volatile(
-        "mov x21, %0\n"
-        "mov x28, %1\n"
-        : : "r" (gp), "r" (sp)
-        : "x21", "x28"
-    );
-    exec();
-    #endif
-    success("execution");
-}
 void init_stack(ExeMeta* exe, int argc, char** argv) {
     Elf64_auxv_t auxv[] = {
         {AT_SYSINFO_EHDR, 0},
@@ -63,18 +48,21 @@ int main(int argc, char** argv, const char** envp) {
     load_library("default.so.1");
     ExeMeta* exe = load_object(argv[1]);
     init_stack(exe, argc, argv);
-    decode(exe->init);
-    success("decode init");
-    execute(0);
-    cache_print();
-    // TODO: init_array calls
-    print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
-    decode(exe->elf->header.e_entry);
-    success("decode _start");
-    execute(1);
-    cache_print();
-    print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
-    cache_clear();
+    
+    execute(exe->init);
+    if (exe->init_array) {
+        size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
+        uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
+        
+        for (size_t i = 0; i < count; i++) {
+            if (init_funcs[i]) {
+                uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
+                print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
+                execute(pos);
+            }
+        }
+    }
+    execute(exe->elf->header.e_entry);
 
     loader_close_elf(exe);
     loader_close_exe(exe);
