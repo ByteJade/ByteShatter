@@ -47,6 +47,7 @@ void cache_clear() {
 }
 uint16_t cache_block_start() {
     last_block = blocks_cache + bp;
+    last_block->offsets = NULL;
     last_block->gp = get_gp();
     last_block->hp = get_hp();
     bp++;
@@ -119,6 +120,7 @@ uint8_t* cache_search(uint32_t gp) {
     // TODO: better cache search
     for (int i = 0; i < bp; i++) {
         CacheUnit* cache = blocks_cache + i;
+        if (cache->offsets == NULL) continue;
         if (gp == cache->gp) return get_host() + cache->hp;
         if (gp > cache->gp && gp <  cache->gp + cache->end) {
             return get_host() + block_cache_search(gp, cache);
