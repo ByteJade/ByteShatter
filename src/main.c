@@ -61,7 +61,7 @@ int main(int argc, char** argv, const char** envp) {
     stack_init();
     set_envp(envp);
     load_library("default.so.1");
-    ExeMeta* exe = load_object(argv[argc-1]);
+    ExeMeta* exe = load_object(argv[1]);
     init_stack(exe, argc, argv);
     decode(exe->init);
     success("decode init");
