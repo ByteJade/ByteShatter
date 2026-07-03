@@ -26,7 +26,6 @@ void brk(void) {return;};
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
-    print_cpu(sc);
     #if defined(__aarch64__) || defined(_M_ARM64)
     uint32_t* code = (uint32_t*)sc->pc;
     uint32_t instruction = *code;
