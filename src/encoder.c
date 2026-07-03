@@ -29,12 +29,12 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
             emit_ldr_reg(SC1, SC1, 0);
             emit32(code | (x64_regs[SC1] << 5));
             // wrapper
-            emit_add_imm(RAX, RDI, 0);
         } else {
             warning("ENCODER::ILLEGAL_RIP");
             emit_brk(0);
         }
     }
+    if (code == CALL) emit_add_imm(RAX, RDI, 0);
 }
 void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
     if (imm > 0)
