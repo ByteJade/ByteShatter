@@ -298,6 +298,18 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch8();
             break;
+        case 0xC1:{
+            reverse = 1;
+            buf->opcount = 2;
+            uint8_t modrm = fetch8();
+            decode_rm(&buf->op1, modrm);
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm8();
+            switch ((modrm >> 3)&7) {
+                case 4: buf->type = SHL; break;
+                default: panic("DECODER::UNKNOWN_C1_SYMBOL: %X", modrm);
+            }
+        } break;
         case 0xC7:
             reverse = 1;
             buf->opcount = 2;

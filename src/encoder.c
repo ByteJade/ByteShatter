@@ -100,6 +100,11 @@ void encode(X64_instruction* buf) {
                 else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
             } else panic("ENCODER::UNHANDLED_ADD");
         } break;
+        case SHL:{
+            if (t0 == REG && t1 == IMM)
+                emit_lsl_imm(SC1, SC1, buf->op1.imm);
+            else panic("ENCODER::UNHANDLED_SHL");
+        }
         case MOV:{
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_imm(ADD_IMM, r0, r1, 0));
