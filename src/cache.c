@@ -154,7 +154,7 @@ void cache_print() {
     print("Cache:");
     for (int i = 0; i < bp; i++) {
         CacheUnit* unit = blocks_cache + i;
-        uint32_t size = unit->offsets[unit->offsetssz-1].hoff/4+4;
+        uint32_t size = unit->offsets[unit->offsetssz-1].hoff/4+5;
         print("\n%lX Block: %i %i", unit->hp, i, size);
         uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
         for (int x = 0; x < size; x++) {
