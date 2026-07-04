@@ -154,11 +154,6 @@ int decode_instr(X64_instruction* buf) {
                     buf->op0.type = IMM;
                     buf->op0.imm = fetch_imm32();
                     break;
-                case 0x86:
-                    buf->opcount = 2;
-                    buf->type = MOVZX;
-                    decode_regrm(buf);
-                    break;
                 case 0x8C:
                     buf->type = JL;
                     buf->op0.type = IMM;
@@ -168,6 +163,11 @@ int decode_instr(X64_instruction* buf) {
                     buf->type = JGE;
                     buf->op0.type = IMM;
                     buf->op0.imm = fetch_imm32();
+                    break;
+                case 0xB6:
+                    buf->opcount = 2;
+                    buf->type = MOVZX;
+                    decode_regrm(buf);
                     break;
                 default:
                     panic("DECODER::UNKNOWN_0F_SYMBOL: %X", modrm);
