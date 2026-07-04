@@ -22,8 +22,6 @@ static GLfloat fix_point = 40.0;	/* Fixation point distance.  */
 static GLfloat left, right, asp;	/* Stereo frustum params.  */
 
 static int framerate = -1; /* Framerate limit if > 0 */
-static unsigned int winWidth = 300, winHeight = 300;
-static int x = 0, y = 0;
 
 static void no_border( Display *dpy, Window w)
 {
@@ -66,7 +64,9 @@ static void no_border( Display *dpy, Window w)
                     );
 }
 
-static void make_window( Display *dpy, const char *name,
+static void
+make_window( Display *dpy, const char *name,
+             int x, int y, int width, int height,
              Window *winRet, GLXContext *ctxRet, VisualID *visRet)
 {
     int attribs[64];
@@ -126,7 +126,7 @@ static void make_window( Display *dpy, const char *name,
     /* XXX this is a bad way to get a borderless window! */
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
 
-    win = XCreateWindow( dpy, root, x, y, winWidth, winHeight,
+    win = XCreateWindow( dpy, root, x, y, width, height,
                     0, visinfo->depth, InputOutput,
                     visinfo->visual, mask, &attr );
 
@@ -138,8 +138,8 @@ static void make_window( Display *dpy, const char *name,
         XSizeHints sizehints;
         sizehints.x = x;
         sizehints.y = y;
-        sizehints.width  = winWidth;
-        sizehints.height = winHeight;
+        sizehints.width  = width;
+        sizehints.height = height;
         sizehints.flags = USSize | USPosition;
         XSetNormalHints(dpy, win, &sizehints);
         XSetStandardProperties(dpy, win, name, name,
@@ -158,6 +158,7 @@ static void make_window( Display *dpy, const char *name,
 
     XFree(visinfo);
 }
+
 static int is_glx_extension_supported(Display *dpy, const char *query)
 {
     const int scrnum = DefaultScreen(dpy);
@@ -218,6 +219,8 @@ static void usage()
 
 int main(int argc, char *argv[])
 {
+    unsigned int winWidth = 300, winHeight = 300;
+    int x = 0, y = 0;
     Display *dpy;
     Window win;
     GLXContext ctx;
@@ -270,7 +273,7 @@ int main(int argc, char *argv[])
         winWidth = DisplayWidth(dpy, scrnum);
         winHeight = DisplayHeight(dpy, scrnum);
     }
-    make_window(dpy, "glxgears", &win, &ctx, &visId);
+    make_window(dpy, "glxgears", x, y, winWidth, winHeight, &win, &ctx, &visId);
     XMapWindow(dpy, win);
     glXMakeCurrent(dpy, win, ctx);
 
