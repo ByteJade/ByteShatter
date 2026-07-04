@@ -174,6 +174,11 @@ int decode_instr(X64_instruction* buf) {
             buf->type = SUB;
             decode_regrm(buf);
             break;
+        case 0x2B:
+            buf->opcount = 2;
+            buf->type = SUB;
+            decode_regrm(buf);
+            break;
         case 0x31:
             buf->opcount = 2;
             buf->type = XOR;

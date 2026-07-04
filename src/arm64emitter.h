@@ -56,6 +56,8 @@
     emit32(_construct_r_r_imm(0x92000000, rd, rn, imm))
 #define emit_ldr_reg(rd, rn, imm) \
     emit32(_construct_r_r_imm(LDR64_REG, rd, rn, imm))
+#define emit_fcvtzs(rd, rn) \
+    emit32(0x1E600000 | ((rn & 0x1F) << 5) | (rd & 0x1F))
 #define emit_blr_reg(rn) \
     emit32(0xD63F0000 | (x64_regs[rn] << 5))
 #define emit_br_reg(rn) \
