@@ -26,7 +26,7 @@ static const char* types[] = {
     "jmp", "cmp", "endbr64", "jl",
     "leave", "cltq", "jne", "jge",
     "nop", "shl", "shr", "sar",
-    "cvttsd2si"
+    "movzx"
 };
 static const char* regs[] = {
     "ax", "cx", "dx", "bx",
@@ -48,7 +48,7 @@ typedef enum {
     JMP, CMP, EBR, JL,
     LEAVE, CLTQ, JNE, JGE,
     NOP, SHL, SHR, SAR,
-    CVTTSD2SI
+    MOVZX
 } InstrTypes;
 
 enum mapped_registers {

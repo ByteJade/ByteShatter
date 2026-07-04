@@ -139,6 +139,7 @@ void encode(X64_instruction* buf) {
             else panic("ENCODER::UNHANDLED_SAR");
             break;
         }
+        case MOVZX:
         case MOV:{
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_imm(ADD_IMM, r0, r1, 0));
