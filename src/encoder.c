@@ -96,7 +96,10 @@ void encode8bit(X64_instruction* buf) {
     }
 }
 void encode(X64_instruction* buf) {
-    if (buf->size == 8) encode8bit(buf);
+    if (buf->size == 8) {
+        encode8bit(buf);
+        return;
+    }
     uint8_t r0 = buf->op0.reg;
     uint8_t r1 = buf->op1.reg;
     uint8_t t0 = buf->op0.type;
