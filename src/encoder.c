@@ -145,6 +145,11 @@ void encode(X64_instruction* buf) {
             else panic("ENCODER::UNHANDLED_SAR");
             break;
         }
+        case MOVSLQ: {
+            if (t0 == REG && t1 == REG) {
+                emit32(0x93407c00 | (x64_regs[r0]<<5) | (x64_regs[r1]));
+            }else panic("ENCODER::UNHANDLED_MOVSLQ");
+        } break;
         case MOVZX:
         case MOV:{
             if (t0 == REG && t1 == REG) {

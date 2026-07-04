@@ -214,6 +214,11 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = REG;
             buf->op0.reg = byte - 0x58;
             break;
+        case 0x63:
+            buf->opcount = 2;
+            buf->type = MOVSLQ;
+            decode_regrm(buf);
+            break;
         case 0x74:
             buf->opcount = 1;
             buf->type = JE;
