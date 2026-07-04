@@ -36,12 +36,8 @@ void decode_rm(Operand* op, uint8_t modrm) {
     uint8_t rm = modrm & 7;
     if (mod < 3) {
         op->type = MEM;
-        if (mod == 1) {
+        if (mod == 1 || mod == 2) {
             op->type |= IMM;
-            op->imm = fetch_imm8();
-        } else if (mod == 2) {
-            op->type |= IMM;
-            op->imm = fetch_imm32();
         }
         if (mod == 0 && rm == 0b101) {
             op->type |= IMM;
@@ -51,6 +47,11 @@ void decode_rm(Operand* op, uint8_t modrm) {
         } else {
             op->type |= REG;
             op->reg = rm;
+        }
+        if (mod == 1) {
+            op->imm = fetch_imm8();
+        } else if (mod == 2) {
+            op->imm = fetch_imm32();
         }
     } else {
         op->type = REG;
