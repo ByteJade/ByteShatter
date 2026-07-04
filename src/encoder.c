@@ -233,6 +233,10 @@ void encode(X64_instruction* buf) {
         case PUSH:{
             if (t0 == REG) {
                 emit_push_reg(r0);
+            } else if (t0&MEM) {
+                emit_address_decode(&buf->op0);
+                emit_ldr_reg(SC1, SC1, 0);
+                emit_push_reg(SC1);
             } else panic("ENCODER::UNHANDLED_PUSH");
         } break;
         case LEAVE: {
