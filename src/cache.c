@@ -65,6 +65,8 @@ void cache_block_point() {
         warning("CACHE::BLOCKS::BAD_OFFSET");
         cache_block_end();
         cache_block_start();
+        goff = get_gp() - last_block->gp;
+        hogg = get_hp() - last_block->hp;
     }
     local_offsets[loffp].goff = goff;
     local_offsets[loffp].hoff = hogg/4;
