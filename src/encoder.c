@@ -242,6 +242,7 @@ void encode(X64_instruction* buf) {
         case CLTQ: {
             emit32(SXTW_REG | (x64_regs[r0] << 5) | x64_regs[r0]);
         } break;
+        case JG:
         case JGE:
         case JL:
         case JNE:
