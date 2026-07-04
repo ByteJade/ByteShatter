@@ -317,7 +317,7 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = REG;
             buf->op0.reg = RAX;
             break;
-        case 0xB8 ... 0xBE:
+        case 0xB8 ... 0xBF:
             buf->opcount = 2;
             buf->type = MOV;
             buf->op0.type = REG;
