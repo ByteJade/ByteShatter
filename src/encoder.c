@@ -85,6 +85,12 @@ void encode8bit(X64_instruction* buf) {
                 }
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;
+        case TST:{
+            if (t0 == REG && t1 == REG) {
+                emit32(0x12001c00 | (x64_regs[r0]<<5) | (x64_regs[r1])); 
+                emit32(_construct_r_r_r(ANDS_REG, XZR, r0, r1));
+            } else panic("ENCODER::UNHANDLED_TST");
+        } break;
         default:
             panic("ENCODER::UNKNOWN_8BIT_INSTRUCTION: %x", buf->type);
     }

@@ -256,6 +256,12 @@ int decode_instr(X64_instruction* buf) {
                 case 7: buf->type = CMP; break; // cmp
             }
         } break;
+        case 0x84:
+            buf->size = 8;
+            buf->opcount = 2;
+            buf->type = TST;
+            decode_regrm(buf);
+            break;
         case 0x85:
             buf->opcount = 2;
             buf->type = TST;
