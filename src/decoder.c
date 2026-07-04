@@ -134,6 +134,10 @@ int decode_instr(X64_instruction* buf) {
         return ret;
     }
     switch (byte) {
+        case 0x00: 
+            buf->opcount = 0;
+            buf->type = NOP;
+            break;
         case 0x01:
             reverse = 1;
             buf->opcount = 2;
