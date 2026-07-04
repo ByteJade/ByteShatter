@@ -1,6 +1,8 @@
 #include "cache.h"
+#include "armdef.h"
 #include "memory.h"
 #include "core.h"
+#include "decoder.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,7 +67,7 @@ void cache_block_point() {
         cache_block_start();
     }
     local_offsets[loffp].goff = goff;
-    local_offsets[loffp].hoff = hogg;
+    local_offsets[loffp].hoff = hogg/4;
     offset_usage += sizeof(OffsetUnit);
     loffp++;
     if (loffp >= MAX_OFFSETS) {
@@ -105,7 +107,7 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
     while (left <= right) {
         int mid = (left + right) / 2;
         uint8_t goff = offsets[mid].goff;
-        if (goff == gp) return cache->hp + offsets[mid].hoff;
+        if (goff == gp) return cache->hp + offsets[mid].hoff*4;
         if (goff < gp) left = mid + 1; 
         else right = mid - 1;
     }
@@ -145,7 +147,7 @@ CacheUnit* cache_get_block(uint16_t block_id) {
 void cache_flush(uint16_t block_id) {
     CacheUnit* unit = blocks_cache + block_id;
     void* code = get_host() + unit->hp;
-    uint32_t size = unit->offsets[unit->offsetssz-1].hoff+16;
+    uint32_t size = unit->offsets[unit->offsetssz-1].hoff*4+32;
     print("flush cache %x-%x; block %x", unit->hp, unit->hp+size, block_id);
     __builtin___clear_cache(code, code + size);
 }
@@ -156,11 +158,20 @@ void cache_print() {
     print("Cache:");
     for (int i = 0; i < bp; i++) {
         CacheUnit* unit = blocks_cache + i;
-        uint32_t size = unit->offsets[unit->offsetssz-1].hoff/4+5;
-        print("\n%lX Block: %i %i", unit->hp, i, size);
+        print("\n%lX Block: %i", unit->hp, i);
         uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
-        for (int x = 0; x < size; x++) {
-            print("%x",host[x]);
+        for (int x = 0; x < unit->offsetssz; x++) {
+            X64_instruction buf;
+            set_gp(unit->gp + unit->offsets[x].goff);
+            decode_instr(&buf);
+            print_instr(&buf);
+            uint32_t end;
+            uint32_t start = unit->offsets[x].hoff;
+            if (x+1 == unit->offsetssz) end = start+4;
+            else end = unit->offsets[x+1].hoff;
+            for (int y = start; y < end; y++) {
+                print("%x",host[y]);
+            }
         }
     }
 }

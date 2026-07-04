@@ -1,5 +1,4 @@
 #include "decoder.h"
-#include "armdef.h"
 #include "memory.h"
 #include "encoder.h"
 #include "cache.h"
