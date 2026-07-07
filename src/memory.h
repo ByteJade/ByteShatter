@@ -23,10 +23,11 @@ uint16_t fetch16();
 uint32_t fetch32();
 
 /* set guest */
-void set_guest(uint64_t new_gp);
+void set_guest(uint64_t new_guest);
+void set_gp(uint32_t new_gp);
 /* set host pointer  
    only for code patching! */
-void set_hp(uint64_t new_hp);
+void set_hp(uint32_t new_hp);
 
 /* get host pointer */
 uint64_t get_hp();

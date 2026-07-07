@@ -448,9 +448,9 @@ int decode_instr(X64_instruction* buf) {
     return ret;
 }
 
-void decode(uint64_t gp) {
+void decode(uint32_t gp) {
     print("Start decode %lx", gp);
-    set_guest(gp);
+    set_gp(gp);
     uint16_t block = cache_block_start();
     while (1) {
         cache_block_point();

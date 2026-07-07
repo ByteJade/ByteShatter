@@ -77,8 +77,10 @@ uint32_t fetch32() {
     return *src;
 }
 
-void set_guest(uint64_t new_gp) { guest = (uint8_t*)new_gp; }
-void set_hp(uint64_t new_hp) { hp = new_hp; }
+void set_guest(uint64_t new_guest) { guest = (uint8_t*)new_guest; }
+
+void set_gp(uint32_t new_gp) { gp = new_gp; }
+void set_hp(uint32_t new_hp) { hp = new_hp; }
 
 uint64_t get_hp() { return hp; }
 uint64_t get_gp() { return gp; }
