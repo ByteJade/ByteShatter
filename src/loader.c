@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/mman.h>
 
 ExeMeta* loader_open_elf(const char* filename) {
     ExeMeta* exe = (ExeMeta*)malloc(sizeof(ExeMeta));
@@ -89,8 +90,8 @@ void loader_map_segments(ExeMeta* exe) {
             fread(dst, 1, phdr->p_filesz, elf->fp);
             /* Usually we use protection here
                but during emulation it will interfere */
-            //mprotect(dst, phdr->p_filesz, 
-            //    get_phdr_mmap_prot(phdr->p_flags) | PROT_WRITE);
+            if (exe->native) mprotect(dst, phdr->p_filesz, 
+                PROT_READ | PROT_WRITE | PROT_EXEC);
             print("map %lx, %lx", phdr->p_vaddr, phdr->p_filesz);
             /* fill .bss */
             if(phdr->p_filesz != phdr->p_memsz) {
