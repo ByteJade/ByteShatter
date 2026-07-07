@@ -6,6 +6,8 @@
 void memory_init(uint32_t guest_size);
 void memory_fini();
 
+void* mmap_guest(uint32_t guest_size);
+
 /* emit byte to host memory */
 void emit8(uint8_t data);
 /* emit 2 bytes to host memory */

@@ -77,8 +77,8 @@ void loader_map_segments(ExeMeta* exe) {
     }
     exe->basesz = ALIGN_U(addr_max) - ALIGN_D(addr_min);
     /* TODO: non-obvious initialization, needs to be moved */
-    memory_init(exe->basesz);
-    exe->base = (uint8_t*)get_guest();
+    if (exe->native) memory_init(exe->basesz);
+    exe->base = (uint8_t*)mmap_guest(exe->basesz);
     print("base done %p", exe->base);
     for (int i = 0; i < elf->header.e_phnum; i++) {
         Elf64_Phdr* phdr = elf->pheaders + i;

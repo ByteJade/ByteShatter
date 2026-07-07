@@ -11,19 +11,11 @@ local hp and gp for each thread
 and host mutex
 */
 uint32_t hostsz = 0;
-uint32_t guestsz = 0;
 uint32_t gp = 0;
 uint32_t hp = 0;
 
 void memory_init(uint32_t guest_size) {
-    guestsz = guest_size;
     hostsz = guest_size * 1.5;
-    guest = mmap(
-        NULL, guestsz,
-        PROT_READ | PROT_WRITE,
-        MAP_ANON | MAP_PRIVATE,
-        -1, 0
-    );
     // host code ~1.5 times larger, than guest
     host = mmap(
         NULL, hostsz,
@@ -31,14 +23,25 @@ void memory_init(uint32_t guest_size) {
         MAP_ANON | MAP_PRIVATE,
         -1, 0
     );
-    if (guest == MAP_FAILED || host == MAP_FAILED) {
+    if (host == MAP_FAILED) {
         panic("MMAP::FAIL");
     }
     success("host and guest mmap");
 }
 void memory_fini() {
-    if (guest) munmap(guest, guestsz);
     if (host) munmap(host, hostsz);
+}
+void* mmap_guest(uint32_t guest_size) {
+    void* guest = mmap(
+        NULL, guest_size,
+        PROT_READ | PROT_WRITE,
+        MAP_ANON | MAP_PRIVATE,
+        -1, 0
+    );
+    if (guest == MAP_FAILED) {
+        panic("MMAP::FAIL");
+    }
+    return guest;
 }
 // TODO: check host overflow
 void emit8(uint8_t data) {
