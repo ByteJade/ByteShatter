@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "dlmanager.h"
 #include <elf.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -41,6 +42,7 @@ ExeMeta* loader_open_elf(const char* filename) {
     fseek(elf->fp, shstrtab_hdr->sh_offset, SEEK_SET);
     fread(elf->shstrtab, 1, shstrtab_hdr->sh_size, elf->fp);
     success("File opened: %s", filename);
+    exe->native = (elf->header.e_machine == EM_AARCH64);
     exe->elf = elf;
     return exe;
 }
@@ -97,6 +99,24 @@ void loader_map_segments(ExeMeta* exe) {
             }
         }
     }
+    /* get file symbols */
+    for (int i = 0; i < elf->header.e_shnum; i++) {
+        Elf64_Shdr* head = elf->sheaders + i;
+        if (head->sh_type == SHT_DYNSYM) {
+            elf->dynsym = (Elf64_Sym*)(exe->base + head->sh_addr);
+            elf->dynsymsz = head->sh_size / head->sh_entsize;
+            break;
+        }
+    }
+    /* create cache */
+    elf->sym_cache = malloc(elf->dynsymsz * sizeof(uint32_t));
+    char* symtab_str = elf->strtab; 
+    for (size_t j = 1; j < elf->dynsymsz; j++) {
+        Elf64_Sym* sym = &elf->dynsym[j];
+        
+        const char* sym_name = symtab_str + sym->st_name;
+        elf->sym_cache[j] = my_hash(sym_name);
+    }
 }
 void reloc_relr(ExeMeta* exe, Elf64_Relr* relr, int size) {
     print("process relr");
@@ -141,8 +161,10 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
                 break;
             case R_X86_64_JUMP_SLOT:
             case R_X86_64_GLOB_DAT: {
-                const char* sym_name = elf->strtab + sym->st_name;
-                void *sym_addr = get_symbol(sym_name);
+                const char* symname = elf->strtab + sym->st_name;
+                void *sym_addr;
+                if (exe->native) get_native_symbol(symname);
+                else get_wrapped_symbol(symname);
     
                 if (sym_addr) {
                     *patch = (Elf64_Addr)sym_addr;
@@ -151,15 +173,17 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
                     *patch = 0;
                     //printf("GLOB_DAT: %s -> 0 (weak)\n", sym_name);
                 } else {
-                    warning("LOADER::UNDEFINED_SYMBOL %s", sym_name);
+                    warning("LOADER::UNDEFINED_SYMBOL %s", symname);
                     *patch = 0;
                 }
             } break;
             case R_X86_64_COPY: {
-                const char* sym_name = elf->strtab + sym->st_name;
+                const char* symname = elf->strtab + sym->st_name;
                 //printf("R_X86_64_COPY: copying %lx bytes of %s\n",
                 //    sym->st_size, sym_name);
-                void *sym_addr = get_symbol(sym_name);
+                void *sym_addr;
+                if (exe->native) get_native_symbol(symname);
+                else get_wrapped_symbol(symname);
                 //printf("R_X86_64_COPY: copying %p %p %lx\n",
                 //    (uint64_t*)patch, sym_addr, *(uint64_t*)sym_addr);
                 size_t size = sym->st_size;

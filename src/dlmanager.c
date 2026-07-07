@@ -19,16 +19,24 @@ static const char* ld_paths[] = {
 };
 typedef struct {
     const char* name;
-    void* data;
+    ExeMeta* wrapped;
+    void* native;
 } Library;
+
 Library libs[16];
 int libs_count = 0;
 
-ExeMeta* files [3];
-int fp = 0;
+uint32_t my_hash(const char* str) {
+    uint32_t hash = 5381;
+    while (*str) {
+        hash = (hash << 5) + hash + *str;
+        str++;
+    }
+    return hash;
+}
 
 int is_external_offset(uint32_t offset) {
-    ExeMeta* exe = files[0];
+    ExeMeta* exe = libs[0].wrapped;
     ElfMeta* elf = exe->elf;
     for (int i = 0; i < elf->header.e_shnum; i++) {
         Elf64_Shdr* header = elf->sheaders + i;
@@ -57,9 +65,13 @@ int is_external_offset(uint32_t offset) {
 }
 ExeMeta* load_object(const char* filename) {
     ExeMeta* exe = loader_open_elf(filename);
-    files[fp++] = exe;
-    loader_map_segments(exe);
-    loader_reloc_dependencies(exe);
+    if (exe) {
+        libs[libs_count].wrapped = exe;
+        libs[libs_count].native = NULL;
+        libs_count++;
+        loader_map_segments(exe);
+        loader_reloc_dependencies(exe);
+    }
     return exe;
 }
 void load_library(const char* filename) {
@@ -68,9 +80,17 @@ void load_library(const char* filename) {
             return;
         }
     }
+    char fullpath[1024];
+    snprintf(
+        fullpath, sizeof(fullpath),
+        "./my_%s", filename
+    );
+    ExeMeta* exe = load_object(fullpath);
+    if (!exe) {
+        panic("DLMANAGER::NO_WRAPPER: %s", filename);
+    }
     void* lib = NULL;
     for (int i = 0; ld_paths[i]; i++) {
-        char fullpath[1024];
         snprintf(
             fullpath, sizeof(fullpath),
             "%s/%s", ld_paths[i], filename
@@ -78,23 +98,41 @@ void load_library(const char* filename) {
         lib = dlopen(fullpath, RTLD_LAZY | RTLD_GLOBAL);
         if (lib) {
             success("load: %s", fullpath);
-            libs[libs_count].name = strdup(filename);
-            libs[libs_count].data = lib;
-            libs_count++;
+            libs[libs_count-1].name = strdup(filename);
+            libs[libs_count-1].native = lib;
             return;
         }
     }
     warning("No library: %s", filename);
 }
-void* get_symbol(const char* symname) {
+void* get_native_symbol(const char* symname) {
     // damn __libc_start_main is not accepted to be used in aarch64
     // so it's not here
     void* sym = dlsym(RTLD_DEFAULT, symname);
     if (sym) return sym;
-    for (int i = 0; i < libs_count; i++) {
-        void* sym = dlsym(libs[i].data, symname);
+    for (int i = 1; i < libs_count; i++) {
+        void* sym = dlsym(libs[i].native, symname);
         if (sym) return sym;
     }
-    warning("No symbol: %s", symname);
+    warning("No native symbol: %s", symname);
+    return NULL;
+}
+void* get_wrapped_symbol(const char* symname) {
+    uint32_t hash = my_hash(symname);
+    for (int i = 1; i < libs_count; i++) {
+        ExeMeta* exe = libs[i].wrapped;
+        ElfMeta* elf = exe->elf;
+        char* symtab_str = elf->strtab; 
+        for (size_t j = 1; j < elf->dynsymsz; j++) {
+            Elf64_Sym* sym = &elf->dynsym[j];
+            
+            if (elf->sym_cache[j] == hash) {
+                const char* sym_name = symtab_str + sym->st_name;
+                if (strcmp(sym_name, symname) == 0)
+                    return exe->base + sym->st_value;
+            }
+        }
+    }
+    warning("No wrapped symbol: %s", symname);
     return NULL;
 }

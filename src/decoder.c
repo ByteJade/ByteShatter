@@ -287,7 +287,7 @@ int decode_instr(X64_instruction* buf) {
                 case 4: buf->type = AND; break;
                 case 5: buf->type = SUB; break;
                 case 6: buf->type = XOR; break;
-                case 7: buf->type = CMP; break; // cmp
+                case 7: buf->type = CMP; break;
             }
         } break;
         case 0x84:
@@ -413,19 +413,21 @@ int decode_instr(X64_instruction* buf) {
             decode_rm(&buf->op1, modrm);
             switch ((modrm >> 3)&7) {
                 case 0:
+                    buf->opcount = 2;
                     buf->type = ADD;
                     buf->op0.type = IMM;
                     buf->op0.imm = 1;
                     break; // inc
                 case 1:
+                    buf->opcount = 2;
                     buf->type = SUB;
                     buf->op0.type = IMM;
                     buf->op0.imm = 1;
                     break; // dec
-                case 2:
-                case 3: buf->type = CALL; break; // call
-                case 4:
-                case 5: buf->type = JMP; ret = JMP; break; // jmps
+                case 2 ... 3:
+                    buf->type = CALL; break; // call
+                case 4 ... 5:
+                    buf->type = JMP; ret = JMP; break; // jmps
                 case 6: buf->type = PUSH; break; // push
             }
         } break;

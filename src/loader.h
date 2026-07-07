@@ -2,6 +2,7 @@
 #define ELF_LOADER_H
 
 #include <elf.h>
+#include <stdint.h>
 #include <stdio.h>
 
 typedef struct {
@@ -10,6 +11,7 @@ typedef struct {
     Elf64_Phdr* pheaders;
     Elf64_Shdr* sheaders;
     Elf64_Sym* dynsym;
+    int dynsymsz;
     Elf64_Sym* symtab;
     char* strtab;
     char* shstrtab;
@@ -19,6 +21,7 @@ typedef struct {
     int pltrelsz;
     Elf64_Relr* relr;
     int relrsz;
+    uint32_t* sym_cache;
 } ElfMeta;
 
 typedef struct {
@@ -34,6 +37,7 @@ typedef struct {
     uint64_t fini_array;
     uint64_t fini_arraysz;
     uint64_t fini;
+    uint8_t native;
 } ExeMeta;
 
 ExeMeta* loader_open_elf(const char* filename);
