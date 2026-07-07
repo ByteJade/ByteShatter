@@ -49,7 +49,7 @@ _print:
         "mov x4, %5\n"
         "mov x5, %6\n"
         "bl printf\n"
-        "mov %0, x0\n"
+        "mov %w0, x0\n"
         : "=r" (result)
         : "r"(argv[0]), "r"(argv[1]), "r"(argv[2]), "r"(argv[3]),
             "r"(argv[4]), "r"(argv[5])
