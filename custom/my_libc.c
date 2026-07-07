@@ -39,6 +39,7 @@ int my_printf(const char *format, ...) {
     if (argc < 7) {
         POP8;
     }
+    int result;
 _print:
     asm volatile(
         "mov x0, %0\n"
@@ -47,11 +48,13 @@ _print:
         "mov x3, %3\n"
         "mov x4, %4\n"
         "mov x5, %5\n"
-        "b printf\n"
-        : : "r"(argv[0]), "r"(argv[1]), "r"(argv[2]), "r"(argv[3]),
+        "bl printf\n"
+        "mov %0, x0\n"
+        : "=r" (result)
+        : "r"(argv[0]), "r"(argv[1]), "r"(argv[2]), "r"(argv[3]),
             "r"(argv[4]), "r"(argv[5])
     );
-    __builtin_unreachable();
+    return result;
 }
 void my_exit(int status) {
     asm volatile("br %0" :: "r"(exit_addr));
