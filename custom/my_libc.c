@@ -27,15 +27,16 @@ int my_printf(const char *format, ...) {
     const char* tmp = format;
     int argc = 0;
     long argv[6] = {0};
+    argv[0] = (long)format;
     char c;
     while ((c = *tmp++))
         if (c == '%') argc++;
-    for (int i = 1; i <= argc && i < 6; i++) {
+    for (int i = 1; i <= argc && i < 5; i++) {
         argv[i] = va_arg(args, long);
     }
     va_end(args);
-    if (argc < 6) goto _print;
-    if (argc < 8) {
+    if (argc < 5) goto _print;
+    if (argc < 7) {
         POP8;
     }
 _print:
