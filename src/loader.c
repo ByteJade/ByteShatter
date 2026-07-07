@@ -84,18 +84,22 @@ void loader_map_segments(ExeMeta* exe) {
         Elf64_Phdr* phdr = elf->pheaders + i;
         if (phdr->p_type == PT_LOAD) {
             fseek(elf->fp, phdr->p_offset, SEEK_SET);
-            fread(exe->base + phdr->p_vaddr, 1, phdr->p_filesz, elf->fp);
+            void* dst = exe->base + phdr->p_vaddr;
+            fread(dst, 1, phdr->p_filesz, elf->fp);
             /* Usually we use protection here
                but during emulation it will interfere */
-            //mprotect(exe->base + phdr->p_vaddr, phdr->p_filesz, 
+            //mprotect(dst, phdr->p_filesz, 
             //    get_phdr_mmap_prot(phdr->p_flags) | PROT_WRITE);
             print("map %lx, %lx", phdr->p_vaddr, phdr->p_filesz);
             /* fill .bss */
             if(phdr->p_filesz != phdr->p_memsz) {
                 memset(
-                    exe->base + phdr->p_vaddr + phdr->p_filesz, 0,
+                    dst + phdr->p_filesz, 0,
                     phdr->p_memsz - phdr->p_filesz
                 );
+            }
+            if (exe->native && (phdr->p_flags&PF_X)) {
+                __builtin___clear_cache(dst, dst + phdr->p_filesz);
             }
         }
     }
