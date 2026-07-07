@@ -275,7 +275,9 @@ void loader_reloc_dependencies(ExeMeta* exe) {
     dyn = (Elf64_Dyn*)(exe->base + dyn_phdr->p_vaddr);
     for (; dyn->d_tag != DT_NULL; dyn++) {
         if (dyn->d_tag == DT_NEEDED) {
-            load_library(elf->strtab + dyn->d_un.d_val);
+            const char* name = elf->strtab + dyn->d_un.d_val;
+            if (exe->native) load_native_library(name);
+            else load_wrapped_library(name);
         }
     }
     if (elf->relr) reloc_relr(exe, elf->relr, elf->relrsz);

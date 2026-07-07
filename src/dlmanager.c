@@ -75,7 +75,7 @@ ExeMeta* load_object(const char* filename) {
     }
     return exe;
 }
-void load_library(const char* filename) {
+void load_wrapped_library(const char* filename) {
     for (int i = 0; i < libs_count; i++) {
         if (strcmp(filename, libs[i].name) == 0) { 
             return;
@@ -90,8 +90,16 @@ void load_library(const char* filename) {
     if (!exe) {
         panic("DLMANAGER::NO_WRAPPER: %s", filename);
     }
+}
+void load_native_library(const char* filename) {
+    for (int i = 0; i < libs_count; i++) {
+        if (strcmp(filename, libs[i].name) == 0) { 
+            return;
+        }
+    }
     void* lib = NULL;
     for (int i = 0; ld_paths[i]; i++) {
+        char fullpath[1024];
         snprintf(
             fullpath, sizeof(fullpath),
             "%s/%s", ld_paths[i], filename
