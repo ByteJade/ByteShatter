@@ -42,12 +42,12 @@ int my_printf(const char *format, ...) {
     int result;
 _print:
     asm volatile(
-        "mov x0, %0\n"
-        "mov x1, %1\n"
-        "mov x2, %2\n"
-        "mov x3, %3\n"
-        "mov x4, %4\n"
-        "mov x5, %5\n"
+        "mov x0, %1\n"
+        "mov x1, %2\n"
+        "mov x2, %3\n"
+        "mov x3, %4\n"
+        "mov x4, %5\n"
+        "mov x5, %6\n"
         "bl printf\n"
         "mov %0, x0\n"
         : "=r" (result)
