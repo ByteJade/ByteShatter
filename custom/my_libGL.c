@@ -1,7 +1,12 @@
 #include "wrapper.h"
+#ifdef __ANDROID__
+    #include <GLES/gl.h>
+    #include <GLES/glext.h>
+#else
 #include <GL/gl.h>
 #include <GL/glx.h>
 #include <GL/glxext.h>
+#endif
 
 WRAP_NORETURN(void, glMatrixMode, GLenum mode);
 WRAP_NORETURN(void, glPushMatrix, void);
