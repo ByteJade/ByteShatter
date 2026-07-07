@@ -47,4 +47,6 @@ void loader_close_exe(ExeMeta* exe);
 void loader_map_segments(ExeMeta* exe);
 void loader_reloc_dependencies(ExeMeta* exe);
 
+void loader_init_library(ExeMeta* exe);
+
 #endif

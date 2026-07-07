@@ -2,6 +2,7 @@
 #include "core.h"
 #include "memory.h"
 #include "dlmanager.h"
+#include "executer.h"
 #include <elf.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -294,4 +295,37 @@ void loader_reloc_dependencies(ExeMeta* exe) {
     if (elf->relr) reloc_relr(exe, elf->relr, elf->relrsz);
     if (elf->rela) reloc_rela(exe, elf->rela, elf->relasz);
     if (elf->jmprel) reloc_rela(exe, elf->jmprel, elf->pltrelsz);
+}
+void loader_init_library(ExeMeta* exe) {
+    if (exe->native) {
+        void* init = exe->base + exe->init;
+        ((void (*)(void))init)();
+        if (exe->init_array) {
+            size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
+            uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
+            
+            for (size_t i = 0; i < count; i++) {
+                if (init_funcs[i]) {
+                    uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
+                    print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
+                    ((void (*)(void))init_funcs[i])();
+                }
+            }
+        }
+    } else {
+        set_guest((uint64_t)exe->base);
+        execute(exe->init);
+        if (exe->init_array) {
+            size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
+            uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
+            
+            for (size_t i = 0; i < count; i++) {
+                if (init_funcs[i]) {
+                    uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
+                    print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
+                    execute(pos);
+                }
+            }
+        }
+    }
 }

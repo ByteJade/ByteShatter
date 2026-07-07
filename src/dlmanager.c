@@ -72,6 +72,7 @@ ExeMeta* load_object(const char* filename) {
         libs_count++;
         loader_map_segments(exe);
         loader_reloc_dependencies(exe);
+        loader_init_library(exe);
     }
     return exe;
 }

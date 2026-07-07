@@ -49,19 +49,6 @@ int main(int argc, char** argv, const char** envp) {
     init_stack(exe, argc, argv);
     
     set_guest((uint64_t)exe->base);
-    execute(exe->init);
-    if (exe->init_array) {
-        size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
-        uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
-        
-        for (size_t i = 0; i < count; i++) {
-            if (init_funcs[i]) {
-                uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
-                print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
-                execute(pos);
-            }
-        }
-    }
     execute(exe->elf->header.e_entry);
 
     loader_close_elf(exe);
