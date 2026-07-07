@@ -76,8 +76,6 @@ WRAP_NORETURN(void, glOrtho, GLdouble left, GLdouble right, GLdouble bottom,
               GLdouble top, GLdouble nearVal, GLdouble farVal);
 WRAP_NORETURN(void, glFrustum, GLdouble left, GLdouble right, GLdouble bottom,
               GLdouble top, GLdouble nearVal, GLdouble farVal);
-WRAP_NORETURN(void, glPerspective, GLdouble fovy, GLdouble aspect,
-              GLdouble zNear, GLdouble zFar);
 //WRAP_NORETURN(void, gluLookAt, GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
 //              GLdouble centerX, GLdouble centerY, GLdouble centerZ,
 //              GLdouble upX, GLdouble upY, GLdouble upZ);
@@ -133,4 +131,6 @@ WRAP_NORETURN(void, glFrontFace, GLenum mode);
 
 WRAP_NORETURN(void, glFlush, void);
 WRAP_NORETURN(void, glFinish, void);
-WRAP_NORETURN(void, glutSwapBuffers, void);
+WRAP_NORETURN(void, glXSwapBuffers, void);
+WRAP_NORETURN(XVisualInfo*, glXChooseVisual, Display *dpy, int screen, int *attribList);
+
