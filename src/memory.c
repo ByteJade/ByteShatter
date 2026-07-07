@@ -1,6 +1,7 @@
 #include "memory.h"
 #include "core.h"
 #include <stddef.h>
+#include <stdint.h>
 #include <sys/mman.h>
 
 static uint8_t* guest = NULL;
@@ -76,11 +77,11 @@ uint32_t fetch32() {
     return *src;
 }
 
-void set_gp(uint32_t new_gp) { gp = new_gp; }
-void set_hp(uint32_t new_hp) { hp = new_hp; }
+void set_guest(uint64_t new_gp) { guest = (uint8_t*)new_gp; }
+void set_hp(uint64_t new_hp) { hp = new_hp; }
 
-uint32_t get_hp() { return hp; }
-uint32_t get_gp() { return gp; }
+uint64_t get_hp() { return hp; }
+uint64_t get_gp() { return gp; }
 
 uint8_t* get_host() { return host; }
 uint8_t* get_guest() { return guest; }

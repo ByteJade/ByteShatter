@@ -22,16 +22,16 @@ uint16_t fetch16();
 /* fetch 4 bytes from guest memory */
 uint32_t fetch32();
 
-/* set guest pointer */
-void set_gp(uint32_t new_gp);
+/* set guest */
+void set_guest(uint64_t new_gp);
 /* set host pointer  
    only for code patching! */
-void set_hp(uint32_t new_hp);
+void set_hp(uint64_t new_hp);
 
 /* get host pointer */
-uint32_t get_hp();
+uint64_t get_hp();
 /* get guest pointer */
-uint32_t get_gp();
+uint64_t get_gp();
 
 /* get pointer to host memory */
 uint8_t* get_host();

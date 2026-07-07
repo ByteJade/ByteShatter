@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void execute(uint32_t address);
+void execute(uint64_t address);
 
 #endif

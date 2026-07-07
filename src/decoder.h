@@ -6,6 +6,6 @@
 
 void print_instr(X64_instruction* buf);
 int decode_instr(X64_instruction* buf);
-void decode(uint32_t gp);
+void decode(uint64_t gp);
 
 #endif
