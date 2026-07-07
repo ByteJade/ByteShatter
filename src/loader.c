@@ -157,8 +157,8 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
             case R_X86_64_GLOB_DAT: {
                 const char* symname = elf->strtab + sym->st_name;
                 void *sym_addr;
-                if (exe->native) get_native_symbol(symname);
-                else get_wrapped_symbol(symname);
+                if (exe->native) sym_addr = get_native_symbol(symname);
+                else sym_addr = get_wrapped_symbol(symname);
     
                 if (sym_addr) {
                     *patch = (Elf64_Addr)sym_addr;
@@ -177,8 +177,8 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
                 //printf("R_X86_64_COPY: copying %lx bytes of %s\n",
                 //    sym->st_size, sym_name);
                 void *sym_addr;
-                if (exe->native) get_native_symbol(symname);
-                else get_wrapped_symbol(symname);
+                if (exe->native) sym_addr = get_native_symbol(symname);
+                else sym_addr = get_wrapped_symbol(symname);
                 //printf("R_X86_64_COPY: copying %p %p %lx\n",
                 //    (uint64_t*)patch, sym_addr, *(uint64_t*)sym_addr);
                 size_t size = sym->st_size;
