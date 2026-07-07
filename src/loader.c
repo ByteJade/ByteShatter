@@ -146,10 +146,13 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
                 *patch = (Elf64_Addr)(sym->st_value + rel->r_addend);
                 //printf("Apply R_X86_64_64 %lx\n", *patch);
                 break;
+            case R_AARCH64_RELATIVE:
             case R_X86_64_RELATIVE:
                 *patch = (Elf64_Addr)(exe->base + rel->r_addend);
                 //printf("Apply R_X86_64_RELATIVE %lx\n", *patch);
                 break;
+            case R_AARCH64_JUMP_SLOT:
+            case R_AARCH64_GLOB_DAT:
             case R_X86_64_JUMP_SLOT:
             case R_X86_64_GLOB_DAT: {
                 const char* symname = elf->strtab + sym->st_name;
@@ -168,6 +171,7 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
                     *patch = 0;
                 }
             } break;
+            case R_AARCH64_COPY:
             case R_X86_64_COPY: {
                 const char* symname = elf->strtab + sym->st_name;
                 //printf("R_X86_64_COPY: copying %lx bytes of %s\n",
