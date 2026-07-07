@@ -193,6 +193,9 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
             default:
                 panic("Unknown RELA %i", t);
         }
+        if (exe->native) {
+            __builtin___clear_cache(patch-4, patch+4);
+        }
     }
 }
 void loader_reloc_dependencies(ExeMeta* exe) {
