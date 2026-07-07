@@ -298,8 +298,10 @@ void loader_reloc_dependencies(ExeMeta* exe) {
 }
 void loader_init_library(ExeMeta* exe) {
     if (exe->native) {
-        void* init = exe->base + exe->init;
-        ((void (*)(void))init)();
+        if (exe->init) {
+            void* init = exe->base + exe->init;
+            ((void (*)(void))init)();
+        }
         if (exe->init_array) {
             size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
             uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
@@ -314,7 +316,7 @@ void loader_init_library(ExeMeta* exe) {
         }
     } else {
         set_guest((uint64_t)exe->base);
-        execute(exe->init);
+        if (exe->init) execute(exe->init);
         if (exe->init_array) {
             size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
             uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
