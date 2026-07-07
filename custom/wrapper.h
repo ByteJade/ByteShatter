@@ -1,7 +1,7 @@
 #define POP8\
     asm volatile(\
         "ldp x6, x7, [x28]\n"\
-        : : : "x6", "x7", "x28", "memory")
+        : : : "x6", "x7", "memory")
 #define WRAP_NORETURN(ret, name, ...) \
     __attribute__((naked, noreturn)) \
     ret my_##name(__VA_ARGS__) { \
