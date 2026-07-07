@@ -48,7 +48,7 @@ int main(int argc, char** argv, const char** envp) {
     ExeMeta* exe = load_object(argv[1]);
     init_stack(exe, argc, argv);
     
-    execute(exe->init);
+    execute((uint64_t)exe->base + exe->init);
     if (exe->init_array) {
         size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
         uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
@@ -57,11 +57,11 @@ int main(int argc, char** argv, const char** envp) {
             if (init_funcs[i]) {
                 uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
                 print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
-                execute(pos);
+                execute(init_funcs[i]);
             }
         }
     }
-    execute(exe->elf->header.e_entry);
+    execute((uint64_t)exe->base + exe->elf->header.e_entry);
 
     loader_close_elf(exe);
     loader_close_exe(exe);
