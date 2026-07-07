@@ -35,7 +35,9 @@ int my_printf(const char *format, ...) {
     }
     va_end(args);
     if (argc < 6) goto _print;
-    if (argc < 8) POP8;
+    if (argc < 8) {
+        POP8;
+    }
 _print:
     asm volatile(
         "mov x0, %0\n"
