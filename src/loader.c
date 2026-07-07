@@ -99,9 +99,6 @@ void loader_map_segments(ExeMeta* exe) {
                     phdr->p_memsz - phdr->p_filesz
                 );
             }
-            if (exe->native && (phdr->p_flags&PF_X)) {
-                __builtin___clear_cache(dst, dst + phdr->p_filesz);
-            }
         }
     }
     /* get file symbols */
@@ -193,9 +190,6 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
             } break;
             default:
                 panic("Unknown RELA %i", t);
-        }
-        if (exe->native) {
-            __builtin___clear_cache(patch-4, patch+4);
         }
     }
 }
@@ -298,6 +292,7 @@ void loader_reloc_dependencies(ExeMeta* exe) {
 }
 void loader_init_library(ExeMeta* exe) {
     if (exe->native) {
+        __builtin___clear_cache(exe->base, exe->base + exe->basesz);
         if (exe->init) {
             void* init = exe->base + exe->init;
             ((void (*)(void))init)();
