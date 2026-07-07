@@ -183,7 +183,7 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
                 }
             } break;
             default:
-                panic("Unknown RELA %x", t);
+                panic("Unknown RELA %i", t);
         }
     }
 }
