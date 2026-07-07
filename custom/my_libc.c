@@ -38,12 +38,12 @@ int my_printf(const char *format, ...) {
     if (argc < 8) POP8;
 _print:
     asm volatile(
-        "mov x0, %1\n"
-        "mov x1, %2\n"
-        "mov x2, %3\n"
-        "mov x3, %4\n"
-        "mov x4, %5\n"
-        "mov x5, %6\n"
+        "mov x0, %0\n"
+        "mov x1, %1\n"
+        "mov x2, %2\n"
+        "mov x3, %3\n"
+        "mov x4, %4\n"
+        "mov x5, %5\n"
         "b printf\n"
         : : "r"(argv[0]), "r"(argv[1]), "r"(argv[2]), "r"(argv[3]),
             "r"(argv[4]), "r"(argv[5])
