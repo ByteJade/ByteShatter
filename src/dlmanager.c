@@ -126,7 +126,12 @@ void* get_native_symbol(const char* symname) {
     return NULL;
 }
 void* get_wrapped_symbol(const char* symname) {
-    uint32_t hash = my_hash(symname);
+    char fullname[1024];
+    snprintf(
+        fullname, sizeof(fullname),
+        "my_%s", symname
+    );
+    uint32_t hash = my_hash(fullname);
     for (int i = 1; i < libs_count; i++) {
         ExeMeta* exe = libs[i].wrapped;
         ElfMeta* elf = exe->elf;
@@ -136,11 +141,13 @@ void* get_wrapped_symbol(const char* symname) {
             
             if (elf->sym_cache[j] == hash) {
                 const char* sym_name = symtab_str + sym->st_name;
-                if (strcmp(sym_name, symname) == 0)
+                if (strcmp(sym_name, fullname) == 0) {
+                    print("found %s in %s", fullname, libs[i].name);
                     return exe->base + sym->st_value;
+                }
             }
         }
     }
-    warning("No wrapped symbol: %s", symname);
+    warning("No wrapped symbol: %s", fullname);
     return NULL;
 }
