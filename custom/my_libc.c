@@ -5,7 +5,7 @@
 
 static void* exit_addr;
 
-int __libc_start_main(
+int my___libc_start_main(
     int (*main)(int, char**, char**),
     int argc,
     char** argv,
