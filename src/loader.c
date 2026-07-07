@@ -108,15 +108,6 @@ void loader_map_segments(ExeMeta* exe) {
             break;
         }
     }
-    /* create cache */
-    elf->sym_cache = malloc(elf->dynsymsz * sizeof(uint32_t));
-    char* symtab_str = elf->strtab; 
-    for (size_t j = 1; j < elf->dynsymsz; j++) {
-        Elf64_Sym* sym = &elf->dynsym[j];
-        
-        const char* sym_name = symtab_str + sym->st_name;
-        elf->sym_cache[j] = my_hash(sym_name);
-    }
 }
 void reloc_relr(ExeMeta* exe, Elf64_Relr* relr, int size) {
     print("process relr");
@@ -272,6 +263,15 @@ void loader_reloc_dependencies(ExeMeta* exe) {
                 warning("unsupported! PREINIT_ARRAY");
                 break;
         }
+    }
+    /* create cache */
+    elf->sym_cache = malloc(elf->dynsymsz * sizeof(uint32_t));
+    char* symtab_str = elf->strtab; 
+    for (size_t j = 1; j < elf->dynsymsz; j++) {
+        Elf64_Sym* sym = &elf->dynsym[j];
+        
+        const char* sym_name = symtab_str + sym->st_name;
+        elf->sym_cache[j] = my_hash(sym_name);
     }
     dyn = (Elf64_Dyn*)(exe->base + dyn_phdr->p_vaddr);
     for (; dyn->d_tag != DT_NULL; dyn++) {
