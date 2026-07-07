@@ -199,7 +199,6 @@ void loader_reloc_dependencies(ExeMeta* exe) {
     }
     if (!dyn_phdr) {
         panic("LOADER::NO_DYNAMIC_SEGMENT");
-        return;
     }
     Elf64_Dyn* dyn = (Elf64_Dyn*)(exe->base + dyn_phdr->p_vaddr);
     for (; dyn->d_tag != DT_NULL; dyn++) {

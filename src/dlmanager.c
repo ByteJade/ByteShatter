@@ -66,6 +66,7 @@ int is_external_offset(uint32_t offset) {
 ExeMeta* load_object(const char* filename) {
     ExeMeta* exe = loader_open_elf(filename);
     if (exe) {
+        libs[libs_count].name = strdup(strrchr(filename, '/')+1);
         libs[libs_count].wrapped = exe;
         libs[libs_count].native = NULL;
         libs_count++;
@@ -98,7 +99,6 @@ void load_library(const char* filename) {
         lib = dlopen(fullpath, RTLD_LAZY | RTLD_GLOBAL);
         if (lib) {
             success("load: %s", fullpath);
-            libs[libs_count-1].name = strdup(filename);
             libs[libs_count-1].native = lib;
             return;
         }
