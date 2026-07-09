@@ -58,6 +58,6 @@ Window my_XCreateWindow(
 	"mov %x0, x0"
 	: "=r" (ret)
     );
-    return ret
+    return ret;
 }
 
