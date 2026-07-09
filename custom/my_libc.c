@@ -60,9 +60,10 @@ void my_exit(int status) {
     asm volatile("br %0" :: "r"(exit_addr));
     __builtin_unreachable();
 }
-WRAP_NORETURN(int, puts, const char* s);
-WRAP_NORETURN(void*, malloc, size_t size);
-WRAP_NORETURN(void, free, void* ptr);
-WRAP_NORETURN(size_t, strlen, const char* s);
-WRAP_NORETURN(int, strcmp, const char* s1, const char* s2);
-WRAP_NORETURN(char*, strstr, const char* haystack, const char* needle);
+WRAP(int, puts, const char* s);
+WRAP(void*, malloc, size_t size);
+WRAP(void, free, void* ptr);
+WRAP(size_t, strlen, const char* s);
+WRAP(int, strcmp, const char* s1, const char* s2);
+WRAP(char*, strstr, const char* haystack, const char* needle);
+WRAP(char*, getenv, const char *name);
