@@ -22,6 +22,8 @@ OffsetUnit local_offsets[MAX_OFFSETS];
 uint8_t loffp = 0;
 uint32_t offset_usage = 0;
 
+int overflow = 0;
+
 void cahce_init(void) {
     blocks_cache = (CacheUnit*) malloc(
         MAX_BLOCKS * sizeof(CacheUnit)
@@ -63,6 +65,7 @@ void cache_block_point(void) {
     uint16_t hogg = get_hp() - last_block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
+        overflow = 1;
         cache_block_end();
         cache_block_start();
         goff = get_gp() - last_block->gp;
@@ -178,4 +181,9 @@ void cache_print(int block) {
 }
 int cache_bp(void) {
     return bp;
+}
+int cache_overflow(void) {
+    int out = overflow;
+    overflow = 0;
+    return out;
 }

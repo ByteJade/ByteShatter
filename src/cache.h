@@ -53,5 +53,7 @@ uint32_t cache_usage(void);
 void cache_print(int block);
 /* get current block pointer */
 int cache_bp(void);
+/* was there a block overflow */
+int cache_overflow(void);
 
 #endif

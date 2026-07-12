@@ -469,6 +469,15 @@ void decode(uint32_t gp) {
         set_break_point(0);
     }
     while (jump_type != RET && jump_type != JMP) {
+        if (cache_overflow()) {
+            cache_flush(block);
+            block++;
+            if (block == debug_break()) {
+                jump_type = decode_step();
+                set_break_point(0);
+            }
+            return;
+        }
         jump_type = decode_step();
         /*
         TODO: Static analysis of block jumps. 
