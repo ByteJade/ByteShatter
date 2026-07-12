@@ -2,52 +2,54 @@
 #include "memory.h"
 #include "cache.h"
 #include "dlmanager.h"
-#include "decoder.h"
 #include "patcher.h"
 #include "stack.h"
 #include "executer.h"
+#include "debugger.h"
 #include <stdint.h>
-#include <sys/auxv.h>
-#include <unistd.h>
+#include <stdlib.h>
 
-void init_stack(ExeMeta* exe, int argc, char** argv) {
-    Elf64_auxv_t auxv[] = {
-        {AT_SYSINFO_EHDR, 0},
-        {AT_MINSIGSTKSZ, 0x5f0},
-        {AT_HWCAP,     0x26},
-        {AT_PAGESZ,    sysconf(_SC_PAGESIZE)},
-        {AT_CLKTCK,    sysconf(_SC_CLK_TCK)},
-        {AT_PHDR,      (uint64_t)exe->base + exe->elf->header.e_phoff},
-        {AT_PHENT,     exe->elf->header.e_phentsize},
-        {AT_PHNUM,     exe->elf->header.e_phnum},
-        {AT_BASE,      0},
-        {AT_FLAGS,     0},
-        {AT_ENTRY,     (uint64_t)exe->base + exe->elf->header.e_entry},
-        {AT_UID,       getuid()},
-        {AT_EUID,      geteuid()},
-        {AT_GID,       getgid()},
-        {AT_EGID,      getegid()},
-        {AT_SECURE,    0},
-        {AT_RANDOM, getauxval(AT_RANDOM)},
-        {AT_HWCAP2,    2},
-        //{AT_SYSINFO,   0}, Android doesn't have this?
-        {AT_NULL,      0}
-    };
-    set_auxv(auxv, 19);
-    push_argv(0);
-    for (int i = argc-1; i > 0; i--) {
-        push_argv(argv[i]);
-    }
-    push_argc();
+
+void usage() {
+    printf("Usage: shatter [commands] <file> [arguments]\n");
+    printf("\t-d  Enable debug mode\n");
+    printf("\t-l  Set log level (-lA,-lE,-lW,-lN)\n");
+    printf("\t-h  Print this help message\n");
+    exit(0);
 }
+
+char* read_argv(int argc, char** argv) {
+    for (int i = 1; i < argc; i++) {
+        if (i == (argc - 1)) usage();
+        char* arg = argv[i];
+        if (arg[0] == '-') {
+            switch (arg[1]) {
+                case 'd': debug_enable(); break;
+                case 'l': set_log_level(arg[2]); break;
+                case 'h':
+                default: usage();
+            }
+        } else {
+            for (int n = argc-1; n > i-1; n--) {
+                push_arg(argv[n]);
+            }
+            return arg;
+        }
+    }
+    usage();
+    return NULL;
+}
+
 int main(int argc, char** argv, const char** envp) {
     patcher_init();
     cahce_init();
     stack_init();
     set_envp(envp);
-    ExeMeta* exe = load_object(argv[1]);
-    init_stack(exe, argc, argv);
     
+    ExeMeta* exe = load_object(read_argv(argc, argv));
+    finish_stack(exe);
+    
+    debug_wait();
     set_guest((uint64_t)exe->base);
     execute(exe->elf->header.e_entry);
 

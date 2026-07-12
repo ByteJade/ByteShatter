@@ -9,7 +9,18 @@ static const char* const prefixes[] = {
     ""
 };
 
+static int log_level = 3;
+
+void set_log_level(char level) {
+    switch (level) {
+        case 'A': log_level = 3; break;
+        case 'W': log_level = 1; break;
+        case 'E': log_level = 0; break;
+        default: panic("CORE::UNKNOWN_LOG_LEVEL");
+    }
+}
 void log_message(LogLevel level, const char* format, ...) {
+    if (level > log_level) return;
     if (prefixes[level][0]) printf("%s", prefixes[level]);
     
     va_list args;

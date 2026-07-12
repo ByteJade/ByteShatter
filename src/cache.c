@@ -28,7 +28,6 @@ void cahce_init() {
     jumps_cache = (PatchUnit*) malloc(
         MAX_JUMPS * sizeof(PatchUnit)
     );
-    success("cache init");
 }
 void cahce_fini() {
     for (int i = 0; i < bp; i++) {

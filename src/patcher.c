@@ -5,6 +5,7 @@
 #include "decoder.h"
 #include "arm64emitter.h"
 #include "armdef.h"
+#include "debugger.h"
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -30,11 +31,10 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t* code = (uint32_t*)sc->pc;
     uint32_t instruction = *code;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
-    if (ret == 0) {
-        panic("Unknown instruction");
-    }
+    if (ret == 0) debug_wait();
     print("ret: %x", ret);
     PatchUnit* patch = cache_get_patch(ret);
+    if (patch->block == block_break()) debug_wait();
     CacheUnit* cahce = cache_get_block(patch->block);
     print("patch: %i", patch->guest_off);
     uint32_t gp = cahce->gp + patch->guest_off;

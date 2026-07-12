@@ -4,12 +4,13 @@
 #include <stdarg.h>
 
 typedef enum {
-    LOG_PANIC,
-    LOG_WARNING,
-    LOG_SUCCESS,
-    LOG_PRINT
+    LOG_PANIC = 0,
+    LOG_WARNING = 1,
+    LOG_SUCCESS = 2,
+    LOG_PRINT = 3
 } LogLevel;
 
+void set_log_level(char level);
 void log_message(LogLevel level, const char* format, ...);
 
 #define panic(...)   log_message(LOG_PANIC, __VA_ARGS__)
