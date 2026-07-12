@@ -462,7 +462,6 @@ void decode(uint32_t gp) {
     set_gp(gp);
     uint16_t block = cache_block_start();
     uint8_t jump_type = 0;
-    warning("BLOCK %i", block);
     if (block == debug_break()) {
         jump_type = decode_step();
         set_break_point();

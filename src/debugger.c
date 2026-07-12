@@ -18,7 +18,7 @@ void debug_enable(void) {
     enabled = 1;
 }
 int debug_break(void) {
-    return break_point;
+    return break_block;
 }
 void set_break_point() {
     uint32_t* pc = (uint32_t*)(get_host() + get_hp() - 4);
