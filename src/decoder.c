@@ -469,6 +469,19 @@ void decode(uint32_t gp) {
         set_break_point(0);
     }
     while (jump_type != RET && jump_type != JMP) {
+        jump_type = decode_step();
+        /*
+        TODO: Static analysis of block jumps. 
+        Cache lookups are resource-intensive.
+        */
+        const uint8_t* blockp = cache_search(get_gp());
+        if (blockp) {
+            int32_t offset = (uint64_t)blockp - (uint64_t)(get_host()+get_hp());
+            warning("DECODER::DUPLICATION %i", offset);
+            cache_block_point();
+            emit32(0x14000000 | ((offset/4) & 0x3FFFFFF));
+            break;
+        }
         if (cache_overflow()) {
             cache_flush(block);
             block++;
@@ -476,19 +489,6 @@ void decode(uint32_t gp) {
                 jump_type = decode_step();
                 set_break_point(0);
             }
-        }
-        jump_type = decode_step();
-        /*
-        TODO: Static analysis of block jumps. 
-        Cache lookups are resource-intensive.
-        */
-        const uint8_t* block = cache_search(get_gp());
-        if (block) {
-            int32_t offset = (uint64_t)block - (uint64_t)(get_host()+get_hp());
-            warning("DECODER::DUPLICATION %i", offset);
-            cache_block_point();
-            emit32(0x14000000 | ((offset/4) & 0x3FFFFFF));
-            break;
         }
     }
     cache_block_end();
