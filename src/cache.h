@@ -23,18 +23,18 @@ typedef struct {
     uint8_t offsetssz;
 } CacheUnit;
 
-void cahce_init();
-void cahce_fini();
+void cahce_init(void);
+void cahce_fini(void);
 
 /* clear all data */
-void cache_clear();
+void cache_clear(void);
 /* set start point of code block cache */
-uint16_t cache_block_start();
+uint16_t cache_block_start(void);
 /* set instruction point in block  
    needed for jumping inside */
-void cache_block_point();
+void cache_block_point(void);
 /* set end point of code block cache */
-void cache_block_end();
+void cache_block_end(void);
 /* save patch in cache for patching */
 uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset);
 
@@ -48,10 +48,10 @@ CacheUnit* cache_get_block(uint16_t block_id);
 /* update code after patching */
 void cache_flush(uint16_t block_id);
 /* how much memory used */
-uint32_t cache_usage();
+uint32_t cache_usage(void);
 /* show recompiled block */
 void cache_print(int block);
 /* get current block pointer */
-int cache_bp();
+int cache_bp(void);
 
 #endif

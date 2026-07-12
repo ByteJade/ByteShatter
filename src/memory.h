@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 void memory_init(uint32_t guest_size);
-void memory_fini();
+void memory_fini(void);
 
 void* mmap_guest(uint32_t guest_size);
 
@@ -16,11 +16,11 @@ void emit16(uint16_t data);
 void emit32(uint32_t data);
 
 /* fetch byte from guest memory */
-uint8_t fetch8();
+uint8_t fetch8(void);
 /* fetch 2 bytes from guest memory */
-uint16_t fetch16();
+uint16_t fetch16(void);
 /* fetch 4 bytes from guest memory */
-uint32_t fetch32();
+uint32_t fetch32(void);
 
 /* set guest */
 void set_guest(uint64_t new_guest);
@@ -30,13 +30,13 @@ void set_gp(uint32_t new_gp);
 void set_hp(uint32_t new_hp);
 
 /* get host pointer */
-uint64_t get_hp();
+uint64_t get_hp(void);
 /* get guest pointer */
-uint64_t get_gp();
+uint64_t get_gp(void);
 
 /* get pointer to host memory */
-uint8_t* get_host();
+uint8_t* get_host(void);
 /* get pointer to guest memory */
-uint8_t* get_guest();
+uint8_t* get_guest(void);
 
 #endif

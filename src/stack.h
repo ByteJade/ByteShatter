@@ -4,10 +4,10 @@
 #include <elf.h>
 #include "dlmanager.h"
 
-void stack_init();
-void stack_fini();
+void stack_init(void);
+void stack_fini(void);
 
-void push_argc();
+void push_argc(void);
 void push_arg(const char* arg);
 void push_envp(const char* env);
 
@@ -15,6 +15,6 @@ void set_envp(const char** envp);
 void set_auxv(Elf64_auxv_t* auxv, int auxc);
 
 void finish_stack(ExeMeta* exe);
-void* get_sp();
+void* get_sp(void);
 
 #endif
