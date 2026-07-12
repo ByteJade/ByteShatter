@@ -266,6 +266,35 @@ int main(int argc, char *argv[])
             dpyName ? dpyName : getenv("DISPLAY"));
         return -1;
     }
+    if (fullscreen) {
+        int scrnum = DefaultScreen(dpy);
+
+        x = 0; y = 0;
+        winWidth = DisplayWidth(dpy, scrnum);
+        winHeight = DisplayHeight(dpy, scrnum);
+    }
+    make_window(dpy, "glxgears", x, y, winWidth, winHeight, &win, &ctx, &visId);
+    XMapWindow(dpy, win);
+    glXMakeCurrent(dpy, win, ctx);
+
+    if (framerate <=  0) {
+        query_vsync(dpy, win);
+    }
+    else {
+        printf("Limiting framerate to ~%d frames/sec\n", framerate);
+    }
+
+    if (printInfo) {
+        printf("GL_RENDERER   = %s\n", (char *) glGetString(GL_RENDERER));
+        printf("GL_VERSION    = %s\n", (char *) glGetString(GL_VERSION));
+        printf("GL_VENDOR     = %s\n", (char *) glGetString(GL_VENDOR));
+        printf("GL_EXTENSIONS = %s\n", (char *) glGetString(GL_EXTENSIONS));
+        printf("VisualID %d, 0x%x\n", (int) visId, (int) visId);
+    }
+
+    glXMakeCurrent(dpy, None, NULL);
+    glXDestroyContext(dpy, ctx);
+    XDestroyWindow(dpy, win);
     XCloseDisplay(dpy);
     return 0;
 }
