@@ -27,23 +27,26 @@ void debug_wait() {
     char arg[32];
     char line[256];
     scanf("%s", line);
-    if (sscanf(line, "%s %s", com, arg) == 2) {
-        if (strcmp(com, "brb") == 0) {
-            breakp = strtol(arg, NULL, 10);
-        } else if (strcmp(com, "print") == 0) {
-            panic("DEBUGGER::TODO");
+    while (1) {
+        if (sscanf(line, "%s %s", com, arg) == 2) {
+            if (strcmp(com, "brb") == 0) {
+                breakp = strtol(arg, NULL, 10);
+            } else if (strcmp(com, "print") == 0) {
+                panic("DEBUGGER::TODO");
+            } else {
+                help();
+            }
         } else {
-            help();
-        }
-    } else {
-        if (strcmp(com, "si") == 0) {
-            panic("DEBUGGER::TODO");
-        } else if (strcmp(com, "sb") == 0) {
-            breakp++;
-        } else if (strcmp(com, "continue") == 0) {
-            return;
-        } else {
-            help();
+            if (strcmp(com, "si") == 0) {
+                panic("DEBUGGER::TODO");
+            } else if (strcmp(com, "sb") == 0) {
+                breakp++;
+                return;
+            } else if (strcmp(com, "continue") == 0) {
+                return;
+            } else {
+                help();
+            }
         }
     }
 }
