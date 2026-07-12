@@ -72,7 +72,8 @@ void decode_shift_table(X64_instruction* buf, uint8_t modrm) {
         default: panic("DECODER::UNKNOWN_SHIFT_SYMBOL: %X", shift);
     }
 }
-void print_op(char* out, X64_instruction* buf, Operand* op) {
+void print_op(char** ptr, X64_instruction* buf, Operand* op) {
+    char* out = *ptr;
     if (op->type == REG) {
         if (buf->size == 64) {
             out += sprintf(out, "r%s ", regs[op->reg]);
@@ -106,13 +107,14 @@ void print_op(char* out, X64_instruction* buf, Operand* op) {
         }
         out += sprintf(out, "] ");
     }
+    *ptr = out;
 }
 void sprint_instr(char* out, X64_instruction* buf) {
     out += sprintf(out, "%s ", types[buf->type]);
     if (buf->opcount > 0)
-        print_op(out, buf, &buf->op0);
+        print_op(&out, buf, &buf->op0);
     if (buf->opcount > 1)
-        print_op(out, buf, &buf->op1);
+        print_op(&out, buf, &buf->op1);
 }
 int decode_instr(X64_instruction* buf) {
     int ret = 0;
