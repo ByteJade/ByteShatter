@@ -158,7 +158,7 @@ uint32_t cache_usage(void) {
 }
 void cache_print(int block) {
     CacheUnit* unit = blocks_cache + block;
-    printf("\n%X Block: %i", unit->hp, block);
+    printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
     for (int x = 0; x < unit->offsetssz; x++) {
         X64_instruction buf;
