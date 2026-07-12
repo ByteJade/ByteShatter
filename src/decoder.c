@@ -230,7 +230,7 @@ int decode_instr(X64_instruction* buf) {
             buf->opcount = 1;
             buf->type = PUSH;
             buf->op0.type = IMM;
-            buf->op0.reg = fetch_imm8();
+            buf->op0.imm = fetch_imm8();
             break;
         case 0x74:
             buf->opcount = 1;
