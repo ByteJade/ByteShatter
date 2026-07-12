@@ -423,9 +423,9 @@ int decode_instr(X64_instruction* buf) {
                     buf->op0.type = IMM;
                     buf->op0.imm = 1;
                     break; // dec
-                case 2 ... 3:
+                case 2: case 3:
                     buf->type = CALL; break; // call
-                case 4 ... 5:
+                case 4: case 5:
                     buf->type = JMP; ret = JMP; break; // jmps
                 case 6: buf->type = PUSH; break; // push
             }
