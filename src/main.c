@@ -28,9 +28,10 @@ int read_argv(int argc, char** argv) {
                 case 'h':
                 default: usage();
             }
-        } else if (i != (argc - 1)) {
+        } else {
             return i;
-        } else usage();
+        }
+        if (i == (argc - 1)) usage();
     }
     usage();
     return 0;
