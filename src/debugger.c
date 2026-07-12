@@ -3,6 +3,7 @@
 #include "cache.h"
 #include "patcher.h"
 #include "memory.h"
+#include "decoder.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -72,6 +73,17 @@ void debug_wait(void) {
             }
         } else {
             if (strcmp(com, "si") == 0) {
+                CacheUnit* unit = cache_get_block(break_block);
+                for (int x = 0; x < unit->offsetssz; x++) {
+                    if (break_pc == unit->offsets[x].hoff) {
+                        X64_instruction buf;
+                        set_gp(unit->gp + unit->offsets[x].goff);
+                        decode_instr(&buf);
+                        char out[32];
+                        sprint_instr(out, &buf);
+                        printf("%s\n", out);
+                    }
+                }
                 if (prev_instrp) {
                     *prev_instrp = prev_instr;
                     __builtin___clear_cache(prev_instrp, prev_instrp+4);
