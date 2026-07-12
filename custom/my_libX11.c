@@ -44,6 +44,7 @@ int my_XChangeProperty(
     );
     return result;
 }
+#include <stdio.h>
 Window my_XCreateWindow(
     Display *display, Window parent,
     int x, int y,
@@ -58,9 +59,10 @@ Window my_XCreateWindow(
     Window ret;
     asm volatile(
         "bl XCreateWindow\n"
-	"mov %x0, x0"
+	"mov %0, x0"
 	: "=r" (ret)
     );
+    printf("WINDOW POINTER: %lx\n", ret);
     return ret;
 }
 
