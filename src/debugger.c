@@ -50,7 +50,7 @@ void debug_wait(void) {
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
-                set_log_level(com[0]);
+                set_log_level(arg[0]);
             } else {
                 help();
             }
