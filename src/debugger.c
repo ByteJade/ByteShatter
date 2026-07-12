@@ -3,7 +3,6 @@
 #include "cache.h"
 #include "patcher.h"
 #include "memory.h"
-#include <bits/floatn.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
