@@ -59,7 +59,7 @@ void debug_wait(void) {
         if (sscanf(line, "%s %s", com, arg) == 2) {
             if (strcmp(com, "brb") == 0) {
                 break_block = strtol(arg, NULL, 10);
-                printf("Set brak point in block %i\n", break_block);
+                printf("Set break point in block %i\n", break_block);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
