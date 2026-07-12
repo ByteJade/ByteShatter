@@ -77,6 +77,7 @@ void debug_wait(void) {
                     __builtin___clear_cache(prev_instrp, prev_instrp+4);
                 }
                 set_break_point(break_pc + 4);
+                return;
             } else if (strcmp(com, "sb") == 0) {
                 break_block++;
                 return;
