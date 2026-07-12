@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 int debug_break(void);
-void set_break_point();
+void set_break_point(uint32_t pc);
 void debug_enable(void);
 void debug_wait(void);
 

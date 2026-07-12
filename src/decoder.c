@@ -464,7 +464,7 @@ void decode(uint32_t gp) {
     uint8_t jump_type = 0;
     if (block == debug_break()) {
         jump_type = decode_step();
-        set_break_point();
+        set_break_point(0);
     }
     while (jump_type != RET && jump_type != JMP) {
         jump_type = decode_step();
