@@ -29,7 +29,7 @@ void debug_wait() {
     char line[256];
     while (1) {
         printf(" <- ");
-        scanf("%s", line);
+        fgets(line, sizeof(line), stdin);
         if (sscanf(line, "%s %s", com, arg) == 2) {
             if (strcmp(com, "brb") == 0) {
                 breakp = strtol(arg, NULL, 10);
