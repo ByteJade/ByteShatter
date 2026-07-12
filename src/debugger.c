@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 static int enabled = 0;
+static int break_pc = 0;
 static int break_block = -1;
 static uint64_t break_point = 0;
 static uint32_t prev_instr = 0;
@@ -21,6 +22,7 @@ int debug_break(void) {
     return break_block;
 }
 void set_break_point(uint32_t pc) {
+    break_pc = pc;
     CacheUnit* cache = cache_get_block(break_block);
     uint32_t* instr = (uint32_t*)(get_host() + cache->hp + pc);
     prev_instr = *instr;
@@ -70,7 +72,11 @@ void debug_wait(void) {
             }
         } else {
             if (strcmp(com, "si") == 0) {
-                panic("DEBUGGER::TODO");
+                if (prev_instrp) {
+                    *prev_instrp = prev_instr;
+                    __builtin___clear_cache(prev_instrp, prev_instrp+4);
+                }
+                set_break_point(break_pc + 4);
             } else if (strcmp(com, "sb") == 0) {
                 break_block++;
                 return;
