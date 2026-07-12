@@ -23,9 +23,12 @@ Display* my_XOpenDisplay(char *display_name) {
     printf("DISPLAY: %s\n", display_name);
     Display* result;
     asm volatile(
+        "mov x0, %1\n"
         "bl XOpenDisplay\n"
         "mov %0, x0\n"
         : "=r" (result)
+        : "r" (display_name)
+        : "x0"
     );
     printf("RETURN: %p\n", result);
     return result;
