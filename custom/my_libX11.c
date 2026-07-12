@@ -55,6 +55,7 @@ Window my_XCreateWindow(
     unsigned long valuemask,
     XSetWindowAttributes *attribute
 ) {
+    printf("XCREATEWINDOW\n");
     POP8;
     Window ret;
     asm volatile(
