@@ -18,7 +18,7 @@ void usage() {
     exit(0);
 }
 
-char* read_argv(int argc, char** argv) {
+int read_argv(int argc, char** argv) {
     for (int i = 1; i < argc; i++) {
         char* arg = argv[i];
         if (arg[0] == '-') {
@@ -29,10 +29,7 @@ char* read_argv(int argc, char** argv) {
                 default: usage();
             }
         } else {
-            for (int n = argc-1; n > i-1; n--) {
-                push_arg(argv[n]);
-            }
-            return arg;
+            return i;
         }
         if (i == (argc - 1)) usage();
     }
@@ -46,8 +43,15 @@ int main(int argc, char** argv, const char** envp) {
     stack_init();
     set_envp(envp);
     
-    ExeMeta* exe = load_object(read_argv(argc, argv));
+    int end = read_argv(argc, argv);
+    ExeMeta* exe = load_object(argv[end]);
     finish_stack(exe);
+    push_arg(0);
+    for (int n = argc-1; n > end-1; n--) {
+        push_arg(argv[n]);
+    }
+    push_argc();
+    
     
     debug_wait();
     set_guest((uint64_t)exe->base);

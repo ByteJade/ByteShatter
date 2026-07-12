@@ -30,6 +30,9 @@ void stack_fini() {
     munmap(stack, STACK_SIZE);
 }
 
+void push_argc() {
+    *(--sp) = argc;
+}
 void push_arg(const char* arg) {
     if (arg) {
         *(--sp) = (uint64_t)dp;
@@ -87,8 +90,6 @@ void finish_stack(ExeMeta* exe) {
         {AT_NULL,      0}
     };
     set_auxv(auxv, 19);
-    push_arg(0);
-    *(--sp) = argc;
 }
 
 void* get_sp() {

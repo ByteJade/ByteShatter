@@ -7,6 +7,7 @@
 void stack_init();
 void stack_fini();
 
+void push_argc();
 void push_arg(const char* arg);
 void push_envp(const char* env);
 
