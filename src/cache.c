@@ -5,6 +5,7 @@
 #include "decoder.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #define MAX_BLOCKS 255
@@ -157,19 +158,21 @@ uint32_t cache_usage() {
 }
 void cache_print(int block) {
     CacheUnit* unit = blocks_cache + block;
-    print("\n%lX Block: %i", unit->hp, block);
+    printf("\n%lX Block: %i", unit->hp, block);
     uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
     for (int x = 0; x < unit->offsetssz; x++) {
         X64_instruction buf;
         set_gp(unit->gp + unit->offsets[x].goff);
         decode_instr(&buf);
-        print_instr(&buf);
+        char out[32];
+        sprint_instr(out, &buf);
+        printf(" : %s\n", out);
         uint32_t end;
         uint32_t start = unit->offsets[x].hoff;
         if (x+1 == unit->offsetssz) end = start+4;
         else end = unit->offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
-            print("%x",host[y]);
+            printf("%x",host[y]);
         }
     }
 }

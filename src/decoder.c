@@ -106,15 +106,12 @@ void print_op(char* out, X64_instruction* buf, Operand* op) {
         out += sprintf(out, "] ");
     }
 }
-void print_instr(X64_instruction* buf) {
-    char out[32];
-    char* ptr = out;
-    ptr += sprintf(ptr, "%s ", types[buf->type]);
+void sprint_instr(char* out, X64_instruction* buf) {
+    out += sprintf(out, "%s ", types[buf->type]);
     if (buf->opcount > 0)
-        print_op(ptr, buf, &buf->op0);
+        print_op(out, buf, &buf->op0);
     if (buf->opcount > 1)
-        print_op(ptr, buf, &buf->op1);
-    print("%s", out);
+        print_op(out, buf, &buf->op1);
 }
 int decode_instr(X64_instruction* buf) {
     int ret = 0;
@@ -458,7 +455,9 @@ void decode(uint32_t gp) {
         cache_block_point();
         X64_instruction buf;
         uint8_t jump_type = decode_instr(&buf);
-        print_instr(&buf);
+        char out[32];
+        sprint_instr(out, &buf);
+        print("%s", out);
         encode(&buf);
         if (jump_type == RET || jump_type == JMP) break;
         /*
