@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 static int enabled = 0;
-uint64_t break_block = 0;
+int break_block = 0;
 uint64_t break_point = 0;
 uint32_t prev_instr = 0;
 uint32_t* prev_instrp = NULL;
@@ -58,8 +58,8 @@ void debug_wait(void) {
         fgets(line, sizeof(line), stdin);
         if (sscanf(line, "%s %s", com, arg) == 2) {
             if (strcmp(com, "brb") == 0) {
-                int i = strtol(arg, NULL, 10);
-                break_block = i;
+                break_block = strtol(arg, NULL, 10);
+                printf("Set brak point in block %i\n", break_block);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
