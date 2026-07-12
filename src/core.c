@@ -20,7 +20,7 @@ void set_log_level(char level) {
     }
 }
 void log_message(LogLevel level, const char* format, ...) {
-    if (level > log_level) return;
+    if ((int)level > log_level) return;
     if (prefixes[level][0]) printf("%s", prefixes[level]);
     
     va_list args;

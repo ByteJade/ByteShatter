@@ -148,12 +148,12 @@ CacheUnit* cache_get_block(uint16_t block_id) {
 
 void cache_flush(uint16_t block_id) {
     CacheUnit* unit = blocks_cache + block_id;
-    void* code = get_host() + unit->hp;
+    uint8_t* code = get_host() + unit->hp;
     uint32_t size = unit->offsets[unit->offsetssz-1].hoff*4+32;
     print("flush cache %x-%x; block %x", unit->hp, unit->hp+size, block_id);
     __builtin___clear_cache(code, code + size);
 }
-uint32_t cache_usage() {
+uint32_t cache_usage(void) {
     return bp * sizeof(CacheUnit) + pp * sizeof(PatchUnit) + offset_usage;
 }
 void cache_print(int block) {
@@ -167,8 +167,8 @@ void cache_print(int block) {
         char out[32];
         sprint_instr(out, &buf);
         printf(" : %s\n", out);
-        uint32_t end;
-        uint32_t start = unit->offsets[x].hoff;
+        int end;
+        int start = unit->offsets[x].hoff;
         if (x+1 == unit->offsetssz) end = start+4;
         else end = unit->offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
@@ -176,6 +176,6 @@ void cache_print(int block) {
         }
     }
 }
-int cache_bp() {
+int cache_bp(void) {
     return bp;
 }

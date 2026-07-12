@@ -6,10 +6,10 @@
 #include <stdint.h>
 #include <stdio.h>
 
-int64_t fetch_imm8() {
+int64_t fetch_imm8(void) {
     return (int64_t)(int8_t)fetch8();
 }
-int64_t fetch_imm32() {
+int64_t fetch_imm32(void) {
     return (int64_t)(int32_t)fetch32();
 }
 void decode_sib(Operand* op) {
@@ -18,7 +18,7 @@ void decode_sib(Operand* op) {
     op->type |= IDX;
     op->scale = sib>>6;
     op->idx = (sib>>3)&7;
-    if (base == 0b101 && (op->type&IMM) == 0) {
+    if (base == 5 && (op->type&IMM) == 0) {
         op->type |= IMM;
         op->imm = fetch_imm32();
     } else {
@@ -38,10 +38,10 @@ void decode_rm(Operand* op, uint8_t modrm) {
         if (mod == 1 || mod == 2) {
             op->type |= IMM;
         }
-        if (mod == 0 && rm == 0b101) {
+        if (mod == 0 && rm == 5) {
             op->type |= IMM;
             op->imm = fetch_imm32();
-        } else if (rm == 0b100) {
+        } else if (rm == 4) {
             decode_sib(op);
         } else {
             op->type |= REG;

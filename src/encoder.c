@@ -222,7 +222,7 @@ void encode(X64_instruction* buf) {
             } else if (t0 == REG && t1 == IMM) {
                 uint64_t imm = buf->op1.imm;
                 if (imm == 0xFFFFFFFFFFFFFFF0) {
-                    emit_and_imm(r0, r1, 0b01111100111011);
+                    emit_and_imm(r0, r1, 7995);
                 } else {
                     emit_and_imm(r0, r1, imm);
                 }

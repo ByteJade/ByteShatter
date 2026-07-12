@@ -86,7 +86,7 @@ void loader_map_segments(ExeMeta* exe) {
         Elf64_Phdr* phdr = elf->pheaders + i;
         if (phdr->p_type == PT_LOAD) {
             fseek(elf->fp, phdr->p_offset, SEEK_SET);
-            void* dst = exe->base + phdr->p_vaddr;
+            uint8_t* dst = exe->base + phdr->p_vaddr;
             fread(dst, 1, phdr->p_filesz, elf->fp);
             /* Usually we use protection here
                but during emulation it will interfere */
@@ -273,7 +273,7 @@ void loader_reloc_dependencies(ExeMeta* exe) {
     /* create cache */
     elf->sym_cache = malloc(elf->dynsymsz * sizeof(uint32_t));
     char* symtab_str = elf->strtab; 
-    for (size_t j = 1; j < elf->dynsymsz; j++) {
+    for (int j = 1; j < elf->dynsymsz; j++) {
         Elf64_Sym* sym = &elf->dynsym[j];
         
         const char* sym_name = symtab_str + sym->st_name;

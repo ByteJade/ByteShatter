@@ -137,7 +137,7 @@ void* get_wrapped_symbol(const char* symname) {
         ExeMeta* exe = libs[i].wrapped;
         ElfMeta* elf = exe->elf;
         char* symtab_str = elf->strtab; 
-        for (size_t j = 1; j < elf->dynsymsz; j++) {
+        for (int j = 1; j < elf->dynsymsz; j++) {
             Elf64_Sym* sym = &elf->dynsym[j];
             
             if (elf->sym_cache[j] == hash) {

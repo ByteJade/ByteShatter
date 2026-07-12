@@ -39,8 +39,7 @@ void print_native_cpu(void) {
     print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
     #endif
 }
-void brk(void) {return;};
-void brk_handler(int sig, siginfo_t* info, void* ucontext) {
+void brk_handler(int, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     sc = (struct sigcontext*)&ctx->uc_mcontext;
     #if defined(__aarch64__) || defined(_M_ARM64)
@@ -107,9 +106,8 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
         debug_wait();
     }
     #endif
-    brk();
 }
-void segv_handler(int sig, siginfo_t* info, void* ucontext) {
+void segv_handler(int, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
     print_cpu();

@@ -8,7 +8,7 @@
 
 #define STACK_SIZE 2*1024*1024
 
-void* stack = NULL;
+uint8_t* stack = NULL;
 char* dp = NULL;
 uint64_t* sp = NULL;
 int argc = 0;
@@ -23,8 +23,8 @@ void stack_init(void) {
     if (stack == MAP_FAILED) {
         panic("STACK::MAP_FAIL");
     }
-    dp = stack;
-    sp = stack + STACK_SIZE;
+    dp = (char*)stack;
+    sp = (uint64_t*)(stack + STACK_SIZE);
 }
 void stack_fini(void) {
     munmap(stack, STACK_SIZE);

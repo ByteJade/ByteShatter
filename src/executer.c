@@ -14,7 +14,7 @@ void execute(uint64_t address) {
     }
     void* guest = get_guest();
     uint32_t offset = cache_get_block(0)->hp;
-    void(*exec)(void) = (void*)get_host() + offset;
+    void(*exec)(void) = (void(*)(void))(get_host() + offset);
     uint64_t* sp = get_sp();
     #if defined(__aarch64__) || defined(_M_ARM64)
     __asm__ volatile(
