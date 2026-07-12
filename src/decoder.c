@@ -71,48 +71,50 @@ void decode_shift_table(X64_instruction* buf, uint8_t modrm) {
         default: panic("DECODER::UNKNOWN_SHIFT_SYMBOL: %X", shift);
     }
 }
-void print_op(X64_instruction* buf, Operand* op) {
+void print_op(char* out, X64_instruction* buf, Operand* op) {
     if (op->type == REG) {
         if (buf->size == 64) {
-            printf("r%s ", regs[op->reg]);
+            out += sprintf(out, "r%s ", regs[op->reg]);
         } else {
-            printf("e%s ", regs[op->reg]);
+            out += sprintf(out, "e%s ", regs[op->reg]);
         }
     } else if (op->type == IMM) {
-        printf("%lx ", op->imm);
+        out += sprintf(out, "%lx ", op->imm);
     } else {
-        printf("[ ");
+        out += sprintf(out, "[ ");
         if (op->type&REG) {
-            printf("r%s ", regs[op->reg]);
-            if (op->type&IDX) printf("+ ");
+            out += sprintf(out, "r%s ", regs[op->reg]);
+            if (op->type&IDX) out += sprintf(out, "+ ");
         }
         if (op->type&IDX) {
-            printf("r%s ", regs[op->idx]);
+            out += sprintf(out, "r%s ", regs[op->idx]);
             if (op->scale == 1) {
-                printf("* 2 ");
+                out += sprintf(out, "* 2 ");
             } else if (op->scale == 2) {
-                printf("* 4 ");
+                out += sprintf(out, "* 4 ");
             } else if (op->scale == 3) {
-                printf("* 8 ");
+                out += sprintf(out, "* 8 ");
             }
         }
         if (op->type&IMM) {
             if (op->type == (MEM|IMM)) {
-                printf("rip ");
+                out += sprintf(out, "rip ");
             }
-            if (op->imm > 0) printf("+ %lx ", op->imm);
-            if (op->imm < 0) printf("- %lx ", -op->imm);
+            if (op->imm > 0) out += sprintf(out, "+ %lx ", op->imm);
+            if (op->imm < 0) out += sprintf(out, "- %lx ", -op->imm);
         }
-        printf("] ");
+        out += sprintf(out, "] ");
     }
 }
 void print_instr(X64_instruction* buf) {
-    printf("%s ", types[buf->type]);
+    char out[32];
+    char* ptr = out;
+    ptr += sprintf(ptr, "%s ", types[buf->type]);
     if (buf->opcount > 0)
-        print_op(buf, &buf->op0);
+        print_op(ptr, buf, &buf->op0);
     if (buf->opcount > 1)
-        print_op(buf, &buf->op1);
-    printf("\n");
+        print_op(ptr, buf, &buf->op1);
+    print("%s", out);
 }
 int decode_instr(X64_instruction* buf) {
     int ret = 0;
