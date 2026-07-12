@@ -24,7 +24,6 @@ void set_break_point(uint32_t pc) {
     CacheUnit* cache = cache_get_block(break_block);
     uint32_t* instr = (uint32_t*)(get_host() + cache->hp + pc);
     printf("hp is %i\n", (cache->hp + pc));
-    if (prev_instrp) *prev_instrp = prev_instr;
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
@@ -77,6 +76,10 @@ void debug_wait(void) {
                 break_block++;
                 return;
             } else if (strcmp(com, "run") == 0) {
+                if (prev_instrp) {
+                    *prev_instrp = prev_instr;
+                    __builtin___clear_cache(prev_instrp, prev_instrp+4);
+                }
                 return;
             } else if (strcmp(com, "exit") == 0) {
                 exit(0);

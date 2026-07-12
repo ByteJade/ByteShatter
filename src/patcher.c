@@ -49,6 +49,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     if (ret == 0) {
         success("break point");
         debug_wait();
+        return;
     }
     print("ret: %x", ret);
     PatchUnit* patch = cache_get_patch(ret);
