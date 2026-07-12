@@ -34,7 +34,7 @@ int read_argv(int argc, char** argv) {
         if (i == (argc - 1)) usage();
     }
     usage();
-    return NULL;
+    return 0;
 }
 
 int main(int argc, char** argv, const char** envp) {
