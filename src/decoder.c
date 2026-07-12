@@ -1,4 +1,5 @@
 #include "decoder.h"
+#include "debugger.h"
 #include "memory.h"
 #include "encoder.h"
 #include "cache.h"
@@ -446,20 +447,27 @@ int decode_instr(X64_instruction* buf) {
     }
     return ret;
 }
-
+int decode_step() {
+    cache_block_point();
+    X64_instruction buf;
+    int jump_type = decode_instr(&buf);
+    char out[32];
+    sprint_instr(out, &buf);
+    print("%s", out);
+    encode(&buf);
+    return jump_type;
+}
 void decode(uint32_t gp) {
     print("Start decode %lx", gp);
     set_gp(gp);
     uint16_t block = cache_block_start();
-    while (1) {
-        cache_block_point();
-        X64_instruction buf;
-        uint8_t jump_type = decode_instr(&buf);
-        char out[32];
-        sprint_instr(out, &buf);
-        print("%s", out);
-        encode(&buf);
-        if (jump_type == RET || jump_type == JMP) break;
+    uint8_t jump_type = 0;
+    if (block == debug_break()) {
+        jump_type = decode_step();
+        set_break_point();
+    }
+    while (jump_type != RET && jump_type != JMP) {
+        jump_type = decode_step();
         /*
         TODO: Static analysis of block jumps. 
         Cache lookups are resource-intensive.

@@ -4,14 +4,9 @@
 #include "decoder.h"
 #include "stack.h"
 #include "core.h"
-#include "debugger.h"
 
 void execute(uint64_t address) {
     decode(address);
-    if (block_break() == 0) {
-        success("Found break point 0");
-        debug_wait();
-    }
     void* guest = get_guest();
     uint32_t offset = cache_get_block(0)->hp;
     void(*exec)(void) = (void(*)(void))(get_host() + offset);

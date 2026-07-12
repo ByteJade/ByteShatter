@@ -101,10 +101,6 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             panic("PATCHER::UNKNOWN_PATCH");
     }
     cache_flush(patch->block);
-    if (cache_bp()-1 == block_break()) {
-        success("Found break point %i", cache_bp()-1);
-        debug_wait();
-    }
     #endif
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {

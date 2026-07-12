@@ -2,18 +2,30 @@
 #include "core.h"
 #include "cache.h"
 #include "patcher.h"
+#include "memory.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 static int enabled = 0;
-static int breakp = -1;
+uint64_t break_block = 0;
+uint64_t break_point = 0;
+uint32_t prev_instr = 0;
+uint32_t* prev_instrp = NULL;
 
 void debug_enable(void) {
     enabled = 1;
 }
-int block_break(void) {
-    return breakp;
+int debug_break(void) {
+    return break_point;
+}
+void set_break_point() {
+    uint32_t* pc = (uint32_t*)(get_host() + get_hp() - 4);
+    if (prev_instrp) *prev_instrp = prev_instr;
+    prev_instr = *pc;
+    prev_instrp = pc;
+    *pc = 0xD4200000;
 }
 void help(void) {
     printf("Commands:\n");
@@ -31,7 +43,7 @@ void handle_print(char* arg) {
     } else if (strcmp(arg, "arm_regs") == 0) {
         print_native_cpu();
     } else if (strcmp(arg, "cache") == 0) {
-        cache_print(breakp);
+        cache_print(break_block);
     } else {
         help();
     }
@@ -46,7 +58,8 @@ void debug_wait(void) {
         fgets(line, sizeof(line), stdin);
         if (sscanf(line, "%s %s", com, arg) == 2) {
             if (strcmp(com, "brb") == 0) {
-                breakp = strtol(arg, NULL, 10);
+                int i = strtol(arg, NULL, 10);
+                break_block = i;
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
@@ -58,7 +71,7 @@ void debug_wait(void) {
             if (strcmp(com, "si") == 0) {
                 panic("DEBUGGER::TODO");
             } else if (strcmp(com, "sb") == 0) {
-                breakp++;
+                break_block++;
                 return;
             } else if (strcmp(com, "continue") == 0) {
                 return;
