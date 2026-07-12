@@ -3,16 +3,17 @@
 #include "cache.h"
 #include "patcher.h"
 #include "memory.h"
+#include <bits/floatn.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 static int enabled = 0;
-int break_block = -1;
-uint64_t break_point = 0;
-uint32_t prev_instr = 0;
-uint32_t* prev_instrp = NULL;
+static int break_block = -1;
+static uint64_t break_point = 0;
+static uint32_t prev_instr = 0;
+static uint32_t* prev_instrp = NULL;
 
 void debug_enable(void) {
     enabled = 1;
@@ -28,7 +29,7 @@ void set_break_point(uint32_t pc) {
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
-    cache_flush(break_block);
+    __builtin___clear_cache(instr, instr+4);
 }
 void help(void) {
     printf("Commands:\n");
