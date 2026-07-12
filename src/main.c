@@ -13,7 +13,7 @@
 void usage() {
     printf("Usage: shatter [commands] <file> [arguments]\n");
     printf("\t-d  Enable debug mode\n");
-    printf("\t-l  Set log level (-lA,-lE,-lW,-lN)\n");
+    printf("\t-l  Set log level (-lA,-lW,-lE)\n");
     printf("\t-h  Print this help message\n");
     exit(0);
 }
@@ -28,10 +28,9 @@ int read_argv(int argc, char** argv) {
                 case 'h':
                 default: usage();
             }
-        } else {
+        } else if (i != (argc - 1)) {
             return i;
-        }
-        if (i == (argc - 1)) usage();
+        } else usage();
     }
     usage();
     return 0;

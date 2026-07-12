@@ -1,5 +1,6 @@
 #include "debugger.h"
 #include "core.h"
+#include "cache.h"
 #include "patcher.h"
 #include <stdio.h>
 #include <string.h>
@@ -19,6 +20,7 @@ void help() {
     printf("brb <i> - set break point in block i\n");
     printf("sb - go to next block\n");
     printf("si - go to next instruction\n");
+    printf("log <level> - set logs to level (A,W,E)\n");
     printf("print <state> - print state (x64_regs, arm_regs, cache)\n");
     printf("continue - return to execution\n");
     printf("exit - stop execution\n");
@@ -29,7 +31,7 @@ void handle_print(char* arg) {
     } else if (strcmp(arg, "arm_regs") == 0) {
         print_native_cpu();
     } else if (strcmp(arg, "cache") == 0) {
-        panic("DEBUGGER::TODO");
+        cache_print(breakp);
     } else {
         help();
     }
@@ -47,6 +49,8 @@ void debug_wait() {
                 breakp = strtol(arg, NULL, 10);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
+            }  else if (strcmp(com, "log") == 0) {
+                set_log_level(com[0]);
             } else {
                 help();
             }

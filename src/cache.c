@@ -155,24 +155,21 @@ void cache_flush(uint16_t block_id) {
 uint32_t cache_usage() {
     return bp * sizeof(CacheUnit) + pp * sizeof(PatchUnit) + offset_usage;
 }
-void cache_print() {
-    print("Cache:");
-    for (int i = 0; i < bp; i++) {
-        CacheUnit* unit = blocks_cache + i;
-        print("\n%lX Block: %i", unit->hp, i);
-        uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
-        for (int x = 0; x < unit->offsetssz; x++) {
-            X64_instruction buf;
-            set_gp(unit->gp + unit->offsets[x].goff);
-            decode_instr(&buf);
-            print_instr(&buf);
-            uint32_t end;
-            uint32_t start = unit->offsets[x].hoff;
-            if (x+1 == unit->offsetssz) end = start+4;
-            else end = unit->offsets[x+1].hoff;
-            for (int y = start; y < end; y++) {
-                print("%x",host[y]);
-            }
+void cache_print(int block) {
+    CacheUnit* unit = blocks_cache + block;
+    print("\n%lX Block: %i", unit->hp, block);
+    uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
+    for (int x = 0; x < unit->offsetssz; x++) {
+        X64_instruction buf;
+        set_gp(unit->gp + unit->offsets[x].goff);
+        decode_instr(&buf);
+        print_instr(&buf);
+        uint32_t end;
+        uint32_t start = unit->offsets[x].hoff;
+        if (x+1 == unit->offsetssz) end = start+4;
+        else end = unit->offsets[x+1].hoff;
+        for (int y = start; y < end; y++) {
+            print("%x",host[y]);
         }
     }
 }

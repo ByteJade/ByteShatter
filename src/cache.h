@@ -49,8 +49,8 @@ CacheUnit* cache_get_block(uint16_t block_id);
 void cache_flush(uint16_t block_id);
 /* how much memory used */
 uint32_t cache_usage();
-/* show recompiled blocks */
-void cache_print();
+/* show recompiled block */
+void cache_print(int block);
 /* get current block pointer */
 int cache_bp();
 
