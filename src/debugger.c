@@ -22,6 +22,8 @@ int debug_break(void) {
 }
 void set_break_point() {
     uint32_t* pc = (uint32_t*)(get_host() + get_hp());
+    printf("host is %p\n", get_host());
+    printf("hp is %li\n", get_hp());
     if (prev_instrp) *prev_instrp = prev_instr;
     prev_instr = *pc;
     prev_instrp = pc;
