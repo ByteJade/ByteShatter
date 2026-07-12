@@ -9,7 +9,7 @@ static const char* const prefixes[] = {
     ""
 };
 
-static int log_level = 3;
+static int log_level = 0;
 
 void set_log_level(char level) {
     switch (level) {

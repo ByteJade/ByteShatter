@@ -10,7 +10,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-void print_cpu(struct sigcontext* sc) {
+static struct sigcontext* sc;
+
+void print_cpu() {
     #if defined(__aarch64__) || defined(_M_ARM64)
     print("PC:  %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 16; i++) {
@@ -23,10 +25,24 @@ void print_cpu(struct sigcontext* sc) {
     print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
     #endif
 }
+void print_native_cpu() {
+    #if defined(__aarch64__) || defined(_M_ARM64)
+    print("PC:  %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
+    for (int i = 0; i < 31; i++) {
+        print("X%i: %lX", i, sc->regs[i]);
+    }
+    print("sp: %lX", sc->sp);
+    int N = (sc->pstate >> 31) & 1;
+    int Z = (sc->pstate >> 30) & 1;  
+    int C = (sc->pstate >> 29) & 1;
+    int V = (sc->pstate >> 28) & 1;
+    print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
+    #endif
+}
 void brk(void) {return;};
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
-    struct sigcontext* sc = (struct sigcontext*)&ctx->uc_mcontext;
+    sc = (struct sigcontext*)&ctx->uc_mcontext;
     #if defined(__aarch64__) || defined(_M_ARM64)
     uint32_t* code = (uint32_t*)sc->pc;
     uint32_t instruction = *code;

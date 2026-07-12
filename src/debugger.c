@@ -1,5 +1,6 @@
 #include "debugger.h"
 #include "core.h"
+#include "patcher.h"
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -22,6 +23,17 @@ void help() {
     printf("continue - return to execution\n");
     printf("exit - stop execution\n");
 }
+void handle_print(char* arg) {
+    if (strcmp(arg, "x64_regs") == 0) {
+        print_cpu();
+    } else if (strcmp(arg, "arm_regs") == 0) {
+        print_native_cpu();
+    } else if (strcmp(arg, "cache") == 0) {
+        panic("DEBUGGER::TODO");
+    } else {
+        help();
+    }
+}
 void debug_wait() {
     if (!enabled) return;
     char com[32];
@@ -34,7 +46,7 @@ void debug_wait() {
             if (strcmp(com, "brb") == 0) {
                 breakp = strtol(arg, NULL, 10);
             } else if (strcmp(com, "print") == 0) {
-                panic("DEBUGGER::TODO");
+                handle_print(arg);
             } else {
                 help();
             }
