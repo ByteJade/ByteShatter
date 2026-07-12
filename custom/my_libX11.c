@@ -10,6 +10,9 @@ WRAP(Display*, XOpenDisplay, char *display_name);
 WRAP(int, XCloseDisplay, Display *display);
 WRAP(int, XFree, void *data);
 WRAP(int, XMapWindow, Display *display, Window w);
+WRAP(int, XDestroyWindow, Display *display, Window w);
+WRAP(void, XSetNormalHints, Display *display, Window w, XSizeHints *hints);
+WRAP(int, XParseGeometry, const char *parsestring, int *x_return, int *y_return, unsigned int *width_return, unsigned int *height_return);
 
 WRAP(Colormap, XCreateColormap, Display *display, Window w, Visual *visual, int alloc);
 

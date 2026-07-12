@@ -130,4 +130,8 @@ WRAP(void, glFinish, void);
 WRAP(void, glXSwapBuffers, void);
 
 WRAP(XVisualInfo*, glXChooseVisual, Display *dpy, int screen, int *attribList);
+WRAP(void, glXDestroyContext, Display *dpy, GLXContext ctx);
+WRAP(void, glXGetProcAddressARB, const GLubyte *procName);
+WRAP(int, glXQueryDrawable, Display *dpy, GLXDrawable draw, int attribute, unsigned int *value);
+WRAP(Bool, glXMakeCurrent, Display *dpy, GLXDrawable drawable, GLXContext ctx);
 WRAP(GLXContext, glXCreateContext, Display *dpy, XVisualInfo* vis, GLXContext shareList, Bool direct);
