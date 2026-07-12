@@ -153,7 +153,7 @@ void cache_flush(uint16_t block_id) {
     CacheUnit* unit = blocks_cache + block_id;
     uint8_t* code = get_host() + unit->hp;
     uint32_t size = unit->offsets[unit->offsetssz-1].hoff*4+32;
-    print("flush cache %x-%x; block %x", unit->hp, unit->hp+size, block_id);
+    print("flush cache %x-%x; block %i", unit->hp, unit->hp+size, block_id);
     __builtin___clear_cache(code, code + size);
 }
 uint32_t cache_usage(void) {
