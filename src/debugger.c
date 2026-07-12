@@ -27,6 +27,7 @@ void set_break_point(uint32_t pc) {
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
+    cache_flush(break_block);
 }
 void help(void) {
     printf("Commands:\n");
