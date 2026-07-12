@@ -23,7 +23,6 @@ int debug_break(void) {
 void set_break_point(uint32_t pc) {
     CacheUnit* cache = cache_get_block(break_block);
     uint32_t* instr = (uint32_t*)(get_host() + cache->hp + pc);
-    printf("hp is %i\n", (cache->hp + pc));
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
