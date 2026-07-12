@@ -20,14 +20,16 @@ void help() {
     printf("si - go to next instruction\n");
     printf("print <state> - print state (x64_regs, arm_regs, cache)\n");
     printf("continue - return to execution\n");
+    printf("exit - stop execution\n");
 }
 void debug_wait() {
     if (!enabled) return;
     char com[32];
     char arg[32];
     char line[256];
-    scanf("%s", line);
     while (1) {
+        printf(" <- ");
+        scanf("%s", line);
         if (sscanf(line, "%s %s", com, arg) == 2) {
             if (strcmp(com, "brb") == 0) {
                 breakp = strtol(arg, NULL, 10);
@@ -44,6 +46,8 @@ void debug_wait() {
                 return;
             } else if (strcmp(com, "continue") == 0) {
                 return;
+            } else if (strcmp(com, "exit") == 0) {
+                exit(0);
             } else {
                 help();
             }
