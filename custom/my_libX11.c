@@ -2,11 +2,13 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 #include "wrapper.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 WRAP(Atom, XInternAtom, Display *display, char *atom_name, Bool only_if_exists);
 WRAP(int, DefaultScreen, Display *display);
 WRAP(Window, RootWindow, Display *display, int screen_number);
-WRAP(Display*, XOpenDisplay, char *display_name);
+//WRAP(Display*, XOpenDisplay, char *display_name);
 WRAP(int, XCloseDisplay, Display *display);
 WRAP(int, XFree, void *data);
 WRAP(int, XMapWindow, Display *display, Window w);
@@ -16,6 +18,18 @@ WRAP(int, XParseGeometry, const char *parsestring, int *x_return, int *y_return,
 
 WRAP(Colormap, XCreateColormap, Display *display, Window w, Visual *visual, int alloc);
 
+Display* my_XOpenDisplay(char *display_name) {
+
+    printf("DISPLAY: %s\n", display_name);
+    Display* result;
+    asm volatile(
+        "bl XOpenDisplay\n"
+        "mov %w0, w0\n"
+        : "=r" (result)
+    );
+    printf("RETURN: %p\n", result);
+    return result;
+}
 int my_XSetStandardProperties(
     Window w, char *window_name,
     char *icon_name, Pixmap icon_pixmap,
@@ -44,7 +58,6 @@ int my_XChangeProperty(
     );
     return result;
 }
-#include <stdio.h>
 Window my_XCreateWindow(
     Display *display, Window parent,
     int x, int y,
@@ -55,7 +68,6 @@ Window my_XCreateWindow(
     unsigned long valuemask,
     XSetWindowAttributes *attribute
 ) {
-    printf("XCREATEWINDOW\n");
     POP8;
     Window ret;
     asm volatile(
@@ -63,7 +75,6 @@ Window my_XCreateWindow(
 	"mov %0, x0"
 	: "=r" (ret)
     );
-    printf("WINDOW POINTER: %lx\n", ret);
     return ret;
 }
 
