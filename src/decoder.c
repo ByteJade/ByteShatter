@@ -483,7 +483,6 @@ void decode(uint32_t gp) {
             break;
         }
         if (cache_overflow()) {
-            cache_flush(block);
             block++;
             if (block == debug_break()) {
                 jump_type = decode_step();
@@ -492,5 +491,4 @@ void decode(uint32_t gp) {
         }
     }
     cache_block_end();
-    cache_flush(block);
 }

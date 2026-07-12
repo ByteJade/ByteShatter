@@ -88,6 +88,7 @@ void cache_block_end(void) {
     memcpy(last_block->offsets, local_offsets, size);
     last_block->offsetssz = loffp;
     loffp = 0;
+    cache_flush(bp-1);
 }
 uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset) {
     if (offset < INT16_MIN || offset > INT16_MAX) {
