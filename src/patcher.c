@@ -46,7 +46,10 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t* code = (uint32_t*)sc->pc;
     uint32_t instruction = *code;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
-    if (ret == 0) debug_wait();
+    if (ret == 0) {
+        success("break point");
+        debug_wait();
+    }
     print("ret: %x", ret);
     PatchUnit* patch = cache_get_patch(ret);
     CacheUnit* cahce = cache_get_block(patch->block);
