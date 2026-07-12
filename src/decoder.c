@@ -207,11 +207,12 @@ int decode_instr(X64_instruction* buf) {
             decode_regrm(buf);
             break;
         case 0x50 ... 0x57:
+            reverse = 1;
             buf->size = 64;
             buf->opcount = 1;
             buf->type = PUSH;
-            buf->op0.type = REG;
-            buf->op0.reg = byte - 0x50;
+            buf->op1.type = REG;
+            buf->op1.reg = byte - 0x50;
             break;
         case 0x58 ... 0x5F:
             buf->size = 64;
