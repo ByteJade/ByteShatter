@@ -8,7 +8,7 @@
 WRAP(Atom, XInternAtom, Display *display, char *atom_name, Bool only_if_exists);
 WRAP(int, DefaultScreen, Display *display);
 WRAP(Window, RootWindow, Display *display, int screen_number);
-//WRAP(Display*, XOpenDisplay, char *display_name);
+WRAP(Display*, XOpenDisplay, char *display_name);
 WRAP(int, XCloseDisplay, Display *display);
 WRAP(int, XFree, void *data);
 WRAP(int, XMapWindow, Display *display, Window w);
@@ -18,21 +18,6 @@ WRAP(int, XParseGeometry, const char *parsestring, int *x_return, int *y_return,
 
 WRAP(Colormap, XCreateColormap, Display *display, Window w, Visual *visual, int alloc);
 
-Display* my_XOpenDisplay(char *display_name) {
-
-    printf("DISPLAY: %s\n", display_name);
-    Display* result;
-    asm volatile(
-        "mov x0, %1\n"
-        "bl XOpenDisplay\n"
-        "mov %0, x0\n"
-        : "=r" (result)
-        : "r" (display_name)
-        : "x0"
-    );
-    printf("RETURN: %p\n", result);
-    return result;
-}
 int my_XSetStandardProperties(
     Window w, char *window_name,
     char *icon_name, Pixmap icon_pixmap,
