@@ -21,8 +21,7 @@ int debug_break(void) {
     return break_block;
 }
 void set_break_point() {
-    warning("BREAK SETTED");
-    uint32_t* pc = (uint32_t*)(get_host() + get_hp() - 4);
+    uint32_t* pc = (uint32_t*)(get_host() + get_hp());
     if (prev_instrp) *prev_instrp = prev_instr;
     prev_instr = *pc;
     prev_instrp = pc;
