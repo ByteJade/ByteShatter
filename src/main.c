@@ -20,7 +20,6 @@ void usage() {
 
 char* read_argv(int argc, char** argv) {
     for (int i = 1; i < argc; i++) {
-        if (i == (argc - 1)) usage();
         char* arg = argv[i];
         if (arg[0] == '-') {
             switch (arg[1]) {
@@ -35,6 +34,7 @@ char* read_argv(int argc, char** argv) {
             }
             return arg;
         }
+        if (i == (argc - 1)) usage();
     }
     usage();
     return NULL;
