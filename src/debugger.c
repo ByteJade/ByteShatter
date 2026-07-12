@@ -21,6 +21,7 @@ int debug_break(void) {
     return break_block;
 }
 void set_break_point() {
+    warning("BREAK SETTED");
     uint32_t* pc = (uint32_t*)(get_host() + get_hp() - 4);
     if (prev_instrp) *prev_instrp = prev_instr;
     prev_instr = *pc;
@@ -34,7 +35,7 @@ void help(void) {
     printf("si - go to next instruction\n");
     printf("log <level> - set logs to level (A,W,E)\n");
     printf("print <state> - print state (x64_regs, arm_regs, cache)\n");
-    printf("continue - return to execution\n");
+    printf("run - return to execution\n");
     printf("exit - stop execution\n");
 }
 void handle_print(char* arg) {
@@ -73,7 +74,7 @@ void debug_wait(void) {
             } else if (strcmp(com, "sb") == 0) {
                 break_block++;
                 return;
-            } else if (strcmp(com, "continue") == 0) {
+            } else if (strcmp(com, "run") == 0) {
                 return;
             } else if (strcmp(com, "exit") == 0) {
                 exit(0);
