@@ -172,7 +172,7 @@ void cache_print(int block) {
         if (x+1 == unit->offsetssz) end = start+4;
         else end = unit->offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
-            printf("%x",host[y]);
+            printf("%x\n",host[y]);
         }
     }
 }
