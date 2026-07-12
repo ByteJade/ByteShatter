@@ -51,5 +51,7 @@ void cache_flush(uint16_t block_id);
 uint32_t cache_usage();
 /* show recompiled blocks */
 void cache_print();
+/* get current block pointer */
+int cache_bp();
 
 #endif

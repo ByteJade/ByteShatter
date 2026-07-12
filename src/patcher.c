@@ -34,10 +34,6 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     if (ret == 0) debug_wait();
     print("ret: %x", ret);
     PatchUnit* patch = cache_get_patch(ret);
-    if (patch->block == block_break()) {
-        success("Found break point");
-        debug_wait();
-    }
     CacheUnit* cahce = cache_get_block(patch->block);
     print("patch: %i", patch->guest_off);
     uint32_t gp = cahce->gp + patch->guest_off;
@@ -90,8 +86,11 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             panic("PATCHER::UNKNOWN_PATCH");
     }
     cache_flush(patch->block);
+    if (cache_bp()-1 == block_break()) {
+        success("Found break point %i", cache_bp()-1);
+        debug_wait();
+    }
     #endif
-    success("patching");
     brk();
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {

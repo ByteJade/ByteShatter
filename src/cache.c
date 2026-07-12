@@ -176,3 +176,6 @@ void cache_print() {
         }
     }
 }
+int cache_bp() {
+    return bp;
+}
