@@ -44,6 +44,9 @@ void* mmap_guest(uint32_t guest_size) {
     }
     return guest;
 }
+void memory_clear_host(void) {
+    hp = 0;
+}
 // TODO: check host overflow
 void emit8(uint8_t data) {
     uint8_t* dst = (uint8_t*)(host + hp);

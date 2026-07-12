@@ -21,6 +21,7 @@ void execute(uint64_t address) {
     exec();
     #endif
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
+    memory_clear_host();
     cache_clear();
     success("execution");
 }
