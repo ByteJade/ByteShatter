@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 
-void usage() {
+void usage(void) {
     printf("Usage: shatter [commands] <file> [arguments]\n");
     printf("\t-d  Enable debug mode\n");
     printf("\t-l  Set log level (-lA,-lW,-lE)\n");

@@ -12,7 +12,7 @@
 
 static struct sigcontext* sc;
 
-void print_cpu() {
+void print_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
     print("PC:  %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 16; i++) {
@@ -25,7 +25,7 @@ void print_cpu() {
     print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
     #endif
 }
-void print_native_cpu() {
+void print_native_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
     print("PC:  %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 31; i++) {
@@ -128,7 +128,7 @@ void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     print_cpu();
     exit(0);
 }
-void patcher_init() {
+void patcher_init(void) {
     struct sigaction sa_trap = {
         .sa_sigaction = brk_handler,
         .sa_flags = SA_SIGINFO,

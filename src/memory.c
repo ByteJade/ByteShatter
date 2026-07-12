@@ -29,7 +29,7 @@ void memory_init(uint32_t guest_size) {
     }
     success("host and guest mmap");
 }
-void memory_fini() {
+void memory_fini(void) {
     if (host) munmap(host, hostsz);
 }
 void* mmap_guest(uint32_t guest_size) {
@@ -61,17 +61,17 @@ void emit32(uint32_t data) {
     hp += 4;
 }
 
-uint8_t fetch8() {
+uint8_t fetch8(void) {
     uint8_t* src = (uint8_t*)(guest + gp);
     gp += 1;
     return *src;
 }
-uint16_t fetch16() {
+uint16_t fetch16(void) {
     uint16_t* src = (uint16_t*)(guest + gp);
     gp += 2;
     return *src;
 }
-uint32_t fetch32() {
+uint32_t fetch32(void) {
     uint32_t* src = (uint32_t*)(guest + gp);
     gp += 4;
     return *src;
@@ -82,8 +82,8 @@ void set_guest(uint64_t new_guest) { guest = (uint8_t*)new_guest; }
 void set_gp(uint32_t new_gp) { gp = new_gp; }
 void set_hp(uint32_t new_hp) { hp = new_hp; }
 
-uint64_t get_hp() { return hp; }
-uint64_t get_gp() { return gp; }
+uint64_t get_hp(void) { return hp; }
+uint64_t get_gp(void) { return gp; }
 
-uint8_t* get_host() { return host; }
-uint8_t* get_guest() { return guest; }
+uint8_t* get_host(void) { return host; }
+uint8_t* get_guest(void) { return guest; }

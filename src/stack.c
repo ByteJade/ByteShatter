@@ -13,7 +13,7 @@ char* dp = NULL;
 uint64_t* sp = NULL;
 int argc = 0;
 
-void stack_init() {
+void stack_init(void) {
     stack = mmap(
         NULL, STACK_SIZE,
         PROT_READ | PROT_WRITE,
@@ -26,11 +26,11 @@ void stack_init() {
     dp = stack;
     sp = stack + STACK_SIZE;
 }
-void stack_fini() {
+void stack_fini(void) {
     munmap(stack, STACK_SIZE);
 }
 
-void push_argc() {
+void push_argc(void) {
     *(--sp) = argc;
 }
 void push_arg(const char* arg) {
@@ -68,30 +68,30 @@ void set_envp(const char** envp) {
 }
 void finish_stack(ExeMeta* exe) {
     Elf64_auxv_t auxv[] = {
-        {AT_SYSINFO_EHDR, 0},
-        {AT_MINSIGSTKSZ, 0x5f0},
-        {AT_HWCAP,     0x26},
-        {AT_PAGESZ,    sysconf(_SC_PAGESIZE)},
-        {AT_CLKTCK,    sysconf(_SC_CLK_TCK)},
-        {AT_PHDR,      (uint64_t)exe->base + exe->elf->header.e_phoff},
-        {AT_PHENT,     exe->elf->header.e_phentsize},
-        {AT_PHNUM,     exe->elf->header.e_phnum},
-        {AT_BASE,      0},
-        {AT_FLAGS,     0},
-        {AT_ENTRY,     (uint64_t)exe->base + exe->elf->header.e_entry},
-        {AT_UID,       getuid()},
-        {AT_EUID,      geteuid()},
-        {AT_GID,       getgid()},
-        {AT_EGID,      getegid()},
-        {AT_SECURE,    0},
-        {AT_RANDOM, getauxval(AT_RANDOM)},
-        {AT_HWCAP2,    2},
-        //{AT_SYSINFO,   0}, Android doesn't have this?
-        {AT_NULL,      0}
+        {AT_SYSINFO_EHDR, {0}},
+        {AT_MINSIGSTKSZ, {0x5f0}},
+        {AT_HWCAP,     {0x26}},
+        {AT_PAGESZ,    {sysconf(_SC_PAGESIZE)}},
+        {AT_CLKTCK,    {sysconf(_SC_CLK_TCK)}},
+        {AT_PHDR,      {(uint64_t)exe->base + exe->elf->header.e_phoff}},
+        {AT_PHENT,     {exe->elf->header.e_phentsize}},
+        {AT_PHNUM,     {exe->elf->header.e_phnum}},
+        {AT_BASE,      {0}},
+        {AT_FLAGS,     {0}},
+        {AT_ENTRY,     {(uint64_t)exe->base + exe->elf->header.e_entry}},
+        {AT_UID,       {getuid()}},
+        {AT_EUID,      {geteuid()}},
+        {AT_GID,       {getgid()}},
+        {AT_EGID,      {getegid()}},
+        {AT_SECURE,    {0}},
+        {AT_RANDOM, {getauxval(AT_RANDOM)}},
+        {AT_HWCAP2,    {2}},
+        //{AT_SYSINFO,   {0}}, Android doesn't have this?
+        {AT_NULL,      {0}}
     };
     set_auxv(auxv, 19);
 }
 
-void* get_sp() {
+void* get_sp(void) {
     return sp;
 }

@@ -22,7 +22,7 @@ OffsetUnit local_offsets[MAX_OFFSETS];
 uint8_t loffp = 0;
 uint32_t offset_usage = 0;
 
-void cahce_init() {
+void cahce_init(void) {
     blocks_cache = (CacheUnit*) malloc(
         MAX_BLOCKS * sizeof(CacheUnit)
     );
@@ -30,7 +30,7 @@ void cahce_init() {
         MAX_JUMPS * sizeof(PatchUnit)
     );
 }
-void cahce_fini() {
+void cahce_fini(void) {
     for (int i = 0; i < bp; i++) {
         CacheUnit* unit = blocks_cache + i;
         if (unit->offsets) free(unit->offsets);
@@ -39,7 +39,7 @@ void cahce_fini() {
     if (jumps_cache) free(jumps_cache);
 }
 
-void cache_clear() {
+void cache_clear(void) {
     for (int i = 0; i < bp; i++) {
         CacheUnit* unit = blocks_cache + i;
         if (unit->offsets) free(unit->offsets);
@@ -47,7 +47,7 @@ void cache_clear() {
     bp = 0;
     pp = 0;
 }
-uint16_t cache_block_start() {
+uint16_t cache_block_start(void) {
     last_block = blocks_cache + bp;
     last_block->offsets = NULL;
     last_block->gp = get_gp();
@@ -58,7 +58,7 @@ uint16_t cache_block_start() {
     }
     return bp-1;
 }
-void cache_block_point() {
+void cache_block_point(void) {
     uint16_t goff = get_gp() - last_block->gp;
     uint16_t hogg = get_hp() - last_block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
@@ -78,7 +78,7 @@ void cache_block_point() {
         cache_block_start();
     }
 }
-void cache_block_end() {
+void cache_block_end(void) {
     last_block->end = get_gp() - last_block->gp;
     uint32_t size = loffp * sizeof(OffsetUnit);
     last_block->offsets = (OffsetUnit*)malloc(size);

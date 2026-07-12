@@ -9,13 +9,13 @@
 static int enabled = 0;
 static int breakp = -1;
 
-void debug_enable() {
+void debug_enable(void) {
     enabled = 1;
 }
-int block_break() {
+int block_break(void) {
     return breakp;
 }
-void help() {
+void help(void) {
     printf("Commands:\n");
     printf("brb <i> - set break point in block i\n");
     printf("sb - go to next block\n");
@@ -36,7 +36,7 @@ void handle_print(char* arg) {
         help();
     }
 }
-void debug_wait() {
+void debug_wait(void) {
     if (!enabled) return;
     char com[32];
     char arg[32];
