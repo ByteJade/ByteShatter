@@ -15,9 +15,9 @@ static struct sigcontext* sc;
 
 void print_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
-    printf("PC:  %lX (%lX)\n", sc->pc, sc->pc - (uint64_t)get_host());
+    printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 16; i++) {
-        printf("r%s: %lX\n", regs[i], sc->regs[x64_regs[i]]);
+        printf("r%s: %llX\n", regs[i], sc->regs[x64_regs[i]]);
     }
     int N = (sc->pstate >> 31) & 1;
     int Z = (sc->pstate >> 30) & 1;  
@@ -28,11 +28,11 @@ void print_cpu(void) {
 }
 void print_native_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
-    printf("PC:  %lX (%lX)\n", sc->pc, sc->pc - (uint64_t)get_host());
+    printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 31; i++) {
-        print("X%i: %lX\n", i, sc->regs[i]);
+        print("X%i: %llX\n", i, sc->regs[i]);
     }
-    printf("sp: %lX\n", sc->sp);
+    printf("sp: %llX\n", sc->sp);
     int N = (sc->pstate >> 31) & 1;
     int Z = (sc->pstate >> 30) & 1;  
     int C = (sc->pstate >> 29) & 1;
