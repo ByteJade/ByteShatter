@@ -10,6 +10,8 @@
     my_\alias:
         ldp x19, x20, [x28]
         stp x19, x20, [sp, #-16]!
+        ldp x19, x20, [x28, #16]
+        stp x19, x20, [sp, #-16]!
         stp x28, x30, [sp, #-16]!
         ldp x6, x7, [x28]
         add x28, x28, #24
@@ -20,5 +22,7 @@
         ldp x28, x30, [sp], #16
         ldp x19, x20, [sp], #16
         stp x19, x20, [x28]
+        ldp x19, x20, [sp], #16
+        stp x19, x20, [x28, #16]
         ret
 .endm
