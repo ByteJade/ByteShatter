@@ -30,7 +30,7 @@ void print_native_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
     printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 31; i++) {
-        print("X%i: %llX\n", i, sc->regs[i]);
+        printf("X%i: %llX\n", i, sc->regs[i]);
     }
     printf("sp: %llX\n", sc->sp);
     int N = (sc->pstate >> 31) & 1;
