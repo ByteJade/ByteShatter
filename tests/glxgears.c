@@ -152,6 +152,7 @@ make_window( Display *dpy, const char *name,
     printf("try glXCreateContext with %p display, %p visinfo\n",
         dpy, visinfo);
     ctx = glXCreateContext( dpy, visinfo, NULL, True );
+    
     if (!ctx) {
         printf("Error: glXCreateContext failed\n");
         exit(1);
@@ -209,6 +210,20 @@ static void query_vsync(Display *dpy, GLXDrawable drawable)
         }
     }
 }
+static int x_error_handler(Display *dpy, XErrorEvent *e) {
+    char buffer[256];
+    XGetErrorText(dpy, e->error_code, buffer, sizeof(buffer));
+    
+    printf("X Error: %s\n", buffer);
+    printf("  Serial: %lu\n", e->serial);
+    printf("  Request code: %d\n", e->request_code);
+    printf("  Minor code: %d\n", e->minor_code);
+    printf("  Resource ID: 0x%lx\n", e->resourceid);
+    
+    // GLX ошибки имеют request_code = glx_request_code
+    // minor_code указывает на конкретную GLX-ошибку
+    return 0;
+}
 
 static void usage()
 {
@@ -265,6 +280,7 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
+    XSetErrorHandler(x_error_handler);
     dpy = XOpenDisplay(dpyName);
     if (!dpy) {
         printf("Error: couldn't open display %s\n",
