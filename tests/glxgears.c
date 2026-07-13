@@ -69,6 +69,7 @@ make_window( Display *dpy, const char *name,
              int x, int y, int width, int height,
              Window *winRet, GLXContext *ctxRet, VisualID *visRet)
 {
+    printf("Make window %s\n", name);
     int attribs[64];
     int i = 0;
 
@@ -116,6 +117,8 @@ make_window( Display *dpy, const char *name,
             printf(", Multisample");
         printf(" visual\n");
         exit(1);
+    } else {
+        printf("visinfo %p done\n", visinfo);
     }
 
     /* window attributes */
@@ -146,6 +149,8 @@ make_window( Display *dpy, const char *name,
                                 None, (char **)NULL, 0, &sizehints);
     }
 
+    printf("try glXCreateContext with %p display, %p visinfo\n",
+        dpy, visinfo);
     ctx = glXCreateContext( dpy, visinfo, NULL, True );
     if (!ctx) {
         printf("Error: glXCreateContext failed\n");
@@ -265,6 +270,8 @@ int main(int argc, char *argv[])
         printf("Error: couldn't open display %s\n",
             dpyName ? dpyName : getenv("DISPLAY"));
         return -1;
+    } else {
+        printf("Display opened %p\n", dpy);
     }
     if (fullscreen) {
         int scrnum = DefaultScreen(dpy);
