@@ -21,8 +21,8 @@
         mov sp, x20
         ldp x28, x30, [sp], #16
         ldp x20, x21, [sp], #16
-        stp x20, x21, [x28]
-        ldp x20, x21, [sp], #16
         stp x20, x21, [x28, #16]
+        ldp x20, x21, [sp], #16
+        stp x20, x21, [x28]
         ret
 .endm
