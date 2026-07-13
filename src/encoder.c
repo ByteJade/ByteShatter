@@ -71,7 +71,9 @@ void emit_address_decode(Operand* op) {
 void emit_imm(Operand* op) {
     if (op->imm >= 0) {
         if (op->imm <= INT16_MAX) emit_movz(SC2, op->imm, 0);
-        else emit_mov32(SC2, op->imm);
+        else {
+            emit_mov32(SC2, op->imm);
+        }
     } else {
         if (~op->imm <= INT16_MAX) emit_movn(SC2, ~op->imm, 0);
         else {
