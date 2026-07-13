@@ -21,14 +21,16 @@ my___libc_start_main:
     ret
 
 my_printf:
-    stp x28, x30, [sp, #-16]!
+    stp x19, x28, [sp, #-16]!
+    stp x29, x30, [sp, #-16]!
     ldp x6, x7, [x28, #8]!
     add x28, x28, #16
     mov x19, sp
     mov sp, x28
     bl printf
     mov sp, x19
-    ldp x28, x30, [sp], #16
+    ldp x29, x30, [sp], #16
+    ldp x19, x28, [sp], #16
     ret
 
 WRAP_FUNC exit
