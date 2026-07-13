@@ -1,4 +1,4 @@
-.include "wrapper.s"
+.include "wrapper.inc"
 
 .section .text
 .global my___libc_start_main
