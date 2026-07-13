@@ -59,6 +59,7 @@ Window my_XCreateWindow(
     POP8;
     Window ret;
     asm volatile(
+        "add x28, x28, #16"
         "mov x8, sp\n"
         "mov sp, x28\n"
         "mov x28, x8\n"
@@ -73,6 +74,7 @@ Window my_XCreateWindow(
         "mov x8, sp\n"
         "mov sp, x28\n"
         "mov x28, x8\n"
+        "sub x28, x28, #16"
         : : : "x8", "memory"
     );
     return ret;
