@@ -2,7 +2,6 @@
 
 .section .text
 
-
 WRAP_BIG_FUNC XCreateWindow
 
 WRAP_MED_FUNC XSetStandardProperties

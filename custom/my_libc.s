@@ -20,4 +20,6 @@ WRAP_FUNC malloc
 WRAP_FUNC free
 WRAP_FUNC strlen
 WRAP_FUNC strstr
+WRAP_FUNC strcmp
+WRAP_FUNC __isoc23_strtol
 WRAP_FUNC getenv
