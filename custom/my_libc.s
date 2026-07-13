@@ -22,8 +22,8 @@ my___libc_start_main:
 
 my_printf:
     stp x29, x30, [sp, #-16]!
-    ldp x6, x7, [x28, #8]
-    add x28, x28, #24
+    ldp x6, x7, [x28, #8]!
+    add x28, x28, #16
     mov x8, sp
     mov sp, x28
     mov x28, x8
