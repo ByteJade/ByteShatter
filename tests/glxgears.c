@@ -60,12 +60,7 @@ int main() {
     
     // Создать контекст (сначала пробуем без прямого рендеринга)
     printf("Creating context...\n");
-    ctx = glXCreateContext(dpy, visinfo, NULL, False);
-    
-    if (!ctx) {
-        printf("glXCreateContext(False) failed, trying True...\n");
-        ctx = glXCreateContext(dpy, visinfo, NULL, True);
-    }
+    ctx = glXCreateContext(dpy, visinfo, NULL, True);
     
     if (!ctx) {
         printf("glXCreateContext failed completely\n");
