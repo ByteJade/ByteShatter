@@ -1,11 +1,9 @@
 .include "./wrapper.inc"
 
 .section .text
-.global my___libc_start_main
-.extern printf
-.global my_printf
 
 // just call main and return
+.global my___libc_start_main
 my___libc_start_main:
     stp x29, x30, [sp, #-16]!
     mov x7, x0
