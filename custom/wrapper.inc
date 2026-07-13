@@ -12,7 +12,7 @@
         stp x19, x20, [sp, #-16]!
         stp x28, x30, [sp, #-16]!
         ldp x6, x7, [x28]
-        add x28, x28, #16
+        add x28, x28, #24
         mov x19, sp
         mov sp, x28
         bl \alias
