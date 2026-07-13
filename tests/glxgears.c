@@ -118,7 +118,7 @@ make_window( Display *dpy, const char *name,
         printf(" visual\n");
         exit(1);
     } else {
-        printf("visinfo %p done\n", visinfo);
+        printf("visinfo %p done, root %lx\n", visinfo, root);
     }
 
     /* window attributes */
