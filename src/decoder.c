@@ -347,6 +347,7 @@ int decode_instr(X64_instruction* buf) {
         case 0xE9:
             buf->opcount = 1;
             buf->type = JMP;
+            ret = JMP;
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm32();
             break;
