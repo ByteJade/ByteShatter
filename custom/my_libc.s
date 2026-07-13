@@ -16,7 +16,7 @@ my___libc_start_main:
     mov x7, x0
     mov x0, x1
     mov x1, x2
-    bl x7
+    blr x7
     ldp x29, x30, [sp], #16
     ret
 
