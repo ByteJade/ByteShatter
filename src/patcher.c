@@ -9,34 +9,35 @@
 #include <signal.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 static struct sigcontext* sc;
 
 void print_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
-    print("PC:  %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
+    printf("PC:  %lX (%lX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 16; i++) {
-        print("r%s: %lX", regs[i], sc->regs[x64_regs[i]]);
+        printf("r%s: %lX\n", regs[i], sc->regs[x64_regs[i]]);
     }
     int N = (sc->pstate >> 31) & 1;
     int Z = (sc->pstate >> 30) & 1;  
     int C = (sc->pstate >> 29) & 1;
     int V = (sc->pstate >> 28) & 1;
-    print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
+    printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
     #endif
 }
 void print_native_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
-    print("PC:  %lX (%lX)", sc->pc, sc->pc - (uint64_t)get_host());
+    printf("PC:  %lX (%lX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 31; i++) {
-        print("X%i: %lX", i, sc->regs[i]);
+        print("X%i: %lX\n", i, sc->regs[i]);
     }
-    print("sp: %lX", sc->sp);
+    printf("sp: %lX\n", sc->sp);
     int N = (sc->pstate >> 31) & 1;
     int Z = (sc->pstate >> 30) & 1;  
     int C = (sc->pstate >> 29) & 1;
     int V = (sc->pstate >> 28) & 1;
-    print("Flags: N%x Z%x C%x V%x", N, Z, C, V);
+    printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
     #endif
 }
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {

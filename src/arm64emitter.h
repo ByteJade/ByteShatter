@@ -42,6 +42,8 @@
 
 #define emit_movz(rd, imm, shift) \
     emit32(0xD2800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
+#define emit_movn(rd, imm, shift) \
+    emit32(0x92800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
 #define emit_sub_imm(rd, rn, imm) \
     emit32(_construct_r_r_imm(0xD1000000, rd, rn, imm))
 #define emit_sub_reg(rd, rn, rm) \
