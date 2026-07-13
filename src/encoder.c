@@ -95,6 +95,18 @@ void encode8bit(X64_instruction* buf) {
             panic("ENCODER::UNKNOWN_8BIT_INSTRUCTION: %x", buf->type);
     }
 }
+void encode_imm(Operand* op) {
+    if (op->imm >= 0) {
+        if (op->imm <= INT16_MAX) emit_movz(SC2, op->imm, 0);
+        else emit_mov32(SC2, op->imm);
+    } else {
+        if (~op->imm <= INT16_MAX) emit_movn(SC2, ~op->imm, 0);
+        else {
+            emit_mov32(SC2, op->imm);
+            emit32(SXTW_REG | (x64_regs[SC2] << 5) | x64_regs[SC2]);
+        }
+    }
+}
 void encode(X64_instruction* buf) {
     if (buf->size == 8) {
         encode8bit(buf);
@@ -171,8 +183,7 @@ void encode(X64_instruction* buf) {
                     if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, r1, SC1, 0));
                     else emit32(sf|_construct_r_r_imm(STR32_REG, r1, SC1, 0));
                 } else {
-                    if (buf->op1.imm >= 0) emit_movz(SC2, buf->op1.imm, 0);
-                    else emit_movn(SC2, ~buf->op1.imm, 0);
+                    encode_imm(&buf->op1);
                     if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, SC2, SC1, 0));
                     else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
                 }
