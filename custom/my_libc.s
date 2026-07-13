@@ -28,10 +28,7 @@ my_printf:
     mov sp, x28
     mov x28, x8
     bl printf
-    mov x8, sp
     mov sp, x28
-    mov x28, x8
-    sub x28, x28, #24
     ldp x28, x29, [sp], #16
     ret
 
