@@ -3,9 +3,10 @@
 .section .text
 
 
-WRAP_BIG_FUNC XSetStandardProperties
-WRAP_BIG_FUNC XChangeProperty
 WRAP_BIG_FUNC XCreateWindow
+
+WRAP_MED_FUNC XSetStandardProperties
+WRAP_MED_FUNC XChangeProperty
 
 WRAP_FUNC XInternAtom
 WRAP_FUNC DefaultScreen
