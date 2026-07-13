@@ -171,8 +171,8 @@ void encode(X64_instruction* buf) {
                     if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, r1, SC1, 0));
                     else emit32(sf|_construct_r_r_imm(STR32_REG, r1, SC1, 0));
                 } else {
-                    if (buf->op1.imm > 0) emit_movz(SC2, buf->op1.imm, 0);
-                    else emit_movn(SC2, buf->op1.imm, 0);
+                    if (buf->op1.imm >= 0) emit_movz(SC2, buf->op1.imm, 0);
+                    else emit_movn(SC2, ~buf->op1.imm, 0);
                     if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, SC2, SC1, 0));
                     else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
                 }
