@@ -226,6 +226,12 @@ int decode_instr(X64_instruction* buf) {
             buf->type = MOVSLQ;
             decode_regrm(buf);
             break;
+        case 0x68:
+            buf->opcount = 1;
+            buf->type = PUSH;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            break;
         case 0x6A:
             buf->opcount = 1;
             buf->type = PUSH;
