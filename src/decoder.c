@@ -331,12 +331,13 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.reg = RAX;
             break;
         case 0xB8 ... 0xBF:
+            reverse = 1;
             buf->opcount = 2;
             buf->type = MOV;
-            buf->op0.type = REG;
-            buf->op0.reg = byte - 0xB8;
-            buf->op1.type = IMM;
-            buf->op1.imm = fetch_imm32();
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            buf->op1.type = REG;
+            buf->op1.reg = byte - 0xB8;
             break;
         case 0xE8:
             buf->opcount = 1;
