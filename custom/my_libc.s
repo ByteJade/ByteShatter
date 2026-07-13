@@ -1,14 +1,9 @@
+.include "wrapper.s"
+
 .section .text
 .global my___libc_start_main
 .extern printf
 .global my_printf
-
-.macro WRAP_FUNC alias
-    .global my_\alias
-    .extern \alias
-    my_\alias:
-        b \alias
-.endm
 
 // just call main and return
 my___libc_start_main:
@@ -20,21 +15,7 @@ my___libc_start_main:
     ldp x29, x30, [sp], #16
     ret
 
-my_printf:
-    ldr x19, [x28], #8
-    stp x19, x28, [sp, #-16]!
-    stp x29, x30, [sp, #-16]!
-    ldp x6, x7, [x28]
-    add x28, x28, #16
-    mov x19, sp
-    mov sp, x28
-    bl printf
-    mov sp, x19
-    ldp x29, x30, [sp], #16
-    ldp x19, x28, [sp], #16
-    str x19, [x28]
-    ret
-
+WRAP_BIG_FUNC printf
 WRAP_FUNC exit
 WRAP_FUNC puts
 WRAP_FUNC malloc
