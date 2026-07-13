@@ -70,8 +70,12 @@ make_window( Display *dpy, const char *name,
              Window *winRet, GLXContext *ctxRet, VisualID *visRet)
 {
     printf("Make window %s\n", name);
-    int attribs[64];
-    int i = 0;
+    int attribs[] = {
+        GLX_RGBA,
+        GLX_DOUBLEBUFFER,
+        GLX_DEPTH_SIZE, 24,
+        None
+    };
 
     int scrnum;
     XSetWindowAttributes attr;
@@ -81,30 +85,6 @@ make_window( Display *dpy, const char *name,
     GLXContext ctx;
     XVisualInfo *visinfo;
 
-    /* Singleton attributes. */
-    attribs[i++] = GLX_RGBA;
-    attribs[i++] = GLX_DOUBLEBUFFER;
-    if (stereo)
-        attribs[i++] = GLX_STEREO;
-
-    /* Key/value attributes. */
-    attribs[i++] = GLX_RED_SIZE;
-    attribs[i++] = 1;
-    attribs[i++] = GLX_GREEN_SIZE;
-    attribs[i++] = 1;
-    attribs[i++] = GLX_BLUE_SIZE;
-    attribs[i++] = 1;
-    attribs[i++] = GLX_DEPTH_SIZE;
-    attribs[i++] = 1;
-    if (samples > 0) {
-        attribs[i++] = GLX_SAMPLE_BUFFERS;
-        attribs[i++] = 1;
-        attribs[i++] = GLX_SAMPLES;
-        attribs[i++] = samples;
-    }
-
-    attribs[i++] = None;
-    printf("attribs %i\n", i);
 
     scrnum = DefaultScreen( dpy );
     root = RootWindow( dpy, scrnum );
