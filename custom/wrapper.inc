@@ -8,7 +8,7 @@
     .global my_\alias
     .extern \alias
     my_\alias:
-        ldr x19, [x28], #8
+        ldr x19, [x28, #8]
         stp x19, x28, [sp, #-16]!
         stp x29, x30, [sp, #-16]!
         ldp x6, x7, [x28]
