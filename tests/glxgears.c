@@ -104,6 +104,7 @@ make_window( Display *dpy, const char *name,
     }
 
     attribs[i++] = None;
+    printf("attribs %i\n", i);
 
     scrnum = DefaultScreen( dpy );
     root = RootWindow( dpy, scrnum );
