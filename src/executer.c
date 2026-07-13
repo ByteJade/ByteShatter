@@ -13,7 +13,7 @@ void execute(uint64_t address) {
     uint64_t* sp = get_sp();
     #if defined(__aarch64__) || defined(_M_ARM64)
     __asm__ volatile(
-        "mov x21, %0\n"
+        "mov x22, %0\n"
         "mov x28, %1\n"
         : : "r" (guest), "r" (sp)
         : "x21", "x28"
