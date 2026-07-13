@@ -8,8 +8,6 @@ WRAP_MED_FUNC XSetStandardProperties
 WRAP_MED_FUNC XChangeProperty
 
 WRAP_FUNC XInternAtom
-WRAP_FUNC DefaultScreen
-WRAP_FUNC RootWindow
 WRAP_FUNC XOpenDisplay
 WRAP_FUNC XCloseDisplay
 WRAP_FUNC XFree
