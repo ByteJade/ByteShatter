@@ -24,10 +24,10 @@ my_printf:
     stp x28, x29, [sp, #-16]!
     ldp x6, x7, [x28, #8]!
     add x28, x28, #16
-    mov x29, sp
+    mov x19, sp
     mov sp, x28
     bl printf
-    mov sp, x29
+    mov sp, x19
     ldp x28, x29, [sp], #16
     ret
 
