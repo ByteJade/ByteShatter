@@ -12,19 +12,27 @@
 #include <stdio.h>
 
 static struct sigcontext* sc;
+static int memory_check = 0;
 
 uint64_t get_reg(const char* name) {
     name++;
-    #if defined(__aarch64__) || defined(_M_ARM64)
     for (int i = 0; i < 16; i++) {
         if (strcmp(name, regs[i]) == 0)
             return sc->regs[x64_regs[i]];
     }
-    #endif
     return 0;
 }
+void memory_check_mode() {
+    memory_check = 1;
+}
+int memory_fail() {
+    if (memory_check) {
+        memory_check = 0;
+        return 0;
+    }
+    return 1;
+}
 void print_cpu(void) {
-    #if defined(__aarch64__) || defined(_M_ARM64)
     printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 16; i++) {
         printf("r%s: %llX\n", regs[i], sc->regs[x64_regs[i]]);
@@ -34,10 +42,8 @@ void print_cpu(void) {
     int C = (sc->pstate >> 29) & 1;
     int V = (sc->pstate >> 28) & 1;
     printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
-    #endif
 }
 void print_native_cpu(void) {
-    #if defined(__aarch64__) || defined(_M_ARM64)
     printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 31; i++) {
         printf("X%i: %llX\n", i, sc->regs[i]);
@@ -48,12 +54,11 @@ void print_native_cpu(void) {
     int C = (sc->pstate >> 29) & 1;
     int V = (sc->pstate >> 28) & 1;
     printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
-    #endif
 }
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     sc = (struct sigcontext*)&ctx->uc_mcontext;
-    #if defined(__aarch64__) || defined(_M_ARM64)
+    
     uint32_t* code = (uint32_t*)sc->pc;
     uint32_t instruction = *code;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
@@ -115,17 +120,17 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             panic("PATCHER::UNKNOWN_PATCH");
     }
     cache_flush(patch->block);
-    #endif
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     sc = (struct sigcontext*)&ctx->uc_mcontext;
+    if (memory_check) {
+        sc->pc += 4;
+        memory_check = 0;
+        return;
+    }
     print_cpu();
-    #if defined(__aarch64__) || defined(_M_ARM64)
     uint32_t* code = (uint32_t*)sc->pc;
-    #else
-    uint32_t* code = NULL;
-    #endif
     if (code) {
         panic("segfault: %x", *code);
     } else panic("segfault");

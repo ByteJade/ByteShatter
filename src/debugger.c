@@ -45,11 +45,9 @@ void help(void) {
     printf("exit - stop execution\n");
 }
 int has_access(void* ptr) {
-    unsigned char vec;
-    mincore(ptr, 1, &vec);
-    if (vec&1) return 1;
-    printf("No access to memory\n");
-    return 0;
+    memory_check_mode();
+    char i = *(char*)ptr;
+    return memory_fail();
 }
 void handle_print(char* arg) {
     if (arg[0] == '(') {
