@@ -42,13 +42,11 @@ void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
 void sprint_x_mem(char* out, char* name, uint32_t buf) {
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
-    uint16_t imm = (buf >> 12) & 0x1FF;
+    int16_t imm = (buf >> 12) & 0x1FF;
     int W = (buf >> 10) & 1;  // Write-back?
     int P = (buf >> 11) & 1;  // Pre-indexed?
-    char sign = '+';
     if (imm & 0x100) {
         imm |= 0xFE00;
-        sign = '-';
     }
     char size = 'W';
     if (buf&(1<<30)) size = 'X';
@@ -57,7 +55,7 @@ void sprint_x_mem(char* out, char* name, uint32_t buf) {
     if (P) {
         // Pre-indexed: [Xn, #offset]
         if (W && imm) {
-            out += sprintf(out, ", #%c%x]!", sign, imm);
+            out += sprintf(out, ", #%i]!", imm);
         } else {
             out += sprintf(out, "]");
         }
@@ -65,7 +63,7 @@ void sprint_x_mem(char* out, char* name, uint32_t buf) {
         // Post-indexed: [Xn], #offset
         out += sprintf(out, "]");
         if (W && imm) {
-            out += sprintf(out, ", #%c%x", sign, imm);
+            out += sprintf(out, ", #%i", imm);
         }
     }
 }
