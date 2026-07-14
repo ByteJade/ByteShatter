@@ -42,12 +42,15 @@ void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
 void sprint_x_mem(char* out, char* name, uint32_t buf) {
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
-    uint16_t imm = (buf >> 12) & 0xFF;
+    uint16_t imm = (buf >> 12) & 0x1FF;
     int W = (buf >> 10) & 1;  // Write-back?
     int P = (buf >> 11) & 1;  // Pre-indexed?
-    int U = (buf >> 23) & 1;  // Add or subtract?
+    int U = (buf >> 21) & 1;  // Add or subtract?
     char sign = '+';
-    if (!U) sign = '-';
+    if (!U) {
+        imm = ~imm;
+        sign = '-';
+    }
     char size = 'W';
     if (buf&(1<<30)) size = 'X';
     out += sprintf(out, "%s %c%i, [X%i",
