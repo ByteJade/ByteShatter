@@ -45,10 +45,10 @@ void sprint_x_mem(char* out, char* name, uint32_t buf) {
     uint16_t imm = (buf >> 12) & 0x1FF;
     int W = (buf >> 10) & 1;  // Write-back?
     int P = (buf >> 11) & 1;  // Pre-indexed?
-    int U = (buf >> 21) & 1;  // Add or subtract?
+    int U = (buf >> 20) & 1;  // Add or subtract?
     char sign = '+';
     if (!U) {
-        imm = ~imm;
+        imm = (~imm) & 0x1FF;
         sign = '-';
     }
     char size = 'W';
