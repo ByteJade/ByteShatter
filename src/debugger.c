@@ -38,20 +38,45 @@ void help(void) {
     printf("si - go to next instruction\n");
     printf("log <level> - set logs to level (A,W,E)\n");
     printf("print <state> - print state (x64regs, regs, cache)\n");
-    printf("print [x64reg+imm] - print memory\n");
+    printf("print [x64reg+imm] or (imm64) - print memory\n");
     printf("print <x64reg> - print register\n");
     printf("run - return to execution\n");
     printf("exit - stop execution\n");
 }
 void handle_print(char* arg) {
-    if (strcmp(arg, "x64regs") == 0) {
-        print_cpu();
-    } else if (strcmp(arg, "regs") == 0) {
-        print_native_cpu();
-    } else if (strcmp(arg, "cache") == 0) {
-        cache_print(break_block);
+    if (arg[0] == '(') {
+        uint64_t* imm = (uint64_t*)strtol(arg+1, NULL, 16);
+        printf("%s: %lx\n", arg, *imm);
+    } else if (arg[0] == '[') {
+        char* ptr = arg+1;
+        int p = 0;
+        char reg[4];
+        char sign = ']';
+        reg[3] = '\0';
+        while(1) {
+            char c = *ptr++;
+            if (c == '-' || c == '+' || c == ']'){
+                sign = c;
+                break;
+            }
+            reg[p++] = c;
+        }
+        uint64_t imm = 0;
+        if (sign != ']') imm = strtol(ptr, NULL, 16);
+        uint64_t base = get_reg(arg);
+        if (sign == '+') base += imm;
+        else if (sign == '-') base -= imm;
+        printf("%s: %lx\n", arg, *(uint64_t*)base);
     } else {
-        printf("%s state: %lX\n", arg, get_reg(arg));
+        if (strcmp(arg, "x64regs") == 0) {
+            print_cpu();
+        } else if (strcmp(arg, "regs") == 0) {
+            print_native_cpu();
+        } else if (strcmp(arg, "cache") == 0) {
+            cache_print(break_block);
+        } else {
+            printf("%s state: %lX\n", arg, get_reg(arg));
+        }
     }
 }
 void debug_wait(void) {
