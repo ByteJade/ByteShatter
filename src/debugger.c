@@ -37,19 +37,21 @@ void help(void) {
     printf("sb - go to next block\n");
     printf("si - go to next instruction\n");
     printf("log <level> - set logs to level (A,W,E)\n");
-    printf("print <state> - print state (x64_regs, arm_regs, cache)\n");
+    printf("print <state> - print state (x64regs, regs, cache)\n");
+    printf("print [x64reg+imm] - print memory\n");
+    printf("print <x64reg> - print register\n");
     printf("run - return to execution\n");
     printf("exit - stop execution\n");
 }
 void handle_print(char* arg) {
-    if (strcmp(arg, "x64_regs") == 0) {
+    if (strcmp(arg, "x64regs") == 0) {
         print_cpu();
-    } else if (strcmp(arg, "arm_regs") == 0) {
+    } else if (strcmp(arg, "regs") == 0) {
         print_native_cpu();
     } else if (strcmp(arg, "cache") == 0) {
         cache_print(break_block);
     } else {
-        help();
+        printf("%s state: %lX", arg, get_reg(arg));
     }
 }
 void debug_wait(void) {

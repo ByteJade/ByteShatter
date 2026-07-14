@@ -1,18 +1,27 @@
 #include "patcher.h"
-#include "cache.h"
 #include "core.h"
+#include "cache.h"
 #include "memory.h"
 #include "decoder.h"
 #include "arm64emitter.h"
 #include "armdef.h"
 #include "debugger.h"
+#include <string.h>
 #include <signal.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 static struct sigcontext* sc;
 
+uint64_t get_reg(const char* name) {
+    #if defined(__aarch64__) || defined(_M_ARM64)
+    for (int i = 0; i < 16) {
+        if (strcmp(name, regs[i]) == 0)
+            return sc->regs[x64_regs[i]];
+    }
+    #endif
+    return 0;
+}
 void print_cpu(void) {
     #if defined(__aarch64__) || defined(_M_ARM64)
     printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
