@@ -51,7 +51,7 @@ void handle_print(char* arg) {
     } else if (strcmp(arg, "cache") == 0) {
         cache_print(break_block);
     } else {
-        printf("%s state: %lX", arg, get_reg(arg));
+        printf("%s state: %lX\n", arg, get_reg(arg));
     }
 }
 void debug_wait(void) {

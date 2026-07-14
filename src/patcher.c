@@ -14,6 +14,7 @@
 static struct sigcontext* sc;
 
 uint64_t get_reg(const char* name) {
+    name++;
     #if defined(__aarch64__) || defined(_M_ARM64)
     for (int i = 0; i < 16; i++) {
         if (strcmp(name, regs[i]) == 0)
