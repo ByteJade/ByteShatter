@@ -124,6 +124,7 @@ void debug_wait(void) {
                 if (prev_instrp) {
                     *prev_instrp = prev_instr;
                     __builtin___clear_cache(prev_instrp, prev_instrp+4);
+                    printf("Stop at break point\n");
                 }
                 return;
             } else if (strcmp(com, "exit") == 0) {

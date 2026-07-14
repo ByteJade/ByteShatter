@@ -58,7 +58,6 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     uint32_t instruction = *code;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
     if (ret == 0) {
-        printf("Stop at break point\n");
         debug_wait();
         return;
     }
