@@ -33,7 +33,7 @@ void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
     if (buf&(1<<31)) size = 'X';
     char sign = ' ';
     if (buf&(1<<29)) sign = 'S';
-    out += sprintf(out, "%s%c, %c%i, %c%i, #%i",
+    out += sprintf(out, "%s%c %c%i, %c%i, #%i",
         name, sign,  size, rd, size, rn, imm);
     if (shift) out += sprintf(out, "{%i}", shift);
 }
@@ -57,4 +57,8 @@ void sprint_arm(char* out, uint32_t buf) {
         {sprint_x_x_imm(out, "add", buf); return;}
     if (comp("-1-10001------------------------", buf))
         {sprint_x_x_imm(out, "sub", buf); return;}
+    if (comp("-1-01010------------------------", buf))
+        {sprint_x_x_x(out, "eor", buf); return;}
+    if (comp("11010100001---------------------", buf))
+        {sprintf(out, "brk %x", (buf>>5)&0xFFFF); return;}
 }
