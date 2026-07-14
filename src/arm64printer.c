@@ -91,5 +91,47 @@ void sprint_arm(char* out, uint32_t buf) {
             sprint_x_imm(&ptr, buf);
             return;
     }
+    switch (buf & 0x1F000000) {
+        case 0x0B000000:
+            ptr += sprintf(ptr, "add ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x2B000000:
+            ptr += sprintf(ptr, "adds ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x4B000000:
+            ptr += sprintf(ptr, "sub ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x6B000000:
+            ptr += sprintf(ptr, "subs ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x0A000000:
+            ptr += sprintf(ptr, "and ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x2A000000:
+            ptr += sprintf(ptr, "ands ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x0A200000:
+            ptr += sprintf(ptr, "bic ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x2A200000:
+            ptr += sprintf(ptr, "bics ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x4A000000:
+            ptr += sprintf(ptr, "eor ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+        case 0x6A000000:
+            ptr += sprintf(ptr, "eors ");
+            sprint_x_x_x(&ptr, buf);
+            return;
+    }
     ptr += sprintf(ptr, "und");
 }
