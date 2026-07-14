@@ -46,9 +46,8 @@ void help(void) {
 }
 int has_access(void* ptr) {
     unsigned char vec;
-    if (mincore(ptr, 1, &vec) == 0) {
-        return 1;
-    }
+    mincore(ptr, 1, &vec);
+    if (vec&1) return 1;
     printf("No access to memory\n");
     return 0;
 }
