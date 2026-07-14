@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "core.h"
 #include "decoder.h"
+#include "arm64printer.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -176,7 +177,9 @@ void cache_print(int block) {
         if (x+1 == unit->offsetssz) end = start+4;
         else end = unit->offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
-            printf("%x\n",host[y]);
+            char out[32];
+            sprint_arm(out, host[y]);
+            printf("%x %s\n", host[y], out);
         }
     }
 }
