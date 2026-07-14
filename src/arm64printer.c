@@ -80,5 +80,9 @@ void sprint_arm(char* out, uint32_t buf) {
         {sprintf(out, "brk %x", (buf>>5)&0xFFFF); return;}
     if (comp("1101011001011111----------------", buf))
         {sprintf(out, "ret X%i", (buf>>5)&0x1F); return;}
+    if (comp("0--10000------------------------", buf))
+        {sprintf(out, "adr X%i, %x", buf&0x1F, ((buf >> 29) & 0x3) | (((buf >> 5) & 0x7FFFF) << 2)); return;}
+    if (comp("1--10000------------------------", buf))
+        {sprintf(out, "adrp X%i, %x", buf&0x1F, ((buf >> 29) & 0x3) | (((buf >> 5) & 0x7FFFF) << 2)); return;}
     sprintf(out, "und");
 }
