@@ -47,7 +47,7 @@ void help(void) {
 int has_access(void* ptr) {
     memory_check_mode();
     char i = *(char*)ptr;
-    return memory_fail();
+    return memory_fail() == 0;
 }
 void handle_print(char* arg) {
     if (arg[0] == '(') {
