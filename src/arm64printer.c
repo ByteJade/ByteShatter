@@ -90,9 +90,9 @@ void sprint_arm(char* out, uint32_t buf) {
         {sprint_x_x_imm(out, "sub", buf); return;}
     if (comp("-1-01010------------------------", buf))
         {sprint_x_x_x(out, "eor", buf); return;}
-    if (comp("1-111001010---------------------", buf))
+    if (comp("1-11100101----------------------", buf))
         {sprint_x_mem(out, "ldr", buf); return;}
-    if (comp("1-111001000---------------------", buf))
+    if (comp("1-11100100----------------------", buf))
         {sprint_x_mem(out, "str", buf); return;}
     if (comp("11010100001---------------------", buf))
         {sprintf(out, "brk %x", (buf>>5)&0xFFFF); return;}
