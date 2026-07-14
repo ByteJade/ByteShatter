@@ -84,10 +84,10 @@ void handle_print(char* arg) {
             print_cpu();
         } else if (strcmp(arg, "regs") == 0) {
             print_native_cpu();
-        } else if (strcmp(arg, "flags") == 0) {
-            print_flags();
         } else if (strcmp(arg, "cache") == 0) {
             cache_print(break_block);
+        } else if (strcmp(arg, "flags") == 0) {
+            print_flags();
         } else {
             printf("\033[34m%s\033[0m: %lX\n", arg, get_reg(arg));
         }
@@ -98,6 +98,11 @@ void debug_wait(void) {
     char com[32];
     char arg[32];
     char line[256];
+    if (prev_instrp) {
+        *prev_instrp = prev_instr;
+        __builtin___clear_cache(prev_instrp, prev_instrp+4);
+        prev_instrp = NULL;
+    }
     while (1) {
         printf(" <- ");
         fgets(line, sizeof(line), stdin);
@@ -125,24 +130,15 @@ void debug_wait(void) {
                         printf("%s\n", out);
                     }
                 }
-                if (prev_instrp) {
-                    *prev_instrp = prev_instr;
-                    __builtin___clear_cache(prev_instrp, prev_instrp+4);
-                }
                 set_break_point(break_pc + 4);
-                return;
+                break;
             } else if (strcmp(com, "sb") == 0) {
                 break_block++;
-                return;
+                break;
             } else if (strcmp(com, "run") == 0) {
-                if (prev_instrp || break_block != -1) 
+                if (break_block != -1) 
                     printf("Stop at break point\n");
-                if (prev_instrp) {
-                    *prev_instrp = prev_instr;
-                    __builtin___clear_cache(prev_instrp, prev_instrp+4);
-                    prev_instrp = NULL;
-                }
-                return;
+                break;
             } else if (strcmp(com, "exit") == 0) {
                 exit(0);
             } else {
