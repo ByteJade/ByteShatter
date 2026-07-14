@@ -55,5 +55,4 @@ void sprint_arm(char* out, uint32_t buf) {
         sprint_x_x_imm(out, "add", buf); return;
     if (comp("-1-10001--0---------------------", buf)) // SUB rd, rn, imm
         sprint_x_x_imm(out, "sub", buf); return;
-    printf("%i\n", i);
 }
