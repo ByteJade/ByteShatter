@@ -63,7 +63,7 @@ void handle_print(char* arg) {
         }
         uint64_t imm = 0;
         if (sign != ']') imm = strtol(ptr, NULL, 16);
-        uint64_t base = get_reg(arg);
+        uint64_t base = get_reg(reg);
         if (sign == '+') base += imm;
         else if (sign == '-') base -= imm;
         printf("%s: %lx\n", arg, *(uint64_t*)base);
