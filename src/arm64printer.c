@@ -43,12 +43,30 @@ void sprint_x_mem(char* out, char* name, uint32_t buf) {
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
     uint16_t imm = (buf >> 10) & 0xFFF;
+    int P = (buf >> 24) & 1;  // Pre-indexed?
+    int U = (buf >> 23) & 1;  // Add or subtract?
+    int W = (buf >> 21) & 1;  // Write-back?
+    int32_t offset = imm;
+    if (!U) offset = -offset;
     char size = 'W';
     if (buf&(1<<30)) size = 'X';
     out += sprintf(out, "%s %c%i, [X%i",
         name, size, rd, rn);
-    if (imm) out += sprintf(out, ", #%i", imm);
-    out += sprintf(out, "]");
+    if (imm) out += sprintf(out, ", #%i", offset);
+    if (P) {
+        // Pre-indexed: [Xn, #offset]
+        if (W && offset != 0) {
+            out += sprintf(out, ", #%d]!", offset);
+        } else {
+            out += sprintf(out, "]!");
+        }
+    } else {
+        // Post-indexed: [Xn], #offset
+        out += sprintf(out, "]");
+        if (W && offset != 0) {
+            out += sprintf(out, ", #%d", offset);
+        }
+    }
 }
 void sprint_x_imm(char** out, uint32_t buf) {
     char* ptr = *out;
@@ -83,8 +101,8 @@ void sprint_arm(char* out, uint32_t buf) {
     if (comp("1101011000111111000000-----00000", buf))
         {sprintf(out, "blr X%i", (buf>>5)&0x1F); return;}
     if (comp("0--10000------------------------", buf))
-        {sprintf(out, "adr X%i, %x", buf&0x1F, ((buf >> 29) & 0x3) | (((buf >> 5) & 0x7FFFF) << 2)); return;}
+        {sprintf(out, "adr X%i, #%x", buf&0x1F, ((buf >> 29) & 0x3) | (((buf >> 5) & 0x7FFFF) << 2)); return;}
     if (comp("1--10000------------------------", buf))
-        {sprintf(out, "adrp X%i, %x", buf&0x1F, ((buf >> 29) & 0x3) | (((buf >> 5) & 0x7FFFF) << 2)); return;}
+        {sprintf(out, "adrp X%i, #%x", buf&0x1F, ((buf >> 29) & 0x3) | (((buf >> 5) & 0x7FFFF) << 2)); return;}
     sprintf(out, "und");
 }
