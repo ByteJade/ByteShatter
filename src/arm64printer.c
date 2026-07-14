@@ -61,4 +61,7 @@ void sprint_arm(char* out, uint32_t buf) {
         {sprint_x_x_x(out, "eor", buf); return;}
     if (comp("11010100001---------------------", buf))
         {sprintf(out, "brk %x", (buf>>5)&0xFFFF); return;}
+    if (comp("1101011001011111----------------", buf))
+        {sprintf(out, "ret X%x", (buf>>5)&0x1F); return;}
+    sprintf(out, "und");
 }
