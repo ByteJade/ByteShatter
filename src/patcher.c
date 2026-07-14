@@ -32,16 +32,19 @@ int memory_fail() {
     }
     return 1;
 }
-void print_cpu(void) {
-    printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
-    for (int i = 0; i < 16; i++) {
-        printf("r%s: %llX\n", regs[i], sc->regs[x64_regs[i]]);
-    }
+void print_flags(void) {
     int N = (sc->pstate >> 31) & 1;
     int Z = (sc->pstate >> 30) & 1;  
     int C = (sc->pstate >> 29) & 1;
     int V = (sc->pstate >> 28) & 1;
     printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
+}
+void print_cpu(void) {
+    printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
+    for (int i = 0; i < 16; i++) {
+        printf("r%s: %llX\n", regs[i], sc->regs[x64_regs[i]]);
+    }
+    print_flags();
 }
 void print_native_cpu(void) {
     printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
@@ -49,11 +52,7 @@ void print_native_cpu(void) {
         printf("X%i: %llX\n", i, sc->regs[i]);
     }
     printf("sp: %llX\n", sc->sp);
-    int N = (sc->pstate >> 31) & 1;
-    int Z = (sc->pstate >> 30) & 1;  
-    int C = (sc->pstate >> 29) & 1;
-    int V = (sc->pstate >> 28) & 1;
-    printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
+    print_flags();
 }
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
