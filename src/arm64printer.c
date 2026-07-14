@@ -30,12 +30,12 @@ void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
     uint16_t imm = (buf >> 10) & 0xFFF;
-    uint8_t shift = (buf >> 21) & 0x3;
+    uint8_t shift = (buf >> 22) & 0x3;
     char size = 'W';
     if (buf&(1<<31)) size = 'X';
     char sign = ' ';
     if (buf&(1<<29)) sign = 'S';
-    out += sprintf(out, "%s%c %c%i, %c%i, #%i",
+    out += sprintf(out, "%s%c %c%i, %c%i, #%x",
         name, sign,  size, rd, size, rn, imm);
     if (shift) out += sprintf(out, "{%i}", shift);
 }
@@ -80,6 +80,8 @@ void sprint_arm(char* out, uint32_t buf) {
         {sprintf(out, "brk %x", (buf>>5)&0xFFFF); return;}
     if (comp("1101011001011111----------------", buf))
         {sprintf(out, "ret X%i", (buf>>5)&0x1F); return;}
+    if (comp("1101011000111111000000-----00000", buf))
+        {sprintf(out, "blr X%i", (buf>>5)&0x1F); return;}
     if (comp("0--10000------------------------", buf))
         {sprintf(out, "adr X%i, %x", buf&0x1F, ((buf >> 29) & 0x3) | (((buf >> 5) & 0x7FFFF) << 2)); return;}
     if (comp("1--10000------------------------", buf))
