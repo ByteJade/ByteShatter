@@ -1,26 +1,39 @@
 #include "arm64printer.h"
+#include <stdint.h>
 #include <stdio.h>
-void sprint_x_x_x(char** out, uint32_t buf) {
-    char* ptr = *out;
+int comp(const char* cond, uint64_t opcode) {
+    uint32_t mask = 0;
+    uint32_t check = 0;
+    for (int i = 0; i < 32; i++) {
+        char c = *cond++;
+        if (c == '-') continue;
+        uint32_t addent = 1 << (31 - i);
+        mask |= addent;
+        if (c == '1') check |= addent;
+    }
+    return ((opcode&mask) == check);
+}
+void sprint_x_x_x(char* out, char* name, uint32_t buf) {
     uint8_t rd = (buf >> 0) & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
     uint8_t rt = (buf >> 10) & 0x1F;
     char size = 'W';
     if (buf&(1<<31)) size = 'X';
-    ptr += sprintf(ptr, "%c%i, %c%i, %c%i", size, rd, size, rn, size, rt);
-    *out = ptr;    
+    char sign = ' ';
+    if (buf&(1<<29)) sign = 'S';
+    sprintf(out, "%s%c %c%i, %c%i, %c%i", name, sign, size, rd, size, rn, size, rt);
 }
-void sprint_x_x_imm(char** out, uint32_t buf) {
-    char* ptr = *out;
+void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
     uint16_t imm = (buf >> 10) & 0xFFF;
     uint8_t shift = (buf >> 21) & 0x3;
     char size = 'W';
     if (buf&(1<<31)) size = 'X';
-    ptr += sprintf(ptr, "%c%i, %c%i, #%i", size, rd, size, rn, imm);
-    if (shift) ptr += sprintf(ptr, "{%i}", shift);
-    *out = ptr;
+    char sign = ' ';
+    if (buf&(1<<29)) sign = 'S';
+    out += sprintf(out, "%s%c, %c%i, %c%i, #%i", name, sign,  size, rd, size, rn, imm);
+    if (shift) out += sprintf(out, "{%i}", shift);
 }
 void sprint_x_imm(char** out, uint32_t buf) {
     char* ptr = *out;
@@ -34,104 +47,13 @@ void sprint_x_imm(char** out, uint32_t buf) {
     *out = ptr;
 }
 void sprint_arm(char* out, uint32_t buf) {
-    char* ptr = out;
-    uint8_t rd = (buf >> 0) & 0x1F;
-    uint8_t rn = (buf >> 5) & 0x1F;
-    uint8_t rm = (buf >> 16) & 0x1F;
-    uint8_t rt = (buf >> 0) & 0x1F;
-    uint8_t rt2 = (buf >> 10) & 0x1F;
-    uint8_t cond = (buf >> 12) & 0xF;
-    uint8_t option = (buf >> 13) & 0x7;
-    uint8_t shift = (buf >> 22) & 0x3;
-    uint8_t size = (buf >> 30) & 0x3;
-    if ((buf & 0x9F000000) == 0x10000000) {
-        ptr += sprintf(ptr, "adr X%i", buf & 0x1F);
-        return;
-    }
-    if ((buf & 0x9F000000) == 0x90000000) {
-        ptr += sprintf(ptr, "adrp X%i", buf & 0x1F);
-        return;
-    }
-    switch (buf & 0x7F800000) {
-        case 0x11000000:
-            ptr += sprintf(ptr, "add ");
-            sprint_x_x_imm(&ptr, buf);
-            return;
-        case 0x31000000:
-            ptr += sprintf(ptr, "adds ");
-            sprint_x_x_imm(&ptr, buf);
-            return;
-        case 0x51000000:
-            ptr += sprintf(ptr, "sub");
-            sprint_x_x_imm(&ptr, buf);
-            return;
-        case 0x71000000:
-            ptr += sprintf(ptr, "subs");
-            sprint_x_x_imm(&ptr, buf);
-            return;
-        case 0x12000000:
-            ptr += sprintf(ptr, "and ");
-            sprint_x_x_imm(&ptr, buf);
-            return;
-        case 0x32000000:
-            ptr += sprintf(ptr, "ands ");
-            sprint_x_x_imm(&ptr, buf);
-            return;
-
-        case 0x12800000:
-            ptr += sprintf(ptr, "movn");
-            sprint_x_imm(&ptr, buf);
-            return;
-        case 0x52800000:
-            ptr += sprintf(ptr, "movz ");
-            sprint_x_imm(&ptr, buf);
-            return;
-        case 0x72800000:
-            ptr += sprintf(ptr, "movk ");
-            sprint_x_imm(&ptr, buf);
-            return;
-    }
-    switch (buf & 0x1F000000) {
-        case 0x0B000000:
-            ptr += sprintf(ptr, "add ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x2B000000:
-            ptr += sprintf(ptr, "adds ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x4B000000:
-            ptr += sprintf(ptr, "sub ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x6B000000:
-            ptr += sprintf(ptr, "subs ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x0A000000:
-            ptr += sprintf(ptr, "and ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x2A000000:
-            ptr += sprintf(ptr, "ands ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x0A200000:
-            ptr += sprintf(ptr, "bic ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x2A200000:
-            ptr += sprintf(ptr, "bics ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x4A000000:
-            ptr += sprintf(ptr, "eor ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-        case 0x6A000000:
-            ptr += sprintf(ptr, "eors ");
-            sprint_x_x_x(&ptr, buf);
-            return;
-    }
-    ptr += sprintf(ptr, "und");
+    if (comp("-0-01011--0---------------------", buf))
+        sprint_x_x_x(out, "add", buf); return;
+    if (comp("-1-01011--0---------------------", buf))
+        sprint_x_x_x(out, "sub", buf); return;
+    if (comp("-0-10001--0---------------------", buf)) // ADD rd, rn, imm
+        sprint_x_x_imm(out, "add", buf); return;
+    if (comp("-1-10001--0---------------------", buf)) // SUB rd, rn, imm
+        sprint_x_x_imm(out, "sub", buf); return;
+    printf("%i\n", i);
 }
