@@ -46,7 +46,7 @@ void help(void) {
 void handle_print(char* arg) {
     if (arg[0] == '(') {
         uint64_t* imm = (uint64_t*)strtol(arg+1, NULL, 16);
-        printf("%s: %lX\n", arg, *imm);
+        printf("\033[34m%s\033[0m: %lX\n", arg, *imm);
     } else if (arg[0] == '[') {
         char* ptr = arg+1;
         int p = 0;
@@ -66,7 +66,7 @@ void handle_print(char* arg) {
         uint64_t base = get_reg(reg);
         if (sign == '+') base += imm;
         else if (sign == '-') base -= imm;
-        printf("%s: %lX\n", arg, *(uint64_t*)base);
+        printf("\033[34m%s\033[0m: %lX\n", arg, *(uint64_t*)base);
     } else {
         if (strcmp(arg, "x64regs") == 0) {
             print_cpu();
@@ -75,7 +75,7 @@ void handle_print(char* arg) {
         } else if (strcmp(arg, "cache") == 0) {
             cache_print(break_block);
         } else {
-            printf("%s state: %lX\n", arg, get_reg(arg));
+            printf("\033[34m%s\033[0m: %lX\n", arg, get_reg(arg));
         }
     }
 }
