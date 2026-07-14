@@ -45,7 +45,7 @@ void sprint_x_mem(char* out, char* name, uint32_t buf) {
     uint16_t imm = (buf >> 10) & 0xFFF;
     char size = 'W';
     if (buf&(1<<30)) size = 'X';
-    out += sprintf(out, "%s%c [%c%i",
+    out += sprintf(out, "%s %c%i, [X%i",
         name, size, rd, rn);
     if (imm) out += sprintf(out, ", #%i", imm);
     out += sprintf(out, "]");
