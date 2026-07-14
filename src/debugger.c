@@ -121,10 +121,12 @@ void debug_wait(void) {
                 break_block++;
                 return;
             } else if (strcmp(com, "run") == 0) {
+                if (prev_instr || break_block) 
+                    printf("Stop at break point\n");
                 if (prev_instrp) {
                     *prev_instrp = prev_instr;
                     __builtin___clear_cache(prev_instrp, prev_instrp+4);
-                    printf("Stop at break point\n");
+                    prev_instrp = NULL;
                 }
                 return;
             } else if (strcmp(com, "exit") == 0) {
