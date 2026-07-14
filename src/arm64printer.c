@@ -39,6 +39,17 @@ void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
         name, sign,  size, rd, size, rn, imm);
     if (shift) out += sprintf(out, "{%i}", shift);
 }
+void sprint_x_mem(char* out, char* name, uint32_t buf) {
+    uint8_t rd = buf & 0x1F;
+    uint8_t rn = (buf >> 5) & 0x1F;
+    uint16_t imm = (buf >> 10) & 0xFFF;
+    char size = 'W';
+    if (buf&(1<<30)) size = 'X';
+    out += sprintf(out, "%s%c [%c%i",
+        name, size, rd, rn);
+    if (imm) out += sprintf(out, ", #%i", imm);
+    out += sprintf(out, "]");
+}
 void sprint_x_imm(char** out, uint32_t buf) {
     char* ptr = *out;
     uint8_t rd = buf & 0x1F;
@@ -61,9 +72,13 @@ void sprint_arm(char* out, uint32_t buf) {
         {sprint_x_x_imm(out, "sub", buf); return;}
     if (comp("-1-01010------------------------", buf))
         {sprint_x_x_x(out, "eor", buf); return;}
+    if (comp("1-111001010---------------------", buf))
+        {sprint_x_mem(out, "ldr", buf); return;}
+    if (comp("1-111001000---------------------", buf))
+        {sprint_x_mem(out, "str", buf); return;}
     if (comp("11010100001---------------------", buf))
         {sprintf(out, "brk %x", (buf>>5)&0xFFFF); return;}
     if (comp("1101011001011111----------------", buf))
-        {sprintf(out, "ret X%x", (buf>>5)&0x1F); return;}
+        {sprintf(out, "ret X%i", (buf>>5)&0x1F); return;}
     sprintf(out, "und");
 }
