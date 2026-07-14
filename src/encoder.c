@@ -12,6 +12,17 @@ TODO:
 - encoding for 8, 16 and 32 bit instructions
 - clean emitter
 */
+void emit_rip(uint8_t rd, int32_t offset) {
+    uint64_t full = (uint64_t)(get_guest() + offset);
+    int64_t target = full & ~0xFFF;
+    int64_t current = (uint64_t)(get_host() + get_hp()) & ~0xFFF;
+    int32_t delta = (target - current) / 4096;
+    if (delta < -524288 || delta > 524287) {
+        panic("ENCODER::TOO_LARGE_DISTANCE");
+    }
+    emit_adrp(SC1, delta);
+    emit_add_imm(rd, SC1, full & 0xFFF);
+}
 void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
     if (buf->op0.type == REG) {
         emit32(code | (x64_regs[buf->op0.reg] << 5));
@@ -21,16 +32,7 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
         int32_t offset = get_gp() + buf->op0.imm;
         if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
         if (is_external_offset(offset)) {
-            uint64_t full = (uint64_t)(get_guest() + offset);
-            int64_t target = full & ~0xFFF;
-            int64_t current = (uint64_t)(get_host() + get_hp()) & ~0xFFF;
-            int32_t delta = (target - current) / 4096;
-            if (delta < -524288 || delta > 524287) {
-                panic("ENCODER::TOO_LARGE_DISTANCE");
-            }
-            emit_adrp(SC1, delta);
-            emit_add_imm(SC1, SC1, full & 0xFFF);
-            emit_ldr_reg(SC1, SC1, 0);
+            emit_rip(SC1, offset);
             emit32(code | (x64_regs[SC1] << 5));
             // wrapper
         } else {
@@ -47,10 +49,7 @@ void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
 void emit_address_decode(Operand* op) {
     uint8_t t = op->type;
     if (t == (MEM|IMM)) {
-        int32_t offset = get_gp() + op->imm;
-        if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
-        emit_movz(SC1, offset, 0);
-        emit_add_reg(SC1, SC1, RIP);
+        emit_rip(SC1, get_gp() + op->imm);
         return;
     }
     if (t&IDX) {
@@ -200,8 +199,7 @@ void encode(X64_instruction* buf) {
                 int32_t offset = get_gp() + buf->op1.imm;
                 if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
-                    emit_movz(SC1, offset, 0);
-                    emit_add_reg(r0, SC1, RIP);
+                    emit_rip(r0, offset);
                 } else {
                     emit_brk(cache_patch_point(LEA, r0, buf->op1.imm));
                     warning("ENCODER::ILLEGAL_RIP");
