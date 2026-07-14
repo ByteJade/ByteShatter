@@ -42,7 +42,7 @@ void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
 void sprint_x_mem(char* out, char* name, uint32_t buf) {
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
-    uint16_t imm = (buf >> 10) & 0xFFF;
+    uint16_t imm = (buf >> 12) & 0xFF;
     int W = (buf >> 10) & 1;  // Write-back?
     int P = (buf >> 11) & 1;  // Pre-indexed?
     int U = (buf >> 23) & 1;  // Add or subtract?
