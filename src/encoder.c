@@ -10,9 +10,6 @@
 /*
 TODO:
 - encoding for 8, 16 and 32 bit instructions
-- encoding NZCV flags for math ops
-- memory ops, like "add [rax], 0x2"
-- better "unhandled"
 - clean emitter
 */
 void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
@@ -24,8 +21,15 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
         int32_t offset = get_gp() + buf->op0.imm;
         if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
         if (is_external_offset(offset)) {
-            emit_movz(SC1, offset, 0);
-            emit_add_reg(SC1, SC1, RIP);
+            uint64_t full = (uint64_t)(get_guest() + offset);
+            int64_t target = full & ~0xFFF;
+            int64_t current = (uint64_t)(get_host() + get_hp()) & ~0xFFF;
+            int32_t delta = (target - current) / 4096;
+            if (delta < -524288 || delta > 524287) {
+                panic("ENCODER::TOO_LARGE_DISTANCE");
+            }
+            emit_adrp(SC1, delta);
+            emit_add_imm(SC1, SC1, full & 0xFFF);
             emit_ldr_reg(SC1, SC1, 0);
             emit32(code | (x64_regs[SC1] << 5));
             // wrapper

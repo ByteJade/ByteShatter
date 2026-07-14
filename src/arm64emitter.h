@@ -40,6 +40,8 @@
 #define emit_asr_imm(rd, rn, shift) \
     emit32(0x93600000 | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
 
+#define emit_adrp(rd, delta) \
+    emit32(0x90000000 | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | x64_regs[rd])
 #define emit_movz(rd, imm, shift) \
     emit32(0xD2800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
 #define emit_movn(rd, imm, shift) \
