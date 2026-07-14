@@ -121,7 +121,7 @@ void debug_wait(void) {
                 break_block++;
                 return;
             } else if (strcmp(com, "run") == 0) {
-                if (prev_instr || break_block) 
+                if (prev_instrp || break_block != -1) 
                     printf("Stop at break point\n");
                 if (prev_instrp) {
                     *prev_instrp = prev_instr;
