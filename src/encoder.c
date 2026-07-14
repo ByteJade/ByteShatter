@@ -33,6 +33,7 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
         if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
         if (is_external_offset(offset)) {
             emit_rip(SC1, offset);
+            emit_ldr_reg(SC1, SC1, 0);
             emit32(code | (x64_regs[SC1] << 5));
             // wrapper
         } else {
