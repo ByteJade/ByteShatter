@@ -17,3 +17,4 @@ WRAP_FUNC XSetNormalHints
 WRAP_FUNC XParseGeometry
 WRAP_FUNC XCreateColormap
 WRAP_FUNC XSetErrorHandler
+WRAP_FUNC XGetErrorText
