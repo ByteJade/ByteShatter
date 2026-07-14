@@ -49,12 +49,12 @@ void sprint_x_imm(char** out, uint32_t buf) {
     *out = ptr;
 }
 void sprint_arm(char* out, uint32_t buf) {
-    if (comp("-0-01011--0---------------------", buf))
+    if (comp("-0-01011------------------------", buf))
         sprint_x_x_x(out, "add", buf); return;
-    if (comp("-1-01011--0---------------------", buf))
+    if (comp("-1-01011------------------------", buf))
         sprint_x_x_x(out, "sub", buf); return;
-    if (comp("-0-10001--0---------------------", buf))
+    if (comp("-0-10001------------------------", buf))
         sprint_x_x_imm(out, "add", buf); return;
-    if (comp("-1-10001--0---------------------", buf))
+    if (comp("-1-10001------------------------", buf))
         sprint_x_x_imm(out, "sub", buf); return;
 }
