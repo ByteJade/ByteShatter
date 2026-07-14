@@ -16,13 +16,15 @@ int comp(const char* cond, uint64_t opcode) {
 void sprint_x_x_x(char* out, char* name, uint32_t buf) {
     uint8_t rd = (buf >> 0) & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
-    uint8_t rt = (buf >> 10) & 0x1F;
+    uint8_t rm = (buf >> 16) & 0x1F;
+    uint8_t shift = (buf >> 10) & 0x3;
     char size = 'W';
     if (buf&(1<<31)) size = 'X';
     char sign = ' ';
     if (buf&(1<<29)) sign = 'S';
     sprintf(out, "%s%c %c%i, %c%i, %c%i",
-        name, sign, size, rd, size, rn, size, rt);
+        name, sign, size, rd, size, rn, size, rm);
+    if (shift) out += sprintf(out, "{%i}", shift);
 }
 void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
     uint8_t rd = buf & 0x1F;
