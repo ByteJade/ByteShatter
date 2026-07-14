@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/mman.h>
 
 static int enabled = 0;
 static int break_pc = 0;
@@ -43,10 +44,19 @@ void help(void) {
     printf("run - return to execution\n");
     printf("exit - stop execution\n");
 }
+int has_access(void* ptr) {
+    unsigned char vec;
+    if (mincore(ptr, 1, &vec) == 0) {
+        return 1;
+    }
+    printf("No access to memory\n");
+    return 0;
+}
 void handle_print(char* arg) {
     if (arg[0] == '(') {
         uint64_t* imm = (uint64_t*)strtol(arg+1, NULL, 16);
-        printf("\033[34m%s\033[0m: %lX\n", arg, *imm);
+        if (has_access(imm))
+            printf("\033[34m%s\033[0m: %lX\n", arg, *imm);
     } else if (arg[0] == '[') {
         char* ptr = arg+1;
         int p = 0;
@@ -66,7 +76,8 @@ void handle_print(char* arg) {
         uint64_t base = get_reg(reg);
         if (sign == '+') base += imm;
         else if (sign == '-') base -= imm;
-        printf("\033[34m%s\033[0m: %lX\n", arg, *(uint64_t*)base);
+        if (has_access((void*)base))
+            printf("\033[34m%s\033[0m: %lX\n", arg, *(uint64_t*)base);
     } else {
         if (strcmp(arg, "x64regs") == 0) {
             print_cpu();
