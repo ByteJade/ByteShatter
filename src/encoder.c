@@ -109,7 +109,7 @@ void encode8bit(X64_instruction* buf) {
             } else panic("ENCODER::UNHANDLED_TST");
         } break;
         case CMP:{
-            if (t0&REG) {
+            if (t0 == REG) {
                 emit32(_construct_r_r_r(SUB_IMM|S, XZR, r0, buf->op1.imm));
             } else if (t0&MEM) {
                 emit_address_decode(&buf->op1);
