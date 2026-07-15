@@ -300,6 +300,7 @@ void encode(X64_instruction* buf) {
                 emit_address_decode(&buf->op1);
                 emit32(LDR32_NEON | (SC1<<5) | r1);
             } else panic("ENCODER::UNHANDLED_MOVSS");
+            break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
     }
