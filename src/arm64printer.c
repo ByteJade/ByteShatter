@@ -68,6 +68,7 @@ void sprint_x_mem(char** out, char* name, uint32_t buf) {
         // Post-indexed: [Xn], #offset
         ptr += sprintf(ptr, "]");
         if (W && imm) {
+            ptr += sprintf(ptr, ", #%i", imm);
         }
     }
     *out = ptr;
