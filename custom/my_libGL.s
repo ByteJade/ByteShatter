@@ -18,7 +18,7 @@ WRAP_FUNC glPushMatrix
 WRAP_FUNC glPopMatrix
 WRAP_FUNC glCallList
 WRAP_FUNC glViewport
-WRAP_FUNC glLoadIdentify
+WRAP_FUNC glLoadIdentity
 WRAP_FUNC glShadeModel
 WRAP_FUNC glNewList
 WRAP_FUNC glEndList
@@ -26,6 +26,7 @@ WRAP_FUNC glDrawBuffer
 WRAP_FUNC glFrustum
 WRAP_FUNC glTranslatef
 WRAP_FUNC glLightfv
+WRAP_FUNC glMaterialfv
 
 WRAP_FUNC glXMakeCurrent
 WRAP_FUNC glXGetProcAddressARB
