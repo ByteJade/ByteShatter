@@ -185,9 +185,10 @@ void encode(X64_instruction* buf) {
                 emit32(sf|_construct_r_r_imm(ADD_IMM, r0, r1, 0));
             }else if (t0 == REG && t1 == IMM){
                 int64_t imm = buf->op1.imm;
-                if (imm > INT16_MAX || imm < INT16_MIN)
-                    panic("ENCODER::ILLEGAL_IMM");
-                emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
+                if (imm < 0 || imm > UINT16_MAX) {
+                    emit_imm(&buf->op1);
+                    emit32(sf|_construct_r_r_imm(ADD_IMM, r0, SC2, 0));
+                } else emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
             } else if (t1&MEM) {
                 emit_address_decode(&buf->op1);
                 if (sf) emit32(_construct_r_r_imm(LDR64_REG, r0, SC1, 0));
