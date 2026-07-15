@@ -1,7 +1,7 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#include "armdef.h"
+#include "decoder.h"
 
 void encode(X64_instruction* buf);
 

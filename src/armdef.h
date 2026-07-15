@@ -3,30 +3,18 @@
 
 #include "stdint.h"
 
-typedef struct {
-    uint8_t type;
-    uint8_t reg;
-    uint8_t idx;
-    uint8_t scale;
-    int64_t imm;
-} Operand;
-typedef struct {
-    uint8_t size;
-    uint8_t type;
-    uint8_t opcount;
-
-    Operand op0;
-    Operand op1;
-} X64_instruction;
-
 static const char* types[] = {
+    // std
     "mov", "add", "sub", "test",
     "je", "call", "ret", "xor",
     "pop", "push", "and", "lea",
     "jmp", "cmp", "endbr64", "jl",
     "leave", "cltq", "jne", "jge",
     "nop", "shl", "shr", "sar",
-    "movzx", "movslq", "jg", "jle"
+    "movzx", "movslq", "jg", "jle",
+    // avx
+    "movss", "divss", "mulss", "cvtss2sd",
+    "pxor", "movq", "movapd"
 };
 static const char* regs[] = {
     "ax", "cx", "dx", "bx",
@@ -35,10 +23,11 @@ static const char* regs[] = {
     "12", "13", "14", "15",
 };
 typedef enum {
-    REG = 1,
-    MEM = 2,
-    IDX = 4,
-    IMM = 8,
+    REG = 1<<0,
+    MEM = 1<<2,
+    IDX = 1<<3,
+    IMM = 1<<4,
+    XMM = 1<<5,
 } OpTypes;
 
 typedef enum {
@@ -48,7 +37,11 @@ typedef enum {
     JMP, CMP, EBR, JL,
     LEAVE, CLTQ, JNE, JGE,
     NOP, SHL, SHR, SAR,
-    MOVZX, MOVSLQ, JG, JLE
+    MOVZX, MOVSLQ, JG, JLE,
+    
+    MOVSS, DIVSS, MULSS,
+    CVTSS2SD, PXOR, MOVQ,
+    MOVAPD
 } InstrTypes;
 
 enum mapped_registers {

@@ -1,4 +1,5 @@
 #include "decoder.h"
+#include "armdef.h"
 #include "debugger.h"
 #include "memory.h"
 #include "encoder.h"
@@ -26,10 +27,6 @@ void decode_sib(Operand* op) {
         op->type |= REG;
         op->reg = base;
     }
-}
-void decode_reg(Operand* op, uint8_t reg) {
-    op->type = REG;
-    op->reg = (reg >> 3)&7;
 }
 void decode_rm(Operand* op, uint8_t modrm) {
     uint8_t mod = modrm >> 6;
@@ -60,7 +57,8 @@ void decode_rm(Operand* op, uint8_t modrm) {
 }
 void decode_regrm(X64_instruction* buf) {
     uint8_t byte = fetch8();
-    decode_reg(&buf->op0, byte);
+    buf->op0.type = REG;
+    buf->op0.reg = (byte >> 3)&7;
     decode_rm(&buf->op1, byte);
 }
 void decode_shift_table(X64_instruction* buf, uint8_t modrm) {
@@ -80,6 +78,8 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
         } else {
             out += sprintf(out, "e%s ", regs[op->reg]);
         }
+    } else if (op->type == (REG | XMM)) {
+        out += sprintf(out, "xmm%i ", op->reg);
     } else if (op->type == IMM) {
         out += sprintf(out, "%lx ", op->imm);
     } else {
@@ -119,15 +119,12 @@ void sprint_instr(char* out, X64_instruction* buf) {
 }
 int decode_instr(X64_instruction* buf) {
     int ret = 0;
-    int reverse = 0;
+    buf->reverse = 0;
     uint8_t rex = 0;
     uint8_t byte = fetch8();
     buf->size = 32;
     if (byte >> 4 == 0x4) {
         rex = byte & 0xF;
-        byte = fetch8();
-    } else if (byte == 0x66) {
-        buf->size = 16;
         byte = fetch8();
     } else if (byte == 0x64) {
         // TLS read. I don't know what to do
@@ -142,7 +139,7 @@ int decode_instr(X64_instruction* buf) {
             buf->type = NOP;
             break;
         case 0x01:
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             buf->type = ADD;
             decode_regrm(buf);
@@ -181,7 +178,7 @@ int decode_instr(X64_instruction* buf) {
             }
             break;
         case 0x29:
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             buf->type = SUB;
             decode_regrm(buf);
@@ -197,7 +194,7 @@ int decode_instr(X64_instruction* buf) {
             decode_regrm(buf);
             break;
         case 0x39:
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             buf->type = CMP;
             decode_regrm(buf);
@@ -208,7 +205,7 @@ int decode_instr(X64_instruction* buf) {
             decode_regrm(buf);
             break;
         case 0x50 ... 0x57:
-            reverse = 1;
+            buf->reverse = 1;
             buf->size = 64;
             buf->opcount = 1;
             buf->type = PUSH;
@@ -283,7 +280,7 @@ int decode_instr(X64_instruction* buf) {
             buf->op1.imm = fetch_imm32();
             break;
         case 0x83: {
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             uint8_t modrm = fetch8();
             decode_rm(&buf->op1, modrm);
@@ -312,7 +309,7 @@ int decode_instr(X64_instruction* buf) {
             decode_regrm(buf);
             break;
         case 0x89:
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             buf->type = MOV;
             decode_regrm(buf);
@@ -338,7 +335,7 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.reg = RAX;
             break;
         case 0xB8 ... 0xBF:
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             buf->type = MOV;
             buf->op0.type = IMM;
@@ -367,7 +364,7 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.imm = fetch8();
             break;
         case 0xD1:{
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             uint8_t modrm = fetch8();
             decode_rm(&buf->op1, modrm);
@@ -376,7 +373,7 @@ int decode_instr(X64_instruction* buf) {
             decode_shift_table(buf, modrm);
         } break;
         case 0xC1:{
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             uint8_t modrm = fetch8();
             decode_rm(&buf->op1, modrm);
@@ -385,7 +382,7 @@ int decode_instr(X64_instruction* buf) {
             decode_shift_table(buf, modrm);
         } break;
         case 0xC6:
-            reverse = 1;
+            buf->reverse = 1;
             buf->size = 8;
             buf->opcount = 2;
             buf->type = MOV;
@@ -394,7 +391,7 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.imm = fetch_imm8();
             break;
         case 0xC7:
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 2;
             buf->type = MOV;
             decode_rm(&buf->op1, fetch8());
@@ -411,15 +408,14 @@ int decode_instr(X64_instruction* buf) {
             buf->type = RET;
             ret = RET;
             break;
-        case 0xf3: // currently only endbr64 is used
-            warning("DECODER::REP_PREFIX");
-            fetch16(); fetch8(); // just skip
-            buf->opcount = 0;
-            buf->type = EBR;
+        case 0x66:
+        case 0xf3:
+            if (fetch8() == 0x0F) decode_0F(buf);
+            else panic("DECODER::UNHANDLED_PREFIX");
             break;
         case 0xff: {
             buf->size = 64;
-            reverse = 1;
+            buf->reverse = 1;
             buf->opcount = 1;
             uint8_t modrm = fetch8();
             decode_rm(&buf->op1, modrm);
@@ -452,7 +448,7 @@ int decode_instr(X64_instruction* buf) {
         if (rex&2) buf->op1.idx += 8;
         if (rex&1) buf->op1.reg += 8;
     }
-    if (reverse) {
+    if (buf->reverse) {
         Operand tmp = buf->op0;
         buf->op0 = buf->op1;
         buf->op1 = tmp;
@@ -462,12 +458,12 @@ int decode_instr(X64_instruction* buf) {
 int decode_step() {
     cache_block_point();
     X64_instruction buf;
-    int jump_type = decode_instr(&buf);
+    int type = decode_instr(&buf);
     char out[64];
     sprint_instr(out, &buf);
     print("%s", out);
     encode(&buf);
-    return jump_type;
+    return type;
 }
 void decode(uint32_t gp) {
     print("Start decode %lx", gp);
