@@ -7,6 +7,7 @@
 enum Prefixes {
     P66= 0x66,
     REP = 0xf3,
+    REPN = 0xf2,
 };
 typedef struct {
     uint8_t type;

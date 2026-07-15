@@ -131,7 +131,11 @@ int decode_instr(X64_instruction* buf) {
     } if (byte == REP) {
         buf->prefix = REP;
         byte = fetch8();
-    } if (byte >> 4 == 0x4) {
+    } else if (byte == REPN) {
+        buf->prefix = REPN;
+        byte = fetch8();
+    }
+    if (byte >> 4 == 0x4) {
         rex = byte & 0xF;
         byte = fetch8();
     } else if (byte == 0x64) {
