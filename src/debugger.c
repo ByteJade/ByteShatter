@@ -37,8 +37,10 @@ void set_break_point(uint32_t pc) {
     __builtin___clear_cache(instr, instr+4);
 }
 void set_break() {
-    break_pc = get_hp();
     break_block = cache_search_block(get_hp());
+    CacheUnit* cache = cache_get_block(break_block);
+    break_pc = get_hp() - cache->hp;
+
     uint32_t* instr = (uint32_t*)(get_host() + get_hp() - 4);
     prev_instr = *instr;
     prev_instrp = instr;
