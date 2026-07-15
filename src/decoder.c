@@ -125,7 +125,11 @@ int decode_instr(X64_instruction* buf) {
     uint8_t rex = 0;
     uint8_t byte = fetch8();
     buf->size = 32;
-    if (byte >> 4 == 0x4) {
+    if (byte == 0x66) {
+       buf->prefix = P66;
+    } else if (byte == 0xf3) {
+       buf->prefix = REP;
+    } else if (byte >> 4 == 0x4) {
         rex = byte & 0xF;
         byte = fetch8();
     } else if (byte == 0x64) {
@@ -147,6 +151,10 @@ int decode_instr(X64_instruction* buf) {
             decode_regrm(buf);
             break;
         case 0x0F:
+            if (buf->prefix) {
+                decode_0F(buf);
+                break;
+            }
             buf->opcount = 1;
             uint8_t modrm = fetch8();
             switch (modrm) {
@@ -414,11 +422,6 @@ int decode_instr(X64_instruction* buf) {
             buf->opcount = 0;
             buf->type = RET;
             ret = RET;
-            break;
-        case 0x66:
-        case 0xf3:
-            if (fetch8() == 0x0F) decode_0F(buf);
-            else panic("DECODER::UNHANDLED_PREFIX");
             break;
         case 0xff: {
             buf->size = 64;

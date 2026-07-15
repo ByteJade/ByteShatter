@@ -354,7 +354,7 @@ void encode(X64_instruction* buf) {
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
         case MOVQ:
-            emit32(FMOV_NEON | (r0 << 5) | (r1))
+            emit32(FMOV_NEON | (r0 << 5) | (r1));
             break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);

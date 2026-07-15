@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include "armdef.h"
 
+enum Prefixes {
+    P66,
+    REP,
+};
 typedef struct {
     uint8_t type;
     uint8_t reg;
@@ -16,6 +20,7 @@ typedef struct {
     uint8_t type;
     uint8_t reverse;
     uint8_t opcount;
+    uint8_t prefix;
 
     Operand op0;
     Operand op1;

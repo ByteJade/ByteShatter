@@ -24,6 +24,13 @@ void decode_0F(X64_instruction* buf) {
         case 0x5a:
             buf->type = CVTSS2SD;
             goto set;
+        case 0x7e:
+            buf->reverse = 1;
+            buf->opcount = 2;
+            buf->type = MOVQ;
+            decode_regrm(buf);
+            buf->op1.type |= XMM;
+            goto set;
         case 0xEF:
             buf->type = PXOR;
         set:
