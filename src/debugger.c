@@ -38,6 +38,7 @@ void set_break_point(uint32_t pc) {
 }
 void set_break() {
     break_pc = 0;
+    break_block = cache_search_block(get_hp());
     uint32_t* instr = (uint32_t*)(get_host() + get_hp() - 4);
     prev_instr = *instr;
     prev_instrp = instr;

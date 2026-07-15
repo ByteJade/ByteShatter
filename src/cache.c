@@ -137,6 +137,12 @@ uint8_t* cache_search(uint32_t gp) {
     }
     return NULL;
 }
+uint32_t cache_search_block(uint32_t hp) {
+    for (int i = bp-1; i >= 0; i--) {
+        if (hp >= blocks_cache[i].hp) return i;
+    }
+    return NULL;
+}
 PatchUnit* cache_get_patch(uint16_t patch_id) {
     patch_id--;
     if (patch_id >= pp) {
