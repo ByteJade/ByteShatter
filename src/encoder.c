@@ -178,7 +178,7 @@ void encode(X64_instruction* buf) {
             }else if (t0 == REG && t1 == IMM){
                 int64_t imm = buf->op1.imm;
                 if (imm > INT16_MAX || imm < INT16_MIN) panic("ENCODER::ILLEGAL_IMM");
-                emit_movz(r0, imm & IMM12, 0);
+                emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
             } else if (t1&MEM) {
                 emit_address_decode(&buf->op1);
                 if (sf) emit32(_construct_r_r_imm(LDR64_REG, r0, SC1, 0));

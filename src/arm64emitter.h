@@ -14,6 +14,7 @@
 #define EOR_REG 0x4A000000 // No Flags!
 #define AND_REG 0x0A000000 // No Flags!
 #define ANDS_REG 0x6A000000 // Only Flags!
+#define MOVZ_IMM 0x52800000
 #define BR_IMM 0x14000000
 #define BR_REG 0xD61F0000
 #define BLR_IMM 0x94000000
