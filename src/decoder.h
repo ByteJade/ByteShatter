@@ -5,8 +5,8 @@
 #include "armdef.h"
 
 enum Prefixes {
-    P66,
-    REP,
+    P66= 0x66,
+    REP = 0xf3,
 };
 typedef struct {
     uint8_t type;

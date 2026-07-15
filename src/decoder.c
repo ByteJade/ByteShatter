@@ -125,10 +125,10 @@ int decode_instr(X64_instruction* buf) {
     uint8_t rex = 0;
     uint8_t byte = fetch8();
     buf->size = 32;
-    if (byte == 0x66) {
+    if (byte == P66) {
         buf->prefix = P66;
         byte = fetch8();
-    } if (byte == 0xf3) {
+    } if (byte == REP) {
         buf->prefix = REP;
         byte = fetch8();
     } if (byte >> 4 == 0x4) {
