@@ -11,8 +11,8 @@
 #include <sys/mman.h>
 
 static int enabled = 0;
-static int break_pc = 0;
-static int break_block = -1;
+uint64_t break_pc = 0;
+uint64_t break_block = -1;
 static uint64_t break_point = 0;
 static uint32_t prev_instr = 0;
 static uint32_t* prev_instrp = NULL;
@@ -22,6 +22,9 @@ void debug_enable(void) {
 }
 int debug_break(void) {
     return break_block;
+}
+uint64_t debug_breakp(void) {
+    return break_pc;
 }
 void set_break_point(uint32_t pc) {
     break_pc = pc;
@@ -35,6 +38,7 @@ void set_break_point(uint32_t pc) {
 void help(void) {
     printf("Commands:\n");
     printf("brb <i> - set break point in block i\n");
+    printf("brk <imm64> - set break point in imm64\n");
     printf("sb - go to next block\n");
     printf("si - go to next instruction\n");
     printf("log <level> - set logs to level (A,W,E)\n");
@@ -109,7 +113,10 @@ void debug_wait(void) {
         if (sscanf(line, "%s %s", com, arg) == 2) {
             if (strcmp(com, "brb") == 0) {
                 break_block = strtol(arg, NULL, 10);
-                printf("Set break point in block %i\n", break_block);
+                printf("Set break point in block %li\n", break_block);
+            } else if (strcmp(com, "brk") == 0) {
+                break_pc = strtol(arg, NULL, 16);
+                printf("Set break point in pc %lX\n", break_pc);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {

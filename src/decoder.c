@@ -470,6 +470,8 @@ int decode_step() {
     sprint_instr(out, &buf);
     print("%s", out);
     encode(&buf);
+    if (get_hp() == debug_breakp())
+        set_break_point(0);
     return type;
 }
 void decode(uint32_t gp) {
