@@ -5,6 +5,10 @@
 void decode_0F(X64_instruction* buf) {
     uint8_t byte = fetch8();
     switch (byte) {
+        case 0x1E:
+            buf->opcount = 0;
+            buf->type = EBR;
+            break;
         case 0x10:
             buf->opcount = 2;
             buf->type = MOVSS;
