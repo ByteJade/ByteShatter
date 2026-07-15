@@ -94,7 +94,7 @@ void sprint_arm(char* out, uint32_t buf) {
     if (comp("11010100001---------------------", buf))
         {sprintf(out, "brk %x", (buf>>5)&0xFFFF); return;}
 
-    if (comp("1-10010100----------------------", buf))
+    if (comp("-101001010----------------------", buf))
         {sprint_x_imm(out, "movz", buf); return;}
         
     if (comp("1101011001011111----------------", buf))
