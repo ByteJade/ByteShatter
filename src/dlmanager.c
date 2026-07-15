@@ -12,10 +12,7 @@ static const char* ld_paths[] = {
     "/usr/lib",
     "/usr/lib64",
     "/lib/aarch64-linux-gnu",
-#ifdef __ANDROID__
-    "/system/lib"
     "/data/data/com.termux/files/usr/lib",
-#endif
     NULL
 };
 typedef struct {
