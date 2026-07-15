@@ -11,6 +11,7 @@
 #include <sys/mman.h>
 
 static int enabled = 0;
+uint64_t breakp = 0;
 uint64_t break_pc = 0;
 uint64_t break_block = -1;
 static uint64_t break_point = 0;
@@ -24,12 +25,20 @@ int debug_break(void) {
     return break_block;
 }
 uint64_t debug_breakp(void) {
-    return break_pc;
+    return breakp;
 }
 void set_break_point(uint32_t pc) {
     break_pc = pc;
     CacheUnit* cache = cache_get_block(break_block);
     uint32_t* instr = (uint32_t*)(get_host() + cache->hp + pc);
+    prev_instr = *instr;
+    prev_instrp = instr;
+    *instr = 0xD4200000;
+    __builtin___clear_cache(instr, instr+4);
+}
+void set_break() {
+    break_pc = 0;
+    uint32_t* instr = (uint32_t*)(get_host() + get_hp() - 4);
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
@@ -115,7 +124,7 @@ void debug_wait(void) {
                 break_block = strtol(arg, NULL, 10);
                 printf("Set break point in block %li\n", break_block);
             } else if (strcmp(com, "brk") == 0) {
-                break_pc = strtol(arg, NULL, 16);
+                breakp = strtol(arg, NULL, 16);
                 printf("Set break point in pc %lX\n", break_pc);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);

@@ -472,7 +472,7 @@ int decode_step() {
     sprint_instr(out, &buf);
     print("%s", out);
     encode(&buf);
-    if (brk) set_break_point(0);
+    if (brk) set_break();
     return type;
 }
 void decode(uint32_t gp) {
@@ -482,7 +482,7 @@ void decode(uint32_t gp) {
     uint8_t jump_type = 0;
     if (block == debug_break()) {
         jump_type = decode_step();
-        set_break_point(0);
+        set_break();
     }
     while (jump_type != RET && jump_type != JMP) {
         jump_type = decode_step();
@@ -502,7 +502,7 @@ void decode(uint32_t gp) {
             block++;
             if (block == debug_break()) {
                 jump_type = decode_step();
-                set_break_point(0);
+                set_break();
             }
         }
     }
