@@ -30,7 +30,7 @@ void decode_0F(X64_instruction* buf) {
             buf->type = MOVQ;
             decode_regrm(buf);
             buf->op1.type |= XMM;
-            goto set;
+            break;
         case 0xEF:
             buf->type = PXOR;
         set:
