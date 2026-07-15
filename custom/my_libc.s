@@ -13,6 +13,13 @@ my___libc_start_main:
     ldp x29, x30, [sp], #16
     ret
 
+.global my___isoc23_strtol
+.global my_strtol
+.extern strtol
+my___isoc23_strtol:
+my_strtol:
+	b strtol
+
 WRAP_BIG_FUNC printf
 WRAP_FUNC exit
 WRAP_FUNC puts
@@ -21,5 +28,5 @@ WRAP_FUNC free
 WRAP_FUNC strlen
 WRAP_FUNC strstr
 WRAP_FUNC strcmp
-WRAP_FUNC __isoc23_strtol
+
 WRAP_FUNC getenv
