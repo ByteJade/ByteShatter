@@ -32,6 +32,7 @@
 #define LDR32_NEON 0xBD400000
 #define STR32_NEON 0xBD000000
 #define FDIV_NEON 0x1E201800
+#define FMUL_NEON 0x1E200800
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
