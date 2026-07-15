@@ -293,10 +293,10 @@ void encode(X64_instruction* buf) {
         case EBR: emit_bti(); break;
         case NOP: break;
         case MOVSS:
-            if (t0 == (MEM|IMM)) {
+            if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
                 emit32(STR32_NEON | (SC1<<5) | r1);
-            }else if (t1 == (MEM|IMM)) {
+            }else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
                 emit32(LDR32_NEON | (SC1<<5) | r1);
             } else panic("ENCODER::UNHANDLED_MOVSS");
