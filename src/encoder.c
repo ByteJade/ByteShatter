@@ -308,7 +308,7 @@ void encode(X64_instruction* buf) {
                 emit32(STR32_NEON | (x64_regs[SC1]<<5) | r1);
             }else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | r1);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | r0);
             } else panic("ENCODER::UNHANDLED_MOVSS");
             break;
         case DIVSS:
