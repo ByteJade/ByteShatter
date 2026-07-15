@@ -13,10 +13,25 @@ void decode_0F(X64_instruction* buf) {
         case 0x11:
             buf->reverse = 1;
         case 0x10:
-            buf->opcount = 2;
             buf->type = MOVSS;
+            goto set;
+        case 0x5E:
+            buf->type = DIVSS;
+            goto set;
+        case 0x59:
+            buf->type = MULSS;
+            goto set;
+        case 0x5a:
+            buf->type = CVTSS2SD;
+            goto set;
+        case 0xEF:
+            buf->type = PXOR;
+        set:
+            buf->opcount = 2;
             decode_regrm(buf);
             buf->op0.type |= XMM;
+            if (buf->op1.type == REG)
+                buf->op1.type |= XMM;
             break;
         default: panic("DECODER::UNKNOWN_F0_SYMBOL: %X", byte);
     }
