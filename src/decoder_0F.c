@@ -25,7 +25,8 @@ void decode_0F(X64_instruction* buf) {
             buf->type = MULSS;
             goto set;
         case 0x5a:
-            buf->type = CVTSS2SD;
+            if (buf->prefix == REP) buf->type = CVTSS2SD;
+            else buf->type = CVTSS2SS;
             goto set;
         case 0x7e:
             buf->reverse = 1;

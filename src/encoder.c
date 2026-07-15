@@ -340,17 +340,18 @@ void encode(X64_instruction* buf) {
                 emit32(_construct_r_r_r(EOR_NEON, r0, r0, r1));
             } else panic("ENCODER::UNHANDLED_PXOR");
             break;
+        case CVTSS2SS:
+            if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
+                emit_address_decode(&buf->op1);
+                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(FCVTD_NEON | (r0) | (16 << 5));
+            } else panic("ENCODER::UNHANDLED_DIVSS");
+            break;
         case CVTSS2SD:
-            //if (t0 & MEM) {
-            //    emit_address_decode(&buf->op0);
-            //    emit32(LDR32_NEON | (SC1<<5) | 16);
-            //    emit32(FCVT_NEON | (16 << 5) | (16));
-            //    emit32(STR64_NEON | (SC1<<5) | 16);
-            //} else
             if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
                 emit32(LDR32_NEON | (SC1<<5) | 16);
-                emit32(FCVT_NEON | (r0) | (16 << 5));
+                emit32(FCVTU_NEON | (r0) | (16 << 5));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
         case MOVQ:
