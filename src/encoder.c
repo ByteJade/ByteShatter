@@ -356,6 +356,9 @@ void encode(X64_instruction* buf) {
         case MOVQ:
             emit32(FMOV_NEON | (r0 << 5) | (r1));
             break;
+        case MOVAPD:
+            emit32(MOV_NEON | (r0 << 5) | (r1));
+            break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
     }

@@ -36,6 +36,7 @@
 #define EOR_NEON 0x6E201C00
 #define FCVT_NEON 0x1E22C000
 #define FMOV_NEON 0x1E260000
+#define MOV_NEON 0x4EA01C00
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])

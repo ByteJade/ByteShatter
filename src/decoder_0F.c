@@ -15,6 +15,9 @@ void decode_0F(X64_instruction* buf) {
         case 0x10:
             buf->type = MOVSS;
             goto set;
+        case 0x28:
+            buf->type = MOVAPD;
+            goto set;
         case 0x5E:
             buf->type = DIVSS;
             goto set;
