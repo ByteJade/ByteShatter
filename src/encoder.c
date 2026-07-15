@@ -342,8 +342,6 @@ void encode(X64_instruction* buf) {
             break;
         case CVTSS2SS:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
-                emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
                 emit32(FCVTD_NEON | (r0) | (16 << 5));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
