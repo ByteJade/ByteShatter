@@ -14,6 +14,7 @@ int comp(const char* cond, uint64_t opcode) {
     return ((opcode&mask) == check);
 }
 void sprint_x_x_x(char* out, char* name, uint32_t buf) {
+    out += sprintf(out, "\033[35m");
     uint8_t rd = (buf >> 0) & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
     uint8_t rm = (buf >> 16) & 0x1F;
@@ -25,8 +26,10 @@ void sprint_x_x_x(char* out, char* name, uint32_t buf) {
     sprintf(out, "%s%c %c%i, %c%i, %c%i",
         name, sign, size, rd, size, rn, size, rm);
     if (shift) out += sprintf(out, "{%i}", shift);
+    out += sprintf(out, "\033[0m");
 }
 void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
+    out += sprintf(out, "\033[35m");
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
     uint16_t imm = (buf >> 10) & 0xFFF;
@@ -38,8 +41,10 @@ void sprint_x_x_imm(char* out, char* name, uint32_t buf) {
     out += sprintf(out, "%s%c %c%i, %c%i, #%x",
         name, sign,  size, rd, size, rn, imm);
     if (shift) out += sprintf(out, "{%i}", shift);
+    out += sprintf(out, "\033[0m");
 }
 void sprint_x_mem(char* out, char* name, uint32_t buf) {
+    out += sprintf(out, "\033[35m");
     uint8_t rd = buf & 0x1F;
     uint8_t rn = (buf >> 5) & 0x1F;
     int16_t imm = (buf >> 12) & 0x1FF;
@@ -63,11 +68,12 @@ void sprint_x_mem(char* out, char* name, uint32_t buf) {
         // Post-indexed: [Xn], #offset
         out += sprintf(out, "]");
         if (W && imm) {
-            out += sprintf(out, ", #%i", imm);
         }
     }
+    out += sprintf(out, "\033[0m");
 }
 void sprint_x_imm(char* out, char* name, uint32_t buf) {
+    out += sprintf(out, "\033[35m");
     uint8_t rd = buf & 0x1F;
     uint16_t imm = (buf >> 5) & 0xFFFF;
     uint8_t shift = (buf >> 21) & 0x3;
@@ -75,6 +81,7 @@ void sprint_x_imm(char* out, char* name, uint32_t buf) {
     if (buf&(1<<31)) size = 'X';
     out += sprintf(out, "%s %c%i, #%i", name, size, rd, imm);
     if (shift) out += sprintf(out, "{%i}", shift);
+    out += sprintf(out, "\033[0m");
 }
 void sprint_arm(char* out, uint32_t buf) {
     if (comp("-0-01011------------------------", buf))

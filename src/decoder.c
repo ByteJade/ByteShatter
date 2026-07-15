@@ -110,11 +110,12 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
     *ptr = out;
 }
 void sprint_instr(char* out, X64_instruction* buf) {
-    out += sprintf(out, "\033[34m%s\033[0m ", types[buf->type]);
+    out += sprintf(out, "\033[34m%s \033[33m", types[buf->type]);
     if (buf->opcount > 0)
         print_op(&out, buf, &buf->op0);
     if (buf->opcount > 1)
         print_op(&out, buf, &buf->op1);
+    out += sprintf(out, "\033[0m");
 }
 int decode_instr(X64_instruction* buf) {
     int ret = 0;
