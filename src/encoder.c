@@ -350,14 +350,14 @@ void encode(X64_instruction* buf) {
             if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
                 emit32(LDR32_NEON | (SC1<<5) | 16);
-                emit32(FCVT_NEON | (r0 << 5) | (16));
+                emit32(FCVT_NEON | (r0) | (16 << 5));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
         case MOVQ:
-            emit32(FMOV_NEON | (r0 << 5) | (r1));
+            emit32(FMOV_NEON | (r0) | (r1 << 5));
             break;
         case MOVAPD:
-            emit32(MOV_NEON | (r0 << 5) | (r1));
+            emit32(MOV_NEON | (r0) | (r1 << 5));
             break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
