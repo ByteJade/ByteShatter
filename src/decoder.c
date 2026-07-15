@@ -462,7 +462,7 @@ int decode_step() {
     cache_block_point();
     X64_instruction buf;
     int jump_type = decode_instr(&buf);
-    char out[32];
+    char out[64];
     sprint_instr(out, &buf);
     print("%s", out);
     encode(&buf);

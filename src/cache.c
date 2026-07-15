@@ -169,7 +169,7 @@ void cache_print(int block) {
         X64_instruction buf;
         set_gp(unit->gp + unit->offsets[x].goff);
         decode_instr(&buf);
-        char out[32];
+        char out[64];
         sprint_instr(out, &buf);
         printf(" : %s\n", out);
         int end;
@@ -177,7 +177,6 @@ void cache_print(int block) {
         if (x+1 == unit->offsetssz) end = start+4;
         else end = unit->offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
-            char out[32];
             sprint_arm(out, host[y]);
             printf("%x %s\n", host[y], out);
         }
