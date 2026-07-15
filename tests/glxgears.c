@@ -33,10 +33,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <X11/Xlib.h>
-#include <X11/keysym.h>
 #include <GL/gl.h>
 #include <GL/glx.h>
-#include <GL/glxext.h>
 
 #ifndef GLX_MESA_swap_control
 #define GLX_MESA_swap_control 1
@@ -46,14 +44,9 @@ typedef int (*PFNGLXGETSWAPINTERVALMESAPROC)(void);
 
 #define BENCHMARK
 
-#ifdef BENCHMARK
-
-/* XXX this probably isn't very portable */
-
 #include <sys/time.h>
 #include <unistd.h>
 
-/* return current time (in seconds) */
 static double
 current_time(void)
 {
@@ -66,24 +59,6 @@ current_time(void)
 #endif
    return (double) tv.tv_sec + tv.tv_usec / 1000000.0;
 }
-
-#else /*BENCHMARK*/
-
-/* dummy */
-static double
-current_time(void)
-{
-   /* update this function for other platforms! */
-   static double t = 0.0;
-   static int warn = 1;
-   if (warn) {
-      fprintf(stderr, "Warning: current_time() not implemented!!\n");
-      warn = 0;
-   }
-   return t += 1.0;
-}
-
-#endif /*BENCHMARK*/
 
 
 
