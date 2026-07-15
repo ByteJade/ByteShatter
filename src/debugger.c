@@ -125,7 +125,7 @@ void debug_wait(void) {
                 printf("Set break point in block %li\n", break_block);
             } else if (strcmp(com, "brk") == 0) {
                 breakp = strtol(arg, NULL, 16);
-                printf("Set break point in pc %lX\n", break_pc);
+                printf("Set break point in pc %lX\n", breakp);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
