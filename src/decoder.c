@@ -75,8 +75,10 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
     if (op->type == REG) {
         if (buf->size == 64) {
             out += sprintf(out, "r%s ", regs[op->reg]);
-        } else {
+        } else if (buf->size == 32) {
             out += sprintf(out, "e%s ", regs[op->reg]);
+        } else {
+            out += sprintf(out, "%s ", regs[op->reg]);
         }
     } else if (op->type == (REG | XMM)) {
         out += sprintf(out, "xmm%i ", op->reg);
@@ -263,6 +265,14 @@ int decode_instr(X64_instruction* buf) {
             buf->type = JG;
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
+            break;
+        case 0x80:
+            buf->size = 8;
+            buf->opcount = 2;
+            buf->type = CMP;
+            decode_rm(&buf->op0, fetch8());
+            buf->op1.type = IMM;
+            buf->op1.imm = fetch_imm8();
             break;
         case 0x81:
             buf->opcount = 2;

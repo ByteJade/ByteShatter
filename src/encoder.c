@@ -108,6 +108,13 @@ void encode8bit(X64_instruction* buf) {
                 emit32(_construct_r_r_r(ANDS_REG, XZR, r0, r1));
             } else panic("ENCODER::UNHANDLED_TST");
         } break;
+        case CMP:{
+            if (t0&MEM) {
+                emit_address_decode(&buf->op1);
+                emit32(_construct_r_r_imm(LDR8_REG, SC1, SC1, 0));
+                emit32(_construct_r_r_r(SUB_IMM|S, XZR, SC1, 0));
+            } else panic("ENCODER::UNHANDLED_CMP");
+        } break;
         default:
             panic("ENCODER::UNKNOWN_8BIT_INSTRUCTION: %x", buf->type);
     }
