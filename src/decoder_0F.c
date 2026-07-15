@@ -8,6 +8,7 @@ void decode_0F(X64_instruction* buf) {
         case 0x1E:
             buf->opcount = 0;
             buf->type = EBR;
+            fetch8();
             break;
         case 0x10:
             buf->opcount = 2;
