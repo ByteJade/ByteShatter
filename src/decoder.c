@@ -198,6 +198,15 @@ int decode_instr(X64_instruction* buf) {
             buf->type = CMP;
             decode_regrm(buf);
             break;
+        case 0x3C:
+            buf->size = 8;
+            buf->opcount = 2;
+            buf->type = CMP;
+            buf->op0.type = REG;
+            buf->op0.reg = byte - 0x3C;
+            buf->op1.type = IMM;
+            buf->op1.imm = fetch8();
+            break;
         case 0x50 ... 0x57:
             buf->reverse = 1;
             buf->size = 64;
