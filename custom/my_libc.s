@@ -28,5 +28,7 @@ WRAP_FUNC free
 WRAP_FUNC strlen
 WRAP_FUNC strstr
 WRAP_FUNC strcmp
+WRAP_FUNC cos
+WRAP_FUNC sin
 
 WRAP_FUNC getenv
