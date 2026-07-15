@@ -276,7 +276,6 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.imm = fetch_imm8();
             break;
         case 0x80:
-            buf->reverse = 1;
             buf->size = 8;
             buf->opcount = 2;
             buf->type = CMP;
