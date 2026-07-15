@@ -198,10 +198,10 @@ void encode(X64_instruction* buf) {
         case LEA:{
             if (t1 == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
-                if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
                 if (is_external_offset(offset)) {
                     emit_rip(r0, offset);
                 } else {
+                    if (buf->op1.imm > INT16_MAX || buf->op1.imm < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
                     emit_brk(cache_patch_point(LEA, r0, buf->op1.imm));
                     warning("ENCODER::ILLEGAL_RIP");
                 }
