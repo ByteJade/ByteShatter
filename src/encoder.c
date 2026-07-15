@@ -323,6 +323,18 @@ void encode(X64_instruction* buf) {
                 emit32(_construct_r_r_r(FDIV_NEON, r0, r0, 16));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
+        case MULSS:
+            if (t0 & MEM) {
+                emit_address_decode(&buf->op0);
+                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(_construct_r_r_r(FMUL_NEON, 16, 16, r1));
+                emit32(STR32_NEON | (SC1<<5) | 16);
+            }else if (t1 & MEM) {
+                emit_address_decode(&buf->op1);
+                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(_construct_r_r_r(FMUL_NEON, r0, r0, 16));
+            } else panic("ENCODER::UNHANDLED_DIVSS");
+            break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
     }
