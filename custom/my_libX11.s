@@ -18,3 +18,5 @@ WRAP_FUNC XParseGeometry
 WRAP_FUNC XCreateColormap
 WRAP_FUNC XSetErrorHandler
 WRAP_FUNC XGetErrorText
+WRAP_FUNC XLookupString
+WRAP_FUNC XLookupKeysym
