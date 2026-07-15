@@ -305,33 +305,33 @@ void encode(X64_instruction* buf) {
         case MOVSS:
             if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
-                emit32(STR32_NEON | (SC1<<5) | r1);
+                emit32(STR32_NEON | (x64_regs[SC1]<<5) | r1);
             }else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (SC1<<5) | r1);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | r1);
             } else panic("ENCODER::UNHANDLED_MOVSS");
             break;
         case DIVSS:
             if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
-                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
                 emit32(_construct_r_r_r(FDIV_NEON, 16, 16, r1));
-                emit32(STR32_NEON | (SC1<<5) | 16);
+                emit32(STR32_NEON | (x64_regs[SC1]<<5) | 16);
             } else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
                 emit32(_construct_r_r_r(FDIV_NEON, r0, r0, 16));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
         case MULSS:
             if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
-                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
                 emit32(_construct_r_r_r(FMUL_NEON, 16, 16, r1));
-                emit32(STR32_NEON | (SC1<<5) | 16);
+                emit32(STR32_NEON | (x64_regs[SC1]<<5) | 16);
             } else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
                 emit32(_construct_r_r_r(FMUL_NEON, r0, r0, 16));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
@@ -343,14 +343,14 @@ void encode(X64_instruction* buf) {
         case CVTSS2SS:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
                 emit32(FCVTD_NEON | (r0) | (16 << 5));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
         case CVTSS2SD:
             if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (SC1<<5) | 16);
+                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
                 emit32(FCVTU_NEON | (r0) | (16 << 5));
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
