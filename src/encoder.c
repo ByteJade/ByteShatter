@@ -292,6 +292,14 @@ void encode(X64_instruction* buf) {
         case RET: emit_ret(); break;
         case EBR: emit_bti(); break;
         case NOP: break;
+        case MOVSS:
+            if (t0 == (MEM|IMM)) {
+                emit_address_decode(&buf->op0);
+                emit32(STR32_NEON | (SC1<<5) | r1);
+            }else if (t1 == (MEM|IMM)) {
+                emit_address_decode(&buf->op1);
+                emit32(LDR32_NEON | (SC1<<5) | r1);
+            } else panic("ENCODER::UNHANDLED_MOVSS");
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
     }

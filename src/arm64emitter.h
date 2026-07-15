@@ -27,7 +27,10 @@
 #define LDR64_REG 0xF9400000
 #define STR8_REG 0x39000000
 #define STR32_REG 0xB9000000
-#define STR64_REG 0xF9000000  
+#define STR64_REG 0xF9000000
+
+#define LDR32_NEON 0xBD400000
+#define STR32_NEON 0xBD000000
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])

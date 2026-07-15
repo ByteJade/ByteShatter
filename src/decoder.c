@@ -179,10 +179,6 @@ int decode_instr(X64_instruction* buf) {
             break;
         case 0x29:
             buf->reverse = 1;
-            buf->opcount = 2;
-            buf->type = SUB;
-            decode_regrm(buf);
-            break;
         case 0x2B:
             buf->opcount = 2;
             buf->type = SUB;
@@ -195,10 +191,6 @@ int decode_instr(X64_instruction* buf) {
             break;
         case 0x39:
             buf->reverse = 1;
-            buf->opcount = 2;
-            buf->type = CMP;
-            decode_regrm(buf);
-            break;
         case 0x3B:
             buf->opcount = 2;
             buf->type = CMP;
@@ -310,10 +302,6 @@ int decode_instr(X64_instruction* buf) {
             break;
         case 0x89:
             buf->reverse = 1;
-            buf->opcount = 2;
-            buf->type = MOV;
-            decode_regrm(buf);
-            break;
         case 0x8B:
             buf->opcount = 2;
             buf->type = MOV;

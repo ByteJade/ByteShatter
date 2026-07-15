@@ -10,6 +10,8 @@ void decode_0F(X64_instruction* buf) {
             buf->type = EBR;
             fetch8();
             break;
+        case 0x11:
+            buf->reverse = 1;
         case 0x10:
             buf->opcount = 2;
             buf->type = MOVSS;
