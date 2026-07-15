@@ -336,9 +336,9 @@ void encode(X64_instruction* buf) {
             } else panic("ENCODER::UNHANDLED_DIVSS");
             break;
         case PXOR:
-            if (t0 == REG && t1 == REG) {
+            if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
                 emit32(_construct_r_r_r(EOR_NEON, r0, r0, r1));
-            } else panic("ENCODER::UNHANDLED_DIVSS");
+            } else panic("ENCODER::UNHANDLED_PXOR");
             break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
