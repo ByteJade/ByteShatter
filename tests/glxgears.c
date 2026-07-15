@@ -787,7 +787,7 @@ main(int argc, char *argv[])
       printf("GL_EXTENSIONS = %s\n", (char *) glGetString(GL_EXTENSIONS));
       printf("VisualID %d, 0x%x\n", (int) visId, (int) visId);
    }
-
+   exit(0);
    init();
 
    /* Set initial projection/viewing transformation.
