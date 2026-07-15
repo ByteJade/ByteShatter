@@ -463,6 +463,8 @@ int decode_instr(X64_instruction* buf) {
     return ret;
 }
 int decode_step() {
+    uint8_t brk = 0;
+    if (get_gp() == debug_breakp()) brk = 1;
     cache_block_point();
     X64_instruction buf;
     int type = decode_instr(&buf);
@@ -470,8 +472,7 @@ int decode_step() {
     sprint_instr(out, &buf);
     print("%s", out);
     encode(&buf);
-    if (get_hp() == debug_breakp())
-        set_break_point(0);
+    if (brk) set_break_point(0);
     return type;
 }
 void decode(uint32_t gp) {
