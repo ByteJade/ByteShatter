@@ -29,6 +29,7 @@ void decode_0F(X64_instruction* buf) {
             goto set;
         case 0x7e:
             buf->reverse = 1;
+        case 0x6e:
             buf->opcount = 2;
             buf->type = MOVQ;
             decode_regrm(buf);
