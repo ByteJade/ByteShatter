@@ -30,7 +30,6 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
         emit_brk(cache_patch_point(type, 0, buf->op0.imm));
     } else if (buf->op0.type == (MEM|IMM)) {
         int32_t offset = get_gp() + buf->op0.imm;
-        if (offset > INT16_MAX || offset < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
         if (is_external_offset(offset)) {
             emit_rip(SC1, offset);
             emit_ldr_reg(SC1, SC1, 0);
@@ -177,7 +176,8 @@ void encode(X64_instruction* buf) {
                 emit32(sf|_construct_r_r_imm(ADD_IMM, r0, r1, 0));
             }else if (t0 == REG && t1 == IMM){
                 int64_t imm = buf->op1.imm;
-                if (imm > INT16_MAX || imm < INT16_MIN) panic("ENCODER::ILLEGAL_IMM");
+                if (imm > INT16_MAX || imm < INT16_MIN)
+                    panic("ENCODER::ILLEGAL_IMM");
                 emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
             } else if (t1&MEM) {
                 emit_address_decode(&buf->op1);
