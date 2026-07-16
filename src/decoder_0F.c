@@ -28,9 +28,9 @@ void decode_0F(X64_instruction* buf) {
             if (buf->prefix == REP) buf->type = CVTSS2SD;
             else buf->type = CVTSS2SS;
             goto set;
-        case 0x7e:
-            buf->reverse = 1;
         case 0x6e:
+            buf->reverse = 1;
+        case 0x7e:
             buf->opcount = 2;
             buf->type = MOVQ;
             decode_regrm(buf);
