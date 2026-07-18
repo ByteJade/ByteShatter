@@ -36,7 +36,8 @@
 #define EOR_NEON 0x6E201C00
 #define FCVTU_NEON 0x1E22C000
 #define FCVTD_NEON 0x1E624000
-#define FMOV_NEON 0x1E260000
+#define FMOV_NEON 0x9E660000
+#define FMOVR_NEON 0x9E670000
 #define MOV_NEON 0x4EA01C00
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
