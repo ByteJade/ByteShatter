@@ -139,7 +139,7 @@ int decode_instr(X64_instruction* buf) {
         rex = byte & 0xF;
         byte = fetch8();
     } else if (byte == 0x64) {
-        // TLS read. I don't know what to do
+        // TLS override. I don't know what to do
         decode_instr(buf);
         buf->opcount = 0;
         buf->type = NOP;
