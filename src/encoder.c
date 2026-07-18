@@ -342,7 +342,7 @@ void encode(X64_instruction* buf) {
             break;
         case CVTSD2SI:
             if (t0 == REG && t1 == (REG|XMM)) {
-                emit32(FCVTZS_NEON | (r0) | (r1 << 5));
+                emit32(FCVTZS_NEON | (x64_regs[r0]) | (r1 << 5));
             } else panic("ENCODER::UNHANDLED_CVTSD2SI");
             break;
         case CVTSS2SS:
