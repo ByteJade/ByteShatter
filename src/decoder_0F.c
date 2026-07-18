@@ -1,3 +1,4 @@
+#include "armdef.h"
 #include "decoder.h"
 #include "memory.h"
 #include "core.h"
@@ -18,6 +19,13 @@ void decode_0F(X64_instruction* buf) {
         case 0x28:
             buf->type = MOVAPD;
             goto set;
+        case 0x2C:
+            buf->reverse = 1;
+            buf->opcount = 2;
+            buf->type = CVTSD2SI;
+            decode_regrm(buf);
+            buf->op0.type |= XMM;
+            break;
         case 0x5E:
             buf->type = DIVSS;
             goto set;
