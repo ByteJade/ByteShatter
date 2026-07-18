@@ -28,9 +28,6 @@ WRAP_FUNC free
 WRAP_FUNC strlen
 WRAP_FUNC strstr
 WRAP_FUNC strcmp
-WRAP_FUNC cos
-WRAP_FUNC sin
-WRAP_FUNC sqrt
 WRAP_FUNC fflush
 WRAP_FUNC strtod
 WRAP_FUNC nanosleep
