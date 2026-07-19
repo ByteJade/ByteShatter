@@ -302,7 +302,16 @@ void encode(X64_instruction* buf) {
             emit_pop_reg(RBP);
         } break;
         case CLTQ: {
-            emit32(SXTW_REG | (x64_regs[r0] << 5) | x64_regs[r0]);
+            emit32(SXTW_REG | (x64_regs[RAX] << 5) | x64_regs[RAX]);
+        } break;
+        case CLTD: {
+            emit32(SXTW_REG | (x64_regs[RAX] << 5) | x64_regs[RAX]);
+            emit32(0x937ffd22); // asr x2, x9, #63
+        } break;
+        case IDIV: {
+            emit_add_imm(x64_regs[SC1], x64_regs[RAX], 0);
+            emit32(0x9ac00d89 | (x64_regs[r0]<<16)); // sdiv	x9, x12, r0
+            emit32(0x9b00b122 | (x64_regs[r0]<<16)); // msub	x2, x9, r0, x12
         } break;
         case JG:
         case JGE:

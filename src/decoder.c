@@ -372,11 +372,12 @@ int decode_instr(X64_instruction* buf) {
             buf->type = NOP;
             break;
         case 0x98:
-        case 0x99:
-            buf->opcount = 1;
+            buf->opcount = 0;
             buf->type = CLTQ;
-            buf->op0.type = REG;
-            buf->op0.reg = RAX;
+            break;
+        case 0x99:
+            buf->opcount = 0;
+            buf->type = CLTD;
             break;
         case 0xB8 ... 0xBF:
             buf->reverse = 1;
@@ -452,6 +453,15 @@ int decode_instr(X64_instruction* buf) {
             buf->type = RET;
             ret = RET;
             break;
+        case 0xF7: {
+            uint8_t byte = fetch8();
+            if ((byte&0b11111000) == 0xF8) {
+                buf->opcount = 1;
+                buf->type = IDIV;
+                buf->op0.type = REG;
+                buf->op0.reg = byte&0x7;
+            } else panic("Unhandled F7");
+        } break;
         case 0xff: {
             buf->size = 64;
             buf->reverse = 1;
