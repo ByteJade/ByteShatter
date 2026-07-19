@@ -368,7 +368,9 @@ void encode(X64_instruction* buf) {
             } else panic("ENCODER::UNHANDLED_CVTSS2SS");
             break;
         case CVTSS2SD:
-            if (t1 & MEM) {
+            if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
+                emit32(FCVTU_NEON | (r0) | (r1 << 5));
+            } else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
                 emit32(LDR_NEON | (16) | (x64_regs[SC1]<<5));
                 emit32(FCVTU_NEON | (r0) | (16 << 5));
