@@ -115,7 +115,9 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
             }
         }
         if (op->type&IMM) {
-            if (op->type == (MEM|IMM)) {
+            if (buf->prefix == TLS) {
+                out += sprintf(out, "fs");
+            } else if (op->type == (MEM|IMM)) {
                 out += sprintf(out, "rip ");
             }
             if (op->imm > 0) out += sprintf(out, "+ %lx ", op->imm);
