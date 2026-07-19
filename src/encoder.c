@@ -91,18 +91,20 @@ void emit_neon(X64_instruction* buf, int opcode) {
     uint8_t r1 = buf->op1.reg;
     uint8_t t0 = buf->op0.type;
     uint8_t t1 = buf->op1.type;
-    uint8_t sf = (buf->prefix == REPN) * FT;
+    uint8_t osf = (buf->prefix == REPN) * FT;
+
+    uint8_t msf = (buf->prefix == REPN) * MFT;
     if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
-        emit32(sf|DIV_NEON|(r0)|(r0<<5)|(r1<<16));
+        emit32(osf|DIV_NEON|(r0)|(r0<<5)|(r1<<16));
     } else if (t0 & MEM) {
         emit_address_decode(&buf->op0);
-        emit32(sf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
-        emit32(sf|opcode|(16)|(16<<5)|(r1<<16));
-        emit32(sf|STR_NEON | (x64_regs[SC1]<<5) | 16);
+        emit32(msf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
+        emit32(osf|opcode|(16)|(16<<5)|(r1<<16));
+        emit32(msf|STR_NEON | (x64_regs[SC1]<<5) | 16);
     } else if (t1 & MEM) {
         emit_address_decode(&buf->op1);
-        emit32(sf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
-        emit32(sf|opcode|(r0)|(r0<<5)|(16<<16));
+        emit32(msf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
+        emit32(osf|opcode|(r0)|(r0<<5)|(16<<16));
     } else panic("ENCODER::UNHANDLED_NEON");
 }
 void encode8bit(X64_instruction* buf) {
@@ -323,7 +325,7 @@ void encode(X64_instruction* buf) {
         case EBR: emit_bti(); break;
         case NOP: break;
         case MOVS: {
-            sf = (buf->prefix == REPN) * FT;
+            sf = (buf->prefix == REPN) * MFT;
             if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
                 emit32(sf|STR_NEON | (x64_regs[SC1]<<5) | r1);
