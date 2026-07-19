@@ -169,6 +169,14 @@ int decode_instr(X64_instruction* buf) {
             buf->opcount = 1;
             uint8_t modrm = fetch8();
             switch (modrm) {
+                case 0x57:
+                    buf->type = PXOR;
+                    buf->opcount = 2;
+                    decode_regrm(buf);
+                    buf->op0.type |= XMM;
+                    if (buf->op1.type == REG)
+                        buf->op1.type |= XMM;
+                    break;
                 case 0x84:
                     buf->type = JE;
                     buf->op0.type = IMM;
