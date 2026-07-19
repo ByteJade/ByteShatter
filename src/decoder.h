@@ -28,6 +28,8 @@ typedef struct {
     Operand op1;
 } X64_instruction;
 
+int64_t fetch_imm8(void);
+int64_t fetch_imm32(void);
 void decode_rm(Operand* op, uint8_t modrm);
 void decode_regrm(X64_instruction* buf);
 void decode_0F(X64_instruction* buf);

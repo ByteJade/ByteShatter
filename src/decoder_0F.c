@@ -3,12 +3,6 @@
 #include "memory.h"
 #include "core.h"
 
-int64_t fetch_imm8(void) {
-    return (int64_t)(int8_t)fetch8();
-}
-int64_t fetch_imm32(void) {
-    return (int64_t)(int32_t)fetch32();
-}
 void decode_0F(X64_instruction* buf) {
     uint8_t byte = fetch8();
     switch (byte) {
