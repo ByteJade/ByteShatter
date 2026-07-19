@@ -101,13 +101,13 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
     } else {
         out += sprintf(out, "[ ");
         if (op->type&REG) {
-            if (buf->prefix == TLS)
-                out += sprintf(out, "fs ");
-            else out += sprintf(out, "r%s ", regs[op->reg]);
+            out += sprintf(out, "r%s ", regs[op->reg]);
             if (op->type&IDX) out += sprintf(out, "+ ");
         }
         if (op->type&IDX) {
-            out += sprintf(out, "r%s ", regs[op->idx]);
+            if (buf->prefix == TLS)
+                out += sprintf(out, "fs ");
+            else out += sprintf(out, "r%s ", regs[op->idx]);
             if (op->scale == 1) {
                 out += sprintf(out, "* 2 ");
             } else if (op->scale == 2) {
