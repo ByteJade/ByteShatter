@@ -28,6 +28,9 @@ WRAP_FUNC glTranslatef
 WRAP_FUNC glLightfv
 WRAP_FUNC glMaterialfv
 WRAP_FUNC glClearColor
+WRAP_FUNC glOrtho
+WRAP_FUNC glColor3f
+WRAP_FUNC glDisable
 
 WRAP_FUNC glXMakeCurrent
 WRAP_FUNC glXGetProcAddressARB
