@@ -322,15 +322,16 @@ void encode(X64_instruction* buf) {
         case RET: emit_ret(); break;
         case EBR: emit_bti(); break;
         case NOP: break;
-        case MOVS:
+        case MOVS: {
+            sf = (buf->prefix == REPN) * FT;
             if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
-                emit32(STR_NEON | (x64_regs[SC1]<<5) | r1);
+                emit32(sf|STR_NEON | (x64_regs[SC1]<<5) | r1);
             }else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR_NEON | (x64_regs[SC1]<<5) | r0);
+                emit32(sf|LDR_NEON | (x64_regs[SC1]<<5) | r0);
             } else panic("ENCODER::UNHANDLED_MOVSS");
-            break;
+        } break;
         case MULS:
             emit_neon(buf, MUL_NEON);
             break;
