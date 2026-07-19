@@ -70,6 +70,20 @@ void decode_shift_table(X64_instruction* buf, uint8_t modrm) {
         default: panic("DECODER::UNKNOWN_SHIFT_SYMBOL: %X", shift);
     }
 }
+void decode_grp1(X64_instruction* buf, uint8_t modrm) {
+    uint8_t shift = (modrm >> 3)&7;
+    switch (shift) {
+        case 0: buf->type = ADD; break;
+        //case 1: break; // or
+        //case 2: break; // adc
+        //case 3: break; // sbb
+        case 4: buf->type = AND; break;
+        case 5: buf->type = SUB; break;
+        case 6: buf->type = XOR; break;
+        case 7: buf->type = CMP; break;
+    default: panic("DECODER::UNKNOWN_GRP1: %X", shift);
+    }
+}
 void print_op(char** ptr, X64_instruction* buf, Operand* op) {
     char* out = *ptr;
     if (op->type == REG) {
@@ -326,10 +340,10 @@ int decode_instr(X64_instruction* buf) {
             break;
         case 0x81:
             buf->opcount = 2;
-            buf->type = SUB;
             decode_rm(&buf->op0, fetch8());
             buf->op1.type = IMM;
             buf->op1.imm = fetch_imm32();
+            decode_grp1(buf, modrm);
             break;
         case 0x83: {
             buf->reverse = 1;
@@ -338,16 +352,7 @@ int decode_instr(X64_instruction* buf) {
             decode_rm(&buf->op1, modrm);
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
-            switch ((modrm >> 3)&7) {
-                case 0: buf->type = ADD; break;
-                case 1: break; // or
-                case 2: break; // adc
-                case 3: break; // sbb
-                case 4: buf->type = AND; break;
-                case 5: buf->type = SUB; break;
-                case 6: buf->type = XOR; break;
-                case 7: buf->type = CMP; break;
-            }
+            decode_grp1(buf, modrm);
         } break;
         case 0x84:
             buf->size = 8;
