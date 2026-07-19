@@ -16,7 +16,7 @@ static const char* types[] = {
     // avx
     "cvtss2sd", "cvtsd2ss",
     "pxor", "comis", "movq", "movapd",
-    "cvtsd2si", "cvtsi2sd",
+    "cvtsd2si", "cvtsi2s",
     "movs", "divs", "muls", "adds", "subs",
 
 };
@@ -45,7 +45,7 @@ typedef enum {
     IDIV, JBE, JAE,
     
     CVTSS2SD, CVTSD2SS, PXOR, COMIS,
-    MOVQ, MOVAPD, CVTSD2SI, CVTSI2SD,
+    MOVQ, MOVAPD, CVTSD2SI, CVTSI2S,
     MOVS, DIVS, MULS, ADDS, SUBS,
 
 } InstrTypes;

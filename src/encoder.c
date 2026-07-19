@@ -386,14 +386,17 @@ void encode(X64_instruction* buf) {
                 emit32(FCVTZS_NEON | (x64_regs[r0]) | (r1 << 5));
             } else panic("ENCODER::UNHANDLED_CVTSD2SI");
             break;
-        case CVTSI2SD:
+        case CVTSI2S: {
+            uint32_t instr;
+            if (buf->prefix == REPN) instr = SCVTD_NEON;
+            else instr = SCVTF_NEON;
             if (t1&MEM) {
                 emit_address_decode(&buf->op1, buf->prefix);
-                emit32(SCVTF_NEON | (x64_regs[SC1]) | (r0 << 5));
+                emit32(instr | (x64_regs[SC1]) | (r0 << 5));
             } else if (t1 == REG) {
-                emit32(SCVTF_NEON | (r0) | (x64_regs[r1]<<5));
+                emit32(instr | (r0) | (x64_regs[r1]<<5));
             } else panic("ENCODER::UNHANDLED_CVTSI2SD");
-            break;
+        } break;
         case CVTSD2SS:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
                 emit32(FCVT_NEON | (r0) | (r1 << 5));

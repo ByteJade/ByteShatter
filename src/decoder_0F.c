@@ -22,7 +22,7 @@ void decode_0F(X64_instruction* buf) {
             goto set;
         case 0x2A:
             buf->opcount = 2;
-            buf->type = CVTSI2SD;
+            buf->type = CVTSI2S;
             decode_regrm(buf);
             buf->op0.type |= XMM;
             break;
