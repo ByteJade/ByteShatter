@@ -91,9 +91,9 @@ void emit_neon(X64_instruction* buf, int opcode) {
     uint8_t r1 = buf->op1.reg;
     uint8_t t0 = buf->op0.type;
     uint8_t t1 = buf->op1.type;
-    uint8_t osf = (buf->prefix == REPN) * FT;
+    uint32_t osf = (buf->prefix == REPN) * FT;
 
-    uint8_t msf = (buf->prefix == REPN) * MFT;
+    uint32_t msf = (buf->prefix == REPN) * MFT;
     if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
         emit32(osf|DIV_NEON|(r0)|(r0<<5)|(r1<<16));
     } else if (t0 & MEM) {
