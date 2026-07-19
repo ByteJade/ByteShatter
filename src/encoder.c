@@ -331,11 +331,17 @@ void encode(X64_instruction* buf) {
                 emit32(LDR_NEON | (x64_regs[SC1]<<5) | r0);
             } else panic("ENCODER::UNHANDLED_MOVSS");
             break;
-        case DIVS:
         case MULS:
+            emit_neon(buf, MUL_NEON);
+            break;
+        case DIVS:
+            emit_neon(buf, DIV_NEON);
+            break;
         case ADDS:
+            emit_neon(buf, ADD_NEON);
+            break;
         case SUBS:
-            emit_neon(buf, buf->type);
+            emit_neon(buf, SUB_NEON);
             break;
         case PXOR:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
