@@ -185,6 +185,10 @@ int decode_instr(X64_instruction* buf) {
                 case 0x28:
                     buf->type = MOVAPD;
                     goto done;
+                case 0x2F:
+                    buf->type = COMIS;
+                    buf->prefix = REP;
+                    goto done;
                 case 0x57:
                     buf->type = PXOR;
                 done:
