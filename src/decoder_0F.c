@@ -34,6 +34,8 @@ void decode_0F(X64_instruction* buf) {
             buf->op0.type |= XMM;
             break;
         case 0x2f:
+            if (buf->prefix == P66) buf->prefix = REPN;
+            else buf->prefix = REP;
             buf->type = COMIS;
             goto set;
         case 0x5E:
