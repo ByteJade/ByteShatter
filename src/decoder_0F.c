@@ -33,6 +33,9 @@ void decode_0F(X64_instruction* buf) {
             decode_regrm(buf);
             buf->op0.type |= XMM;
             break;
+        case 0x2f:
+            buf->type = COMIS;
+            goto set;
         case 0x5E:
             buf->type = DIVS;
             goto set;
