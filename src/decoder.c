@@ -115,7 +115,8 @@ void sprint_instr(char* out, X64_instruction* buf) {
     char prefix = ' ';
     if (buf->prefix == REP) prefix = 's';
     if (buf->prefix == REPN) prefix = 'd';
-    out += sprintf(out, "\033[34m%s%c \033[32m", types[buf->type]);
+    out += sprintf(out, "\033[34m%s%c \033[32m",
+        types[buf->type], prefix);
     if (buf->opcount > 0)
         print_op(&out, buf, &buf->op0);
     if (buf->opcount > 1)
