@@ -28,6 +28,7 @@
 #define STR8_REG 0x39000000
 #define STR32_REG 0xB9000000
 #define STR64_REG 0xF9000000
+#define GET_FS 0xd53bd040
 
 #define FT 1<<22
 #define MFT 1<<30

@@ -5,7 +5,8 @@
 #include "armdef.h"
 
 enum Prefixes {
-    P66= 0x66,
+    TLS = 0x64,
+    P66 = 0x66,
     REP = 0xf3,
     REPN = 0xf2,
 };

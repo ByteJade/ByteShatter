@@ -158,11 +158,8 @@ int decode_instr(X64_instruction* buf) {
         rex = byte & 0xF;
         byte = fetch8();
     } else if (byte == 0x64) {
-        // TLS override. I don't know what to do
-        decode_instr(buf);
-        buf->opcount = 0;
-        buf->type = NOP;
-        return ret;
+        buf->prefix = TLS;
+        byte = fetch8();
     }
     switch (byte) {
         case 0x00: 
