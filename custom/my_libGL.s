@@ -27,6 +27,7 @@ WRAP_FUNC glFrustum
 WRAP_FUNC glTranslatef
 WRAP_FUNC glLightfv
 WRAP_FUNC glMaterialfv
+WRAP_FUNC glClearColor
 
 WRAP_FUNC glXMakeCurrent
 WRAP_FUNC glXGetProcAddressARB
