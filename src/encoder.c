@@ -371,6 +371,9 @@ void encode(X64_instruction* buf) {
         case SUBS:
             emit_neon(buf, SUB_NEON);
             break;
+        case COMIS:
+            emit_neon(buf, CMP_NEON);
+            break;
         case PXOR:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
                 emit32(EOR_NEON|(r0)|(r0<<5)|(r1<<16));
