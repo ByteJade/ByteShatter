@@ -372,6 +372,7 @@ int decode_instr(X64_instruction* buf) {
             buf->type = NOP;
             break;
         case 0x98:
+        case 0x99:
             buf->opcount = 1;
             buf->type = CLTQ;
             buf->op0.type = REG;
