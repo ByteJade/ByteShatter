@@ -102,6 +102,7 @@ static void
 gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
      GLint teeth, GLfloat tooth_depth)
 {
+   printf("gear %f\n", inner_radius);
    GLint i;
    GLfloat r0, r1, r2;
    GLfloat angle, da;
@@ -400,6 +401,7 @@ init(void)
    glEndList();
 
    glEnable(GL_NORMALIZE);
+   printf("success init\n");
 }
 
 
