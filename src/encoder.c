@@ -164,7 +164,11 @@ void encode(X64_instruction* buf) {
                 emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, r1));
             else if (t0 == REG && t1 == IMM)
                 emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->op1.imm&IMM12));
-            else panic("ENCODER::UNHANDLED_SUB");
+            else if (t1&MEM) {
+                emit_address_decode(&buf->op1, buf->prefix);
+                emit_ldr_reg(SC2, SC1, 0);
+                emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, SC2));
+            } else panic("ENCODER::UNHANDLED_SUB");
         } break;
         case ADD:{
             if (t0 == REG && t1 == REG)
@@ -181,6 +185,10 @@ void encode(X64_instruction* buf) {
                 }
                 if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, SC2, SC1, 0));
                 else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
+            } else if (t1&MEM) {
+                emit_address_decode(&buf->op1, buf->prefix);
+                emit_ldr_reg(SC2, SC1, 0);
+                emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, SC2));
             } else panic("ENCODER::UNHANDLED_ADD");
         } break;
         case SHL:{
