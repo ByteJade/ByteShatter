@@ -91,7 +91,7 @@ void emit_neon(X64_instruction* buf, int opcode) {
     uint8_t r1 = buf->op1.reg;
     uint8_t t0 = buf->op0.type;
     uint8_t t1 = buf->op1.type;
-    uint8_t sf = (buf->prefix == REPN) * SF;
+    uint8_t sf = (buf->prefix == REPN) * FT;
     if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
         emit32(sf|DIV_NEON|(r0)|(r0<<5)|(r1<<16));
     } else if (t0 & MEM) {
@@ -323,7 +323,7 @@ void encode(X64_instruction* buf) {
         case EBR: emit_bti(); break;
         case NOP: break;
         case MOVS: {
-            sf = (buf->prefix == REPN) * SF;
+            sf = (buf->prefix == REPN) * FT;
             if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
                 emit32(sf|STR_NEON | (x64_regs[SC1]<<5) | r1);
