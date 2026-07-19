@@ -175,67 +175,7 @@ int decode_instr(X64_instruction* buf) {
             decode_regrm(buf);
             break;
         case 0x0F: {
-            if (buf->prefix) {
-                decode_0F(buf);
-                break;
-            }
-            buf->opcount = 1;
-            uint8_t modrm = fetch8();
-            switch (modrm) {
-                case 0x28:
-                    buf->type = MOVAPD;
-                    goto done;
-                case 0x2F:
-                    buf->type = COMIS;
-                    buf->prefix = REP;
-                    goto done;
-                case 0x57:
-                    buf->type = PXOR;
-                done:
-                    buf->opcount = 2;
-                    decode_regrm(buf);
-                    buf->op0.type |= XMM;
-                    if (buf->op1.type == REG)
-                        buf->op1.type |= XMM;
-                    break;
-                case 0x84:
-                    buf->type = JE;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = fetch_imm32();
-                    break;
-                case 0x85:
-                    buf->type = JNE;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = fetch_imm32();
-                    break;
-                case 0x8C:
-                    buf->type = JL;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = fetch_imm32();
-                    break;
-                case 0x8D:
-                    buf->type = JGE;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = fetch_imm32();
-                    break;
-                case 0x8E:
-                    buf->type = JLE;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = fetch_imm32();
-                    break;
-                case 0x8F:
-                    buf->type = JG;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = fetch_imm32();
-                    break;
-                case 0xB6:
-                    buf->opcount = 2;
-                    buf->type = MOVZX;
-                    decode_regrm(buf);
-                    break;
-                default:
-                    panic("DECODER::UNKNOWN_0F_SYMBOL: %X", modrm);
-            }
+            decode_0F(buf);
         } break;
         case 0x29:
             buf->reverse = 1;

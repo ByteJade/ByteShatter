@@ -3,6 +3,12 @@
 #include "memory.h"
 #include "core.h"
 
+int64_t fetch_imm8(void) {
+    return (int64_t)(int8_t)fetch8();
+}
+int64_t fetch_imm32(void) {
+    return (int64_t)(int32_t)fetch32();
+}
 void decode_0F(X64_instruction* buf) {
     uint8_t byte = fetch8();
     switch (byte) {
@@ -38,8 +44,8 @@ void decode_0F(X64_instruction* buf) {
             else buf->prefix = REP;
             buf->type = COMIS;
             goto set;
-        case 0x5E:
-            buf->type = DIVS;
+        case 0x57:
+            buf->type = PXOR;
             goto set;
         case 0x58:
             buf->type = ADDS;
@@ -47,12 +53,15 @@ void decode_0F(X64_instruction* buf) {
         case 0x59:
             buf->type = MULS;
             goto set;
-        case 0x5C:
-            buf->type = SUBS;
-            goto set;
         case 0x5a:
             if (buf->prefix == REP) buf->type = CVTSS2SD;
             else buf->type = CVTSS2SS;
+            goto set;
+        case 0x5C:
+            buf->type = SUBS;
+            goto set;
+        case 0x5E:
+            buf->type = DIVS;
             goto set;
         case 0x7e:
             buf->reverse = 1;
@@ -70,6 +79,41 @@ void decode_0F(X64_instruction* buf) {
             buf->op0.type |= XMM;
             if (buf->op1.type == REG)
                 buf->op1.type |= XMM;
+            break;
+        case 0x84:
+            buf->type = JE;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            break;
+        case 0x85:
+            buf->type = JNE;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            break;
+        case 0x8C:
+            buf->type = JL;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            break;
+        case 0x8D:
+            buf->type = JGE;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            break;
+        case 0x8E:
+            buf->type = JLE;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            break;
+        case 0x8F:
+            buf->type = JG;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm32();
+            break;
+        case 0xB6:
+            buf->opcount = 2;
+            buf->type = MOVZX;
+            decode_regrm(buf);
             break;
         default: panic("DECODER::UNKNOWN_F0_SYMBOL: %X", byte);
     }
