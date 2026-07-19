@@ -169,8 +169,12 @@ int decode_instr(X64_instruction* buf) {
             buf->opcount = 1;
             uint8_t modrm = fetch8();
             switch (modrm) {
+                case 0x28:
+                    buf->type = MOVAPD;
+                    goto done;
                 case 0x57:
                     buf->type = PXOR;
+                done:
                     buf->opcount = 2;
                     decode_regrm(buf);
                     buf->op0.type |= XMM;
