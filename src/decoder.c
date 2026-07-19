@@ -101,7 +101,9 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
     } else {
         out += sprintf(out, "[ ");
         if (op->type&REG) {
-            out += sprintf(out, "r%s ", regs[op->reg]);
+            if (buf->prefix == TLS)
+                out += sprintf(out, "fs ");
+            else out += sprintf(out, "r%s ", regs[op->reg]);
             if (op->type&IDX) out += sprintf(out, "+ ");
         }
         if (op->type&IDX) {
@@ -115,9 +117,7 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
             }
         }
         if (op->type&IMM) {
-            if (buf->prefix == TLS) {
-                out += sprintf(out, "fs");
-            } else if (op->type == (MEM|IMM)) {
+            if (op->type == (MEM|IMM)) {
                 out += sprintf(out, "rip ");
             }
             if (op->imm > 0) out += sprintf(out, "+ %lx ", op->imm);
