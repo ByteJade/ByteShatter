@@ -7,6 +7,7 @@ void decode_0F(X64_instruction* buf) {
     uint8_t byte = fetch8();
     switch (byte) {
         case 0x1E:
+            buf->prefix = 0;
             buf->opcount = 0;
             buf->type = EBR;
             fetch8();
@@ -14,7 +15,7 @@ void decode_0F(X64_instruction* buf) {
         case 0x11:
             buf->reverse = 1;
         case 0x10:
-            buf->type = MOVSS;
+            buf->type = MOVS;
             goto set;
         case 0x28:
             buf->type = MOVAPD;
@@ -27,10 +28,16 @@ void decode_0F(X64_instruction* buf) {
             buf->op0.type |= XMM;
             break;
         case 0x5E:
-            buf->type = DIVSS;
+            buf->type = DIVS;
+            goto set;
+        case 0x58:
+            buf->type = ADDS;
             goto set;
         case 0x59:
-            buf->type = MULSS;
+            buf->type = MULS;
+            goto set;
+        case 0x5C:
+            buf->type = SUBS;
             goto set;
         case 0x5a:
             if (buf->prefix == REP) buf->type = CVTSS2SD;

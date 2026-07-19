@@ -112,7 +112,10 @@ void print_op(char** ptr, X64_instruction* buf, Operand* op) {
     *ptr = out;
 }
 void sprint_instr(char* out, X64_instruction* buf) {
-    out += sprintf(out, "\033[34m%s \033[32m", types[buf->type]);
+    char prefix = ' ';
+    if (buf->prefix == REP) prefix = 's';
+    if (buf->prefix == REPN) prefix = 'd';
+    out += sprintf(out, "\033[34m%s%c \033[32m", types[buf->type]);
     if (buf->opcount > 0)
         print_op(&out, buf, &buf->op0);
     if (buf->opcount > 1)

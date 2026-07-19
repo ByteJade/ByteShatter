@@ -1,6 +1,7 @@
 #include "encoder.h"
 #include "armdef.h"
 #include "core.h"
+#include "decoder.h"
 #include "memory.h"
 #include "cache.h"
 #include "dlmanager.h"
@@ -84,6 +85,25 @@ void emit_imm(Operand* op) {
             emit32(SXTW_REG | (x64_regs[SC2] << 5) | x64_regs[SC2]);
         }
     }
+}
+void emit_neon(X64_instruction* buf, int opcode) {
+    uint8_t r0 = buf->op0.reg;
+    uint8_t r1 = buf->op1.reg;
+    uint8_t t0 = buf->op0.type;
+    uint8_t t1 = buf->op1.type;
+    uint8_t sf = (buf->prefix == REPN) * FT;
+    if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
+        emit32(sf|DIV_NEON|(r0)|(r0<<5)|(r1<<16));
+    } else if (t0 & MEM) {
+        emit_address_decode(&buf->op0);
+        emit32(sf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
+        emit32(sf|opcode|(16)|(16<<5)|(r1<<16));
+        emit32(sf|STR_NEON | (x64_regs[SC1]<<5) | 16);
+    } else if (t1 & MEM) {
+        emit_address_decode(&buf->op1);
+        emit32(sf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
+        emit32(sf|opcode|(r0)|(r0<<5)|(16<<16));
+    } else panic("ENCODER::UNHANDLED_NEON");
 }
 void encode8bit(X64_instruction* buf) {
     uint8_t r0 = buf->op0.reg;
@@ -302,38 +322,20 @@ void encode(X64_instruction* buf) {
         case RET: emit_ret(); break;
         case EBR: emit_bti(); break;
         case NOP: break;
-        case MOVSS:
+        case MOVS:
             if (t0 & MEM) {
                 emit_address_decode(&buf->op0);
-                emit32(STR32_NEON | (x64_regs[SC1]<<5) | r1);
+                emit32(STR_NEON | (x64_regs[SC1]<<5) | r1);
             }else if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | r0);
+                emit32(LDR_NEON | (x64_regs[SC1]<<5) | r0);
             } else panic("ENCODER::UNHANDLED_MOVSS");
             break;
-        case DIVSS:
-            if (t0 & MEM) {
-                emit_address_decode(&buf->op0);
-                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
-                emit32(FDIV_NEON|(16)|(16<<5)|(r1<<16));
-                emit32(STR32_NEON | (x64_regs[SC1]<<5) | 16);
-            } else if (t1 & MEM) {
-                emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
-                emit32(FDIV_NEON|(r0)|(r0<<5)|(16<<16));
-            } else panic("ENCODER::UNHANDLED_DIVSS");
-            break;
-        case MULSS:
-            if (t0 & MEM) {
-                emit_address_decode(&buf->op0);
-                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
-                emit32(FMUL_NEON|(16)|(16<<5)|(r1<<16));
-                emit32(STR32_NEON | (x64_regs[SC1]<<5) | 16);
-            } else if (t1 & MEM) {
-                emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (x64_regs[SC1]<<5) | 16);
-                emit32(FMUL_NEON|(r0)|(r0<<5)|(16<<16));
-            } else panic("ENCODER::UNHANDLED_DIVSS");
+        case DIVS:
+        case MULS:
+        case ADDS:
+        case SUBS:
+            emit_neon(buf, buf->type);
             break;
         case PXOR:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
@@ -353,7 +355,7 @@ void encode(X64_instruction* buf) {
         case CVTSS2SD:
             if (t1 & MEM) {
                 emit_address_decode(&buf->op1);
-                emit32(LDR32_NEON | (16) | (x64_regs[SC1]<<5));
+                emit32(LDR_NEON | (16) | (x64_regs[SC1]<<5));
                 emit32(FCVTU_NEON | (r0) | (16 << 5));
             } else panic("ENCODER::UNHANDLED_CVTSS2SD");
             break;
