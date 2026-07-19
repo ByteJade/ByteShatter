@@ -29,7 +29,7 @@
 #define STR32_REG 0xB9000000
 #define STR64_REG 0xF9000000
 
-#define FT 1<<21
+#define FT 1<<22
 #define MFT 1<<30
 #define MUL_NEON 0x1E200800
 #define DIV_NEON 0x1E201800
