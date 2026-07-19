@@ -175,7 +175,7 @@ int decode_instr(X64_instruction* buf) {
             buf->type = ADD;
             decode_regrm(buf);
             break;
-        case 0x0F:
+        case 0x0F: {
             if (buf->prefix) {
                 decode_0F(buf);
                 break;
@@ -233,7 +233,7 @@ int decode_instr(X64_instruction* buf) {
                 default:
                     panic("DECODER::UNKNOWN_0F_SYMBOL: %X", modrm);
             }
-            break;
+        } break;
         case 0x29:
             buf->reverse = 1;
         case 0x2B:
@@ -338,13 +338,14 @@ int decode_instr(X64_instruction* buf) {
             buf->op1.type = IMM;
             buf->op1.imm = fetch8();
             break;
-        case 0x81:
+        case 0x81: {
             buf->opcount = 2;
-            decode_rm(&buf->op0, fetch8());
+            uint8_t modrm = fetch8();
+            decode_rm(&buf->op0, modrm);
             buf->op1.type = IMM;
             buf->op1.imm = fetch_imm32();
             decode_grp1(buf, modrm);
-            break;
+        } break;
         case 0x83: {
             buf->reverse = 1;
             buf->opcount = 2;
