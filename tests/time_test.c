@@ -19,14 +19,8 @@ static void
 draw_frame(void)
 {
    static int frames = 0;
-   static double tRot0 = -1.0, tRate0 = -1.0;
-   double dt, t = current_time();
-
-   if (tRot0 < 0.0)
-      tRot0 = t;
-   dt = t - tRot0;
-   tRot0 = t;
-
+   static double tRate0 = -1.0;
+   double t = current_time();
    frames++;
    
    if (tRate0 < 0.0)
@@ -34,6 +28,7 @@ draw_frame(void)
    if (t - tRate0 >= 1.0) {
       float seconds = t - tRate0;
       float fps = frames / seconds;
+        printf("time: %lf\n", t);
       printf("%d frames in %3.1f seconds = %6.3f FPS\n", frames, seconds,
              fps);
       fflush(stdout);
