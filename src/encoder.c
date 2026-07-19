@@ -357,10 +357,10 @@ void encode(X64_instruction* buf) {
             } else panic("ENCODER::UNHANDLED_CVTSD2SI");
             break;
         case CVTSI2SD:
-            if (t0 == REG && t1&MEM) {
+            if (t1&MEM) {
                 emit_address_decode(&buf->op1);
                 emit32(SCVTF_NEON | (x64_regs[SC1]) | (r1 << 5));
-            } else panic("ENCODER::UNHANDLED_CVTSD2SI");
+            } else panic("ENCODER::UNHANDLED_CVTSI2SD");
             break;
         case CVTSS2SS:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
