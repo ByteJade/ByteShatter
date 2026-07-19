@@ -100,7 +100,7 @@ void emit_neon(X64_instruction* buf, int opcode) {
 
     uint32_t msf = (buf->prefix == REPN) * MFT;
     if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
-        emit32(osf|DIV_NEON|(r0)|(r0<<5)|(r1<<16));
+        emit32(osf|opcode|(r0)|(r0<<5)|(r1<<16));
     } else if (t0 & MEM) {
         emit_address_decode(&buf->op0, buf->prefix);
         emit32(msf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
