@@ -14,7 +14,7 @@ static const char* types[] = {
     "movzx", "movslq", "jg", "jle",
     "idiv", "jbe", "jae",
     // avx
-    "cvtss2sd", "cvtss2ss",
+    "cvtss2sd", "cvtsd2ss",
     "pxor", "comis", "movq", "movapd",
     "cvtsd2si", "cvtsi2sd",
     "movs", "divs", "muls", "adds", "subs",
@@ -44,7 +44,7 @@ typedef enum {
     MOVZX, MOVSLQ, JG, JLE,
     IDIV, JBE, JAE,
     
-    CVTSS2SD, CVTSS2SS, PXOR, COMIS,
+    CVTSS2SD, CVTSD2SS, PXOR, COMIS,
     MOVQ, MOVAPD, CVTSD2SI, CVTSI2SD,
     MOVS, DIVS, MULS, ADDS, SUBS,
 

@@ -49,7 +49,7 @@ void decode_0F(X64_instruction* buf) {
             goto set;
         case 0x5a:
             if (buf->prefix == REP) buf->type = CVTSS2SD;
-            else buf->type = CVTSS2SS;
+            else buf->type = CVTSD2SS;
             goto set;
         case 0x5C:
             buf->type = SUBS;

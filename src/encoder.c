@@ -394,9 +394,9 @@ void encode(X64_instruction* buf) {
                 emit32(SCVTF_NEON | (r0) | (x64_regs[r1]<<5));
             } else panic("ENCODER::UNHANDLED_CVTSI2SD");
             break;
-        case CVTSS2SS:
+        case CVTSD2SS:
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
-                emit32(FCVTD_NEON | (r0) | (r1 << 5));
+                emit32(FCVT_NEON | (r0) | (r1 << 5));
             } else panic("ENCODER::UNHANDLED_CVTSS2SS");
             break;
         case CVTSS2SD:
