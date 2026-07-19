@@ -144,10 +144,6 @@ int decode_instr(X64_instruction* buf) {
     uint8_t byte = fetch8();
     buf->size = 32;
     buf->prefix = 0;
-    if (byte >> 4 == 0x4) {
-        rex = byte & 0xF;
-        byte = fetch8();
-    }
     if (byte == P66) {
         buf->prefix = P66;
         byte = fetch8();
@@ -159,6 +155,10 @@ int decode_instr(X64_instruction* buf) {
         byte = fetch8();
     } else if (byte == 0x64) {
         buf->prefix = TLS;
+        byte = fetch8();
+    }
+    if (byte >> 4 == 0x4) {
+        rex = byte & 0xF;
         byte = fetch8();
     }
     switch (byte) {
