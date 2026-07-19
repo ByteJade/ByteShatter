@@ -160,11 +160,11 @@ void encode(X64_instruction* buf) {
     uint32_t sf = (buf->size == 64) * SF;
     switch (buf->type) {
         case SUB:{
-            if (t0 == REG && t1 == REG)
+            if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, r1));
-            else if (t0 == REG && t1 == IMM)
+            } else if (t0 == REG && t1 == IMM) {
                 emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->op1.imm&IMM12));
-            else if (t1&MEM) {
+            } else if (t1&MEM) {
                 emit_address_decode(&buf->op1, buf->prefix);
                 emit_ldr_reg(SC2, SC1, 0);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, SC2));
