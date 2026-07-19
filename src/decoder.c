@@ -297,6 +297,12 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
             break;
+        case 0x73:
+            buf->opcount = 1;
+            buf->type = JAE;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm8();
+            break;
         case 0x74:
             buf->opcount = 1;
             buf->type = JE;
