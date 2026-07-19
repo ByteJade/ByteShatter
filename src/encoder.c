@@ -52,6 +52,7 @@ void emit_address_decode(Operand* op, uint8_t prefix) {
     if (prefix==TLS) {
         emit32(GET_FS | x64_regs[SC1]);
         emit_add_signed(SC1, SC1, op->imm);
+        return;
     }
     if (t == (MEM|IMM)) {
         emit_rip(SC1, get_gp() + op->imm);
