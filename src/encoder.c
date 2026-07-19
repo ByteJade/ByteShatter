@@ -335,6 +335,7 @@ void encode(X64_instruction* buf) {
         case JLE:
         case JNE:
         case JBE:
+        case JAE:
         case JE:{
             emit_brk(cache_patch_point(buf->type, 0, buf->op0.imm));
         } break;

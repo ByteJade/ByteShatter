@@ -91,6 +91,10 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
             print("patch JE");
             *code = 0x54000000 | (((offset/4) & 0x7FFFF) << 5);
             break;
+        case JAE:
+            print("patch JAE");
+            *code = 0x54000002 | (((offset/4) & 0x7FFFF) << 5);
+            break;
         case JNE:
             print("patch JNE");
             *code = 0x54000001 | (((offset/4) & 0x7FFFF) << 5);
