@@ -73,7 +73,6 @@ current_time(void)
 #define DRAW 2
 
 static GLfloat view_rotx = 20.0, view_roty = 30.0, view_rotz = 0.0;
-static GLint gear1, gear2, gear3;
 static GLfloat angle = 0.0;
 
 static GLboolean fullscreen = GL_FALSE;	/* Create a single fullscreen window */
@@ -98,25 +97,6 @@ static int framerate = -1; /* Framerate limit if > 0 */
  *          teeth - number of teeth
  *          tooth_depth - depth of tooth
  */
-static void
-gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
-     GLint teeth, GLfloat tooth_depth)
-{
-   printf("gear: r0=%f, r1=%f, width=%f, teeth=%d\n", 
-           inner_radius, outer_radius, width, teeth);
-
-    glDisable(GL_LIGHTING);
-    glColor3f(1.0f, 0.0f, 0.0f);
-
-    glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(0.0f, 0.0f, 0.0f);
-    for (int i = 0; i <= 30; i++) {
-        float angle = i * 2.0f * M_PI / 30.0f;
-        glVertex3f(outer_radius * cos(angle), outer_radius * sin(angle), 0.0f);
-    }
-    glEnd();
-}
-
 
 static void
 draw(void)
@@ -124,52 +104,27 @@ draw(void)
    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   glPushMatrix();
-   glRotatef(view_rotx, 1.0, 0.0, 0.0);
-   glRotatef(view_roty, 0.0, 1.0, 0.0);
-   glRotatef(view_rotz, 0.0, 0.0, 1.0);
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
+   glOrtho(-2.0, 2.0, -2.0, 2.0, -2.0, 2.0);
 
-   glPushMatrix();
-   glTranslatef(-3.0, -2.0, 0.0);
-   glRotatef(angle, 0.0, 0.0, 1.0);
-   glCallList(gear1);
-   glPopMatrix();
+   glMatrixMode(GL_MODELVIEW);
+   glLoadIdentity();
+    
+   glColor3f(1.0f, 0.0f, 0.0f);  // Красный цвет
 
-   glPushMatrix();
-   glTranslatef(3.1, -2.0, 0.0);
-   glRotatef(-2.0 * angle - 9.0, 0.0, 0.0, 1.0);
-   glCallList(gear2);
-   glPopMatrix();
-
-   glPushMatrix();
-   glTranslatef(-3.1, 4.2, 0.0);
-   glRotatef(-2.0 * angle - 25.0, 0.0, 0.0, 1.0);
-   glCallList(gear3);
-   glPopMatrix();
-
-   glPopMatrix();
+   glBegin(GL_TRIANGLES);
+   glVertex3f(-0.5f, -0.5f, 0.0f);
+   glVertex3f(0.5f, -0.5f, 0.0f);
+   glVertex3f(0.0f, 0.5f, 0.0f);
+   glEnd();
 }
 
 
 static void
 draw_gears(void)
 {
-   if (stereo) {
-      /* First left eye.  */
-      glMatrixMode(GL_PROJECTION);
-      glLoadIdentity();
-      glOrtho(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-      
-      glMatrixMode(GL_MODELVIEW);
-      glLoadIdentity();
-      
-      glTranslatef(0.0f, 0.0f, -5.0f);
-      
-      draw();
-   }
-   else {
-      draw();
-   }
+   draw();
 }
 
 
@@ -239,46 +194,6 @@ reshape(int width, int height)
    glLoadIdentity();
    glTranslatef(0.0, 0.0, -40.0);
 }
-   
-
-
-static void
-init(void)
-{
-   static GLfloat pos[4] = { 5.0, 5.0, 10.0, 0.0 };
-   static GLfloat red[4] = { 0.8, 0.1, 0.0, 1.0 };
-   static GLfloat green[4] = { 0.0, 0.8, 0.2, 1.0 };
-   static GLfloat blue[4] = { 0.2, 0.2, 1.0, 1.0 };
-
-   glLightfv(GL_LIGHT0, GL_POSITION, pos);
-   glEnable(GL_CULL_FACE);
-   glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-   glEnable(GL_DEPTH_TEST);
-
-   /* make the gears */
-   gear1 = glGenLists(1);
-   glNewList(gear1, GL_COMPILE);
-   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, red);
-   gear(1.0, 4.0, 1.0, 20, 0.7);
-   glEndList();
-
-   gear2 = glGenLists(1);
-   glNewList(gear2, GL_COMPILE);
-   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, green);
-   gear(0.5, 2.0, 2.0, 10, 0.7);
-   glEndList();
-
-   gear3 = glGenLists(1);
-   glNewList(gear3, GL_COMPILE);
-   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
-   gear(1.3, 2.0, 0.5, 10, 0.7);
-   glEndList();
-
-   glEnable(GL_NORMALIZE);
-   printf("success init\n");
-}
-
 
 /**
  * Remove window border/decorations.
@@ -665,7 +580,6 @@ main(int argc, char *argv[])
       printf("GL_EXTENSIONS = %s\n", (char *) glGetString(GL_EXTENSIONS));
       printf("VisualID %d, 0x%x\n", (int) visId, (int) visId);
    }
-   init();
 
    /* Set initial projection/viewing transformation.
     * We can't be sure we'll get a ConfigureNotify event when the window
@@ -675,9 +589,6 @@ main(int argc, char *argv[])
 
    event_loop(dpy, win);
 
-   glDeleteLists(gear1, 1);
-   glDeleteLists(gear2, 1);
-   glDeleteLists(gear3, 1);
    glXMakeCurrent(dpy, None, NULL);
    glXDestroyContext(dpy, ctx);
    XDestroyWindow(dpy, win);
