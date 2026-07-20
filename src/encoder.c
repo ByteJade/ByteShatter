@@ -17,7 +17,7 @@ void emit_rip(uint8_t rd, int32_t offset) {
     uint64_t full = (uint64_t)(get_guest() + offset);
     int64_t target = full & ~0xFFF;
     int64_t current = (uint64_t)(get_host() + get_hp()) & ~0xFFF;
-    int32_t delta = (target - current) / 4096;
+    int32_t delta = (target - current) >> 12;
     if (delta < -524288 || delta > 524287) {
         panic("ENCODER::TOO_LARGE_DISTANCE");
     }
@@ -416,7 +416,7 @@ void encode(X64_instruction* buf) {
             else emit32(FMOVR_NEON | (r0) | (x64_regs[r1] << 5));
             break;
         case MOVAPD:
-            emit32(sf|MOV_NEON | (r0) | (r1 << 5));
+            emit32(sf|MOV_NEON | (r0) | (r1 << 5) | (r1 << 16));
             break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
