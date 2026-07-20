@@ -136,8 +136,8 @@ gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
    r1 = outer_radius - tooth_depth / 2.0;
    r2 = outer_radius + tooth_depth / 2.0;
    da = 2.0 * M_PI / teeth / 4.0;
-   printf("%f %f %f %f\n",
-      r0, r1, r2, da);
+   printf("%f %f %f %f %f %f\n",
+      r0, r1, r2, da, 2.0 * M_PI / teeth, 2.0 * M_PI / teeth / 4.0);
    glBegin(GL_QUAD_STRIP);
    for (i = 0; i <= teeth; i++) {
       printf("i=%d: A=(%f,%f,%f), B=(%f,%f,%f)\n", 
