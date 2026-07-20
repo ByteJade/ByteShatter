@@ -392,7 +392,7 @@ void encode(X64_instruction* buf) {
             else instr = SCVTF_NEON;
             if (t1&MEM) {
                 emit_address_decode(&buf->op1, buf->prefix);
-                emit_ldr_reg(SC1, SC1, 0);
+                emit32(_construct_r_r_imm(LDR32_REG, SC1, SC1, 0));
                 emit32(instr | (r0) | (x64_regs[SC1] << 5));
             } else if (t1 == REG) {
                 emit32(instr | (r0) | (x64_regs[r1]<<5));
