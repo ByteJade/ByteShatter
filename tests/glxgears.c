@@ -497,16 +497,6 @@ init(void)
    gear(1.0, 4.0, 1.0, 20, 0.7);
    glEndList();
 
-   gear2 = glGenLists(1);
-   glNewList(gear2, GL_COMPILE);
-   gear(0.5, 2.0, 2.0, 10, 0.7);
-   glEndList();
-
-   gear3 = glGenLists(1);
-   glNewList(gear3, GL_COMPILE);
-   gear(1.3, 2.0, 0.5, 10, 0.7);
-   glEndList();
-
    glEnable(GL_NORMALIZE);
 }
 
