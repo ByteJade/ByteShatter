@@ -116,27 +116,20 @@ draw(void)
    glClearColor(1.0, 1.0, 1.0, 1.0);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   glOrtho(-2.0, 2.0, -2.0, 2.0, -2.0, 2.0);
-
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-
    glPushMatrix();
-   //glTranslatef(-3.0, -2.0, 0.0);
+   glTranslatef(-3.0, -2.0, 0.0);
    glRotatef(angle, 0.0, 0.0, 1.0);
    glCallList(gear1);
    glPopMatrix();
 
    glPushMatrix();
-   //glTranslatef(3.1, -2.0, 0.0);
+   glTranslatef(3.1, -2.0, 0.0);
    glRotatef(-2.0 * angle - 9.0, 0.0, 0.0, 1.0);
    glCallList(gear2);
    glPopMatrix();
 
    glPushMatrix();
-   //glTranslatef(-3.1, 4.2, 0.0);
+   glTranslatef(-3.1, 4.2, 0.0);
    glRotatef(-2.0 * angle - 25.0, 0.0, 0.0, 1.0);
    glCallList(gear3);
    glPopMatrix();
@@ -193,6 +186,7 @@ draw_frame(Display *dpy, Window win)
 static void
 reshape(int width, int height)
 {
+   printf("reshape: width=%d, height=%d\n", width, height);
    glViewport(0, 0, (GLint) width, (GLint) height);
 
    if (stereo) {
@@ -206,6 +200,7 @@ reshape(int width, int height)
    }
    else {
       GLfloat h = (GLfloat) height / (GLfloat) width;
+   printf("reshape: h=%f\n", h);
 
       glMatrixMode(GL_PROJECTION);
       glLoadIdentity();
