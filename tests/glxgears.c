@@ -128,14 +128,27 @@ static void
 gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
      GLint teeth, GLfloat tooth_depth)
 {
-   glColor3f(1.0f, 0.0f, 0.0f);
-   glBegin(GL_TRIANGLE_FAN);
-    glVertex3f(0.0f, 0.0f, 0.0f);  // Центр
-    for (int i = 0; i <= 30; i++) {
-        angle = i * 2.0f * M_PI / 30.0f;
-        glVertex3f(outer_radius * cos(angle), outer_radius * sin(angle), 0.0f);
-    }
-    glEnd();
+   GLint i;
+   GLfloat r0, r1, r2;
+   GLfloat angle, da;
+
+   r0 = inner_radius;
+   r1 = outer_radius - tooth_depth / 2.0;
+   r2 = outer_radius + tooth_depth / 2.0;
+   da = 2.0 * M_PI / teeth / 4.0;
+
+   glBegin(GL_QUAD_STRIP);
+   for (i = 0; i <= teeth; i++) {
+      angle = i * 2.0 * M_PI / teeth;
+      glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+      glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
+      if (i < teeth) {
+         glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
+         glVertex3f(r1 * cos(angle + 3 * da), r1 * sin(angle + 3 * da),
+                     width * 0.5);
+      }
+   }
+   glEnd();
 }
 
 
