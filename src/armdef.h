@@ -15,7 +15,8 @@ static const char* types[] = {
     "idiv",
     // jumps
     "JB", "jae", "je",
-    "jne", "jbe",
+    "jne", "jbe", "ja",
+    "js", "jp", "jnp",
     // avx
     "cvtss2sd", "cvtsd2ss",
     "pxor", "comis", "movq", "movapd",
@@ -46,7 +47,9 @@ typedef enum {
     NOP, SHL, SHR, SAR,
     MOVZX, MOVSLQ, JG, JLE,
     IDIV,
+    
     JB, JAE, JE, JNE, JBE,
+    JA, JS, JNS, JP, JNP,
     
     CVTSS2SD, CVTSD2SS, PXOR, COMIS,
     MOVQ, MOVAPD, CVTSD2SI, CVTSI2S,

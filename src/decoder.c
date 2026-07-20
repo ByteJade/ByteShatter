@@ -237,57 +237,9 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
             break;
-        case 0x72:
+        case 0x72 ... 0x7F:
             buf->opcount = 1;
-            buf->type = JB;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x73:
-            buf->opcount = 1;
-            buf->type = JAE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x74:
-            buf->opcount = 1;
-            buf->type = JE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x75:
-            buf->opcount = 1;
-            buf->type = JNE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x76:
-            buf->opcount = 1;
-            buf->type = JBE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x7C:
-            buf->opcount = 1;
-            buf->type = JL;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x7D:
-            buf->opcount = 1;
-            buf->type = JGE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x7E:
-            buf->opcount = 1;
-            buf->type = JLE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0x7F:
-            buf->opcount = 1;
-            buf->type = JG;
+            buf->type = byte - 0x72 + JB;
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
             break;
