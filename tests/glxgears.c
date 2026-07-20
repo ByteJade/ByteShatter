@@ -73,7 +73,7 @@ current_time(void)
 #define DRAW 2
 
 static GLfloat view_rotx = 20.0, view_roty = 30.0, view_rotz = 0.0;
-static GLuint test_list = 0;
+static GLuint gear1, gear2, gear3 = 0;
 static GLfloat angle = 0.0;
 
 static GLboolean fullscreen = GL_FALSE;	/* Create a single fullscreen window */
@@ -100,20 +100,45 @@ static int framerate = -1; /* Framerate limit if > 0 */
  */
 
 static void
+gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
+     GLint teeth, GLfloat tooth_depth)
+{
+   glColor3f(1.0f, 0.0f, 0.0f);
+   glBegin(GL_TRIANGLES);
+   glVertex3f(-0.5f, -0.5f, 0.0f);
+   glVertex3f(0.5f, -0.5f, 0.0f);
+   glVertex3f(0.0f, 0.5f, 0.0f);
+   glEnd();
+}
+static void
 draw(void)
 {
-   glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-2.0, 2.0, -2.0, 2.0, -2.0, 2.0);
+   glPushMatrix();
+   glRotatef(view_rotx, 1.0, 0.0, 0.0);
+   glRotatef(view_roty, 0.0, 1.0, 0.0);
+   glRotatef(view_rotz, 0.0, 0.0, 1.0);
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+   glPushMatrix();
+   glTranslatef(-3.0, -2.0, 0.0);
+   glRotatef(angle, 0.0, 0.0, 1.0);
+   glCallList(gear1);
+   glPopMatrix();
 
-    glCallList(test_list);
+   glPushMatrix();
+   glTranslatef(3.1, -2.0, 0.0);
+   glRotatef(-2.0 * angle - 9.0, 0.0, 0.0, 1.0);
+   glCallList(gear2);
+   glPopMatrix();
 
+   glPushMatrix();
+   glTranslatef(-3.1, 4.2, 0.0);
+   glRotatef(-2.0 * angle - 25.0, 0.0, 0.0, 1.0);
+   glCallList(gear3);
+   glPopMatrix();
+
+   glPopMatrix();
 }
 
 
@@ -483,22 +508,40 @@ event_loop(Display *dpy, Window win)
   }      
 }
 
-static void init(void)
+static void
+init(void)
 {
-    test_list = glGenLists(1);
-    printf("test_list = %d\n", test_list);
-    
-    glNewList(test_list, GL_COMPILE);
-    
-    // Рисуем тот же красный треугольник
-    glColor3f(1.0f, 0.0f, 0.0f);
-    glBegin(GL_TRIANGLES);
-    glVertex3f(-0.5f, -0.5f, 0.0f);
-    glVertex3f(0.5f, -0.5f, 0.0f);
-    glVertex3f(0.0f, 0.5f, 0.0f);
-    glEnd();
-    
-    glEndList();
+   static GLfloat pos[4] = { 5.0, 5.0, 10.0, 0.0 };
+   static GLfloat red[4] = { 0.8, 0.1, 0.0, 1.0 };
+   static GLfloat green[4] = { 0.0, 0.8, 0.2, 1.0 };
+   static GLfloat blue[4] = { 0.2, 0.2, 1.0, 1.0 };
+
+   glLightfv(GL_LIGHT0, GL_POSITION, pos);
+   glEnable(GL_CULL_FACE);
+   glEnable(GL_LIGHTING);
+   glEnable(GL_LIGHT0);
+   glEnable(GL_DEPTH_TEST);
+
+   /* make the gears */
+   gear1 = glGenLists(1);
+   glNewList(gear1, GL_COMPILE);
+   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, red);
+   gear(1.0, 4.0, 1.0, 20, 0.7);
+   glEndList();
+
+   gear2 = glGenLists(1);
+   glNewList(gear2, GL_COMPILE);
+   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, green);
+   gear(0.5, 2.0, 2.0, 10, 0.7);
+   glEndList();
+
+   gear3 = glGenLists(1);
+   glNewList(gear3, GL_COMPILE);
+   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
+   gear(1.3, 2.0, 0.5, 10, 0.7);
+   glEndList();
+
+   glEnable(GL_NORMALIZE);
 }
 
 static void
