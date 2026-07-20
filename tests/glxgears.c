@@ -139,6 +139,10 @@ gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 
    glBegin(GL_QUAD_STRIP);
    for (i = 0; i <= teeth; i++) {
+      printf("i=%d: A=(%f,%f,%f), B=(%f,%f,%f)\n", 
+         i, 
+         r0 * cos(angle), r0 * sin(angle), width * 0.5,
+         r1 * cos(angle), r1 * sin(angle), width * 0.5);
       angle = i * 2.0 * M_PI / teeth;
       glVertex3f(r0 * cos(angle), r0 * sin(angle), width * 0.5);
       glVertex3f(r1 * cos(angle), r1 * sin(angle), width * 0.5);
