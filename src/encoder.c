@@ -392,7 +392,8 @@ void encode(X64_instruction* buf) {
             else instr = SCVTF_NEON;
             if (t1&MEM) {
                 emit_address_decode(&buf->op1, buf->prefix);
-                emit32(instr | (x64_regs[SC1]) | (r0 << 5));
+                emit_ldr_reg(SC1, SC1, 0);
+                emit32(instr | (r0) | (x64_regs[SC1] << 5));
             } else if (t1 == REG) {
                 emit32(instr | (r0) | (x64_regs[r1]<<5));
             } else panic("ENCODER::UNHANDLED_CVTSI2SD");
