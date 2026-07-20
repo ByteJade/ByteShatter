@@ -31,15 +31,9 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
         emit_brk(cache_patch_point(type, 0, buf->op0.imm));
     } else if (buf->op0.type == (MEM|IMM)) {
         int32_t offset = get_gp() + buf->op0.imm;
-        if (is_external_offset(offset)) {
-            emit_rip(SC1, offset);
-            emit_ldr_reg(SC1, SC1, 0);
-            emit32(code | (x64_regs[SC1] << 5));
-            // wrapper
-        } else {
-            warning("ENCODER::ILLEGAL_RIP");
-            emit_brk(0);
-        }
+        emit_rip(SC1, offset);
+        emit_ldr_reg(SC1, SC1, 0);
+        emit32(code | (x64_regs[SC1] << 5));
     }
 }
 void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
