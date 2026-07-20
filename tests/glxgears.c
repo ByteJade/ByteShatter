@@ -128,13 +128,13 @@ draw(void)
 
    glPushMatrix();
    glTranslatef(3.1, -2.0, 0.0);
-   glRotatef(-2.0 * angle - 9.0, 0.0, 0.0, 1.0);
+   glRotatef(angle, 0.0, 0.0, 1.0);
    glCallList(gear2);
    glPopMatrix();
 
    glPushMatrix();
    glTranslatef(-3.1, 4.2, 0.0);
-   glRotatef(-2.0 * angle - 25.0, 0.0, 0.0, 1.0);
+   glRotatef(angle, 0.0, 0.0, 1.0);
    glCallList(gear3);
    glPopMatrix();
 
