@@ -21,6 +21,9 @@ static uint32_t* prev_instrp = NULL;
 void debug_enable(void) {
     enabled = 1;
 }
+int debug_enabled(void) {
+    return enabled;
+}
 int debug_break(void) {
     return break_block;
 }

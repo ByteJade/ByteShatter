@@ -8,6 +8,7 @@ uint64_t debug_breakp(void);
 void set_break();
 void set_break_point(uint32_t pc);
 void debug_enable(void);
+int debug_enabled(void);
 void debug_wait(void);
 
 #endif

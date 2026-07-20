@@ -476,9 +476,11 @@ int decode_step() {
     cache_block_point();
     X64_instruction buf;
     int type = decode_instr(&buf);
-    char out[64];
-    sprint_instr(out, &buf);
-    print("%s", out);
+    if (debug_enabled()) {
+        char out[64];
+        sprint_instr(out, &buf);
+        print("%s", out);
+    }
     encode(&buf);
     if (brk) set_break();
     return type;
