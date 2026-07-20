@@ -6,13 +6,16 @@
 static const char* types[] = {
     // std
     "mov", "add", "sub", "test",
-    "je", "call", "ret", "xor",
+    "call", "ret", "xor",
     "pop", "push", "and", "lea",
     "jmp", "cmp", "endbr64", "jl",
-    "leave", "cltq", "cltd", "jne", "jge",
+    "leave", "cltq", "cltd", "jge",
     "nop", "shl", "shr", "sar",
     "movzx", "movslq", "jg", "jle",
-    "idiv", "jbe", "jae",
+    "idiv",
+    // jumps
+    "JB", "jae", "je",
+    "jne", "jbe",
     // avx
     "cvtss2sd", "cvtsd2ss",
     "pxor", "comis", "movq", "movapd",
@@ -36,13 +39,14 @@ typedef enum {
 
 typedef enum {
     MOV, ADD, SUB, TST,
-    JE, CALL, RET, XOR,
+    CALL, RET, XOR,
     POP, PUSH, AND, LEA,
     JMP, CMP, EBR, JL,
-    LEAVE, CLTQ, CLTD, JNE, JGE,
+    LEAVE, CLTQ, CLTD, JGE,
     NOP, SHL, SHR, SAR,
     MOVZX, MOVSLQ, JG, JLE,
-    IDIV, JBE, JAE,
+    IDIV,
+    JB, JAE, JE, JNE, JBE,
     
     CVTSS2SD, CVTSD2SS, PXOR, COMIS,
     MOVQ, MOVAPD, CVTSD2SI, CVTSI2S,

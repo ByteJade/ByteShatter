@@ -164,12 +164,10 @@ int decode_instr(X64_instruction* buf) {
         byte = fetch8();
     }
     switch (byte) {
-        case 0x00: 
-            buf->opcount = 0;
-            buf->type = NOP;
-            break;
-        case 0x01:
+        case 0x00: case 0x01:
             buf->reverse = 1;
+        case 0x02: case 0x03:
+            if (!(byte&1)) buf->size = 8;
             buf->opcount = 2;
             buf->type = ADD;
             decode_regrm(buf);
@@ -177,9 +175,10 @@ int decode_instr(X64_instruction* buf) {
         case 0x0F: {
             decode_0F(buf);
         } break;
-        case 0x29:
+        case 0x28: case 0x29:
             buf->reverse = 1;
-        case 0x2B:
+        case 0x2A: case 0x2B:
+            if (!(byte&1)) buf->size = 8;
             buf->opcount = 2;
             buf->type = SUB;
             decode_regrm(buf);
@@ -189,9 +188,10 @@ int decode_instr(X64_instruction* buf) {
             buf->type = XOR;
             decode_regrm(buf);
             break;
-        case 0x39:
+        case 0x38: case 0x39:
             buf->reverse = 1;
-        case 0x3B:
+        case 0x3A: case 0x3B:
+            if (!(byte&1)) buf->size = 8;
             buf->opcount = 2;
             buf->type = CMP;
             decode_regrm(buf);
@@ -234,6 +234,12 @@ int decode_instr(X64_instruction* buf) {
         case 0x6A:
             buf->opcount = 1;
             buf->type = PUSH;
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm8();
+            break;
+        case 0x72:
+            buf->opcount = 1;
+            buf->type = JB;
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
             break;
