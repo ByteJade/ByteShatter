@@ -113,29 +113,11 @@ gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
 static void
 draw(void)
 {
+   glClearColor(1.0, 1.0, 1.0, 1.0);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
    glPushMatrix();
-   glRotatef(0, 1.0, 0.0, 0.0);
-   glRotatef(0, 0.0, 1.0, 0.0);
-   glRotatef(0, 0.0, 0.0, 1.0);
-
-   glPushMatrix();
-   glTranslatef(-3.0, -2.0, 0.0);
-   glRotatef(0.0, 0.0, 0.0, 1.0);
    glCallList(gear1);
-   glPopMatrix();
-
-   glPushMatrix();
-   glTranslatef(3.1, -2.0, 0.0);
-   glRotatef(0.0, 0.0, 0.0, 1.0);
-   glCallList(gear2);
-   glPopMatrix();
-
-   glPushMatrix();
-   glTranslatef(-3.1, 4.2, 0.0);
-   glRotatef(0.0, 0.0, 0.0, 1.0);
-   glCallList(gear3);
    glPopMatrix();
 
    glPopMatrix();
