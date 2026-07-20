@@ -145,8 +145,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
 void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     sc = (struct sigcontext*)&ctx->uc_mcontext;
-    print_cpu();
-    exit(0);
+    debug_wait();
 }
 void patcher_init(void) {
     struct sigaction sa_trap = {
