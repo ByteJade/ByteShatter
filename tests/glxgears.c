@@ -129,11 +129,13 @@ gear(GLfloat inner_radius, GLfloat outer_radius, GLfloat width,
      GLint teeth, GLfloat tooth_depth)
 {
    glColor3f(1.0f, 0.0f, 0.0f);
-   glBegin(GL_TRIANGLES);
-   glVertex3f(-0.5f, -0.5f, 0.0f);
-   glVertex3f(0.5f, -0.5f, 0.0f);
-   glVertex3f(0.0f, 0.5f, 0.0f);
-   glEnd();
+   glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(0.0f, 0.0f, 0.0f);  // Центр
+    for (int i = 0; i <= 30; i++) {
+        angle = i * 2.0f * M_PI / 30.0f;
+        glVertex3f(outer_radius * cos(angle), outer_radius * sin(angle), 0.0f);
+    }
+    glEnd();
 }
 
 
