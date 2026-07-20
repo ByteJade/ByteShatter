@@ -119,8 +119,6 @@ draw(void)
    glPushMatrix();
    glCallList(gear1);
    glPopMatrix();
-
-   glPopMatrix();
 }
 
 
