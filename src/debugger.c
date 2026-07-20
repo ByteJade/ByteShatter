@@ -57,7 +57,7 @@ void help(void) {
     printf("sb - go to next block\n");
     printf("si - go to next instruction\n");
     printf("log <level> - set logs to level (A,W,E)\n");
-    printf("print <state> - print state (flags, x64regs, regs, cache)\n");
+    printf("print <state> - print state (flags, x64regs, regs, cache, usage)\n");
     printf("print [x64reg+imm] or (imm64) - print memory\n");
     printf("print <x64reg> - print register\n");
     printf("run - return to execution\n");
@@ -107,6 +107,8 @@ void handle_print(char* arg) {
             cache_print(break_block);
         } else if (strcmp(arg, "flags") == 0) {
             print_flags();
+        } else if (strcmp(arg, "usage") == 0) {
+            printf("cache usage: %i bytes\n", cache_usage());
         } else {
             printf("\033[34m%s\033[0m: %lX\n", arg, get_reg(arg));
         }
