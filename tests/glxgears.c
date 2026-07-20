@@ -73,6 +73,7 @@ current_time(void)
 #define DRAW 2
 
 static GLfloat view_rotx = 20.0, view_roty = 30.0, view_rotz = 0.0;
+static GLuint test_list = 0;
 static GLfloat angle = 0.0;
 
 static GLboolean fullscreen = GL_FALSE;	/* Create a single fullscreen window */
@@ -102,22 +103,17 @@ static void
 draw(void)
 {
    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-   glMatrixMode(GL_PROJECTION);
-   glLoadIdentity();
-   glOrtho(-2.0, 2.0, -2.0, 2.0, -2.0, 2.0);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-2.0, 2.0, -2.0, 2.0, -2.0, 2.0);
 
-   glMatrixMode(GL_MODELVIEW);
-   glLoadIdentity();
-    
-   glColor3f(1.0f, 0.0f, 0.0f);  // Красный цвет
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 
-   glBegin(GL_TRIANGLES);
-   glVertex3f(-0.5f, -0.5f, 0.0f);
-   glVertex3f(0.5f, -0.5f, 0.0f);
-   glVertex3f(0.0f, 0.5f, 0.0f);
-   glEnd();
+    glCallList(test_list);
+
 }
 
 
@@ -487,6 +483,23 @@ event_loop(Display *dpy, Window win)
   }      
 }
 
+static void init(void)
+{
+    test_list = glGenLists(1);
+    printf("test_list = %d\n", test_list);
+    
+    glNewList(test_list, GL_COMPILE);
+    
+    // Рисуем тот же красный треугольник
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glBegin(GL_TRIANGLES);
+    glVertex3f(-0.5f, -0.5f, 0.0f);
+    glVertex3f(0.5f, -0.5f, 0.0f);
+    glVertex3f(0.0f, 0.5f, 0.0f);
+    glEnd();
+    
+    glEndList();
+}
 
 static void
 usage(void)
@@ -585,6 +598,7 @@ main(int argc, char *argv[])
     * We can't be sure we'll get a ConfigureNotify event when the window
     * first appears.
     */
+    init();
    reshape(winWidth, winHeight);
 
    event_loop(dpy, win);
