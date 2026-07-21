@@ -322,7 +322,7 @@ void encode(X64_instruction* buf) {
         case POP:{
             if (t0 == REG) {
                 if (prev_instruction == POP) {
-                    patch32(POPP | (r0<<10) | (prev_register));
+                    patch32(POPP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
                     prev_instruction = NOP;
                 } else {
                     emit_pop_reg(r0);
@@ -334,7 +334,7 @@ void encode(X64_instruction* buf) {
         case PUSH:{
             if (t0 == REG) {
                 if (prev_instruction == PUSH) {
-                    patch32(PUSHP | (r0<<10) | (prev_register));
+                    patch32(PUSHP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
                     prev_instruction = NOP;
                 } else {
                     emit_push_reg(r0);
