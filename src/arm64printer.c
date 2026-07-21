@@ -103,7 +103,7 @@ void sprint_arm(char* out, uint32_t buf) {
         sprint_x_mem(&out, "ldr", buf);
     else if (comp("1-11100-00----------------------", buf))
         sprint_x_mem(&out, "str", buf);
-    else if (comp("0-10100-00----------------------", buf))
+    else if (comp("0-11100-00----------------------", buf))
         sprint_x_mem(&out, "strb", buf);
     else if (comp("-101001010----------------------", buf))
         sprint_x_imm(&out, "movz", buf);
