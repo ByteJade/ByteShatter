@@ -185,8 +185,7 @@ void encode(X64_instruction* buf) {
             } else if (t0 == REG && t1 == IMM) {
                 emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->op1.imm&IMM12));
             } else if (t1&MEM) {
-                emit_address_decode(&buf->op1, buf->prefix);
-                emit_ldr_reg(SC2, SC1, 0);
+                emit_load(x64_regs[SC2], buf);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, SC2));
             } else panic("ENCODER::UNHANDLED_SUB");
         } break;
@@ -196,18 +195,20 @@ void encode(X64_instruction* buf) {
             else if (t0 == REG && t1 == IMM)
                 emit_add_signed(r0, r0, buf->op1.imm);
             else if (t0&MEM) {
-                emit_address_decode(&buf->op0, buf->prefix);
-                emit_ldr_reg(SC2, SC1, 0);
+                uint8_t simple = emit_load(x64_regs[SC2], buf);
                 if (t1 == REG) {
                     emit32(sf|_construct_r_r_r(ADD_REG|S, SC2, SC2, r1));
                 } else {
                     emit_add_signed(SC2, SC2, buf->op1.imm);
                 }
-                if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, SC2, SC1, 0));
-                else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
+                if (simple) {
+                    emit_store(x64_regs[SC2], buf);
+                } else {
+                    sf >>= 1;
+                    emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
+                }
             } else if (t1&MEM) {
-                emit_address_decode(&buf->op1, buf->prefix);
-                emit_ldr_reg(SC2, SC1, 0);
+                emit_load(x64_regs[SC2], buf);
                 emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, SC2));
             } else panic("ENCODER::UNHANDLED_ADD");
         } break;
