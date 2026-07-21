@@ -58,9 +58,7 @@ void sprint_x_mem(char** out, char* name, uint32_t buf) {
     if (buf&(1<<30)) size = 'X';
     ptr += sprintf(ptr, "%s %c%i, [X%i",
         name, size, rd, rn);
-    if (U) {
-        ptr += sprintf(ptr, ", #%i]", imm);
-    } else if (P) {
+    if (U|P) {
         // Pre-indexed: [Xn, #offset]
         if (W && imm) {
             ptr += sprintf(ptr, ", #%i]!", imm);
