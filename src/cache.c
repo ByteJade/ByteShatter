@@ -157,6 +157,9 @@ CacheUnit* cache_get_block(uint16_t block_id) {
     return blocks_cache + block_id;
 }
 
+void cache_back() {
+    local_offsets[loffp-1].hoff--;
+}
 void cache_flush(uint16_t block_id) {
     CacheUnit* unit = blocks_cache + block_id;
     uint8_t* code = get_host() + unit->hp;
