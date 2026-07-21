@@ -106,6 +106,32 @@ void emit_neon(X64_instruction* buf, int opcode) {
         emit32(osf|opcode|(r0)|(r0<<5)|(16<<16));
     } else panic("ENCODER::UNHANDLED_NEON");
 }
+int emit_load(uint8_t rd, X64_instruction* buf) {
+    uint32_t sf = (buf->size == 64) * (SF>>1);
+    if (buf->op1.type == (MEM|REG|IMM) &&
+        buf->op1.imm > -256 &&
+        buf->op1.imm < 255) {
+        emit32(sf|LDUR|((buf->op1.imm&0x1FF)<<12)|(buf->op1.reg<<5)|(rd));
+        return 1;
+    } else {
+        emit_address_decode(&buf->op1, buf->prefix);
+        emit32(sf|_construct_r_r_imm(LDR32_REG, rd, SC1, 0));
+        return 0;
+    }
+}
+int emit_store(uint8_t rd, X64_instruction* buf) {
+    uint32_t sf = (buf->size == 64) * (SF>>1);
+    if (buf->op0.type == (MEM|REG|IMM) &&
+        buf->op0.imm > -256 &&
+        buf->op0.imm < 255) {
+        emit32(sf|STUR|((buf->op0.imm&0x1FF)<<12)|(buf->op0.reg<<5)|(rd));
+        return 1;
+    } else {
+        emit_address_decode(&buf->op0, buf->prefix);
+        emit32(sf|_construct_r_r_imm(STR32_REG, rd, SC1, 0));
+        return 0;
+    }
+}
 void encode8bit(X64_instruction* buf) {
     uint8_t r0 = buf->op0.reg;
     uint8_t r1 = buf->op1.reg;
@@ -219,19 +245,17 @@ void encode(X64_instruction* buf) {
                     emit32(sf|_construct_r_r_imm(ADD_IMM, r0, SC2, 0));
                 } else emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
             } else if (t1&MEM) {
-                emit_address_decode(&buf->op1, buf->prefix);
-                if (sf) emit32(_construct_r_r_imm(LDR64_REG, r0, SC1, 0));
-                else emit32(_construct_r_r_imm(LDR32_REG, r0, SC1, 0));
+                emit_load(r0, buf);
             } else if (t0&MEM) {
-                emit_address_decode(&buf->op0, buf->prefix);
-                if (t1 == REG){
-                    if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, r1, SC1, 0));
-                    else emit32(sf|_construct_r_r_imm(STR32_REG, r1, SC1, 0));
-                } else {
-                    emit_imm(&buf->op1);
-                    if (sf) emit32(sf|_construct_r_r_imm(STR64_REG, SC2, SC1, 0));
-                    else emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
+                if (t1 == IMM){
+                    if (buf->op1.imm == 0) {
+                        r1 = XZR;
+                    } else {
+                        emit_imm(&buf->op1);
+                        r1 = SC2;
+                    }
                 }
+                emit_store(r1, buf);
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;
         case LEA:{
