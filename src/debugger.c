@@ -109,6 +109,7 @@ void handle_print(char* arg) {
             print_flags();
         } else if (strcmp(arg, "usage") == 0) {
             printf("cache usage: %i bytes\n", cache_usage());
+            printf("program usage: %li bytes\n", get_gp());
         } else {
             printf("\033[34m%s\033[0m: %lX\n", arg, get_reg(arg));
         }
