@@ -108,6 +108,9 @@ void emit_neon(X64_instruction* buf, int opcode) {
 }
 int emit_load(uint8_t rd, X64_instruction* buf) {
     uint32_t sf = (buf->size == 64) * (SF>>1);
+    emit_address_decode(&buf->op1, buf->prefix);
+    emit32(sf|_construct_r_r_imm(LDR32_REG, rd, SC1, 0));
+    return 0;
     if (buf->op1.type == (MEM|REG|IMM) &&
         buf->op1.imm > -256 &&
         buf->op1.imm < 255) {
