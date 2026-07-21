@@ -59,8 +59,8 @@ int is_external_offset(uint32_t offset) {
             return 0;
         }
     }
-    panic("not found %x", offset);
-    return 0;
+    warning("not found %x", offset);
+    return -1;
 }
 ExeMeta* load_object(const char* filename) {
     ExeMeta* exe = loader_open_elf(filename);
