@@ -17,9 +17,9 @@ static const char* ld_paths[] = {
     NULL
 };
 typedef struct {
+    uint8_t native;
     const char* name;
-    ExeMeta* wrapped;
-    void* native;
+    void* object;
 } Library;
 
 Library libs[16];
@@ -35,7 +35,7 @@ uint32_t my_hash(const char* str) {
 }
 
 int is_external_offset(uint32_t offset) {
-    ExeMeta* exe = libs[0].wrapped;
+    ExeMeta* exe = libs[0].object;
     ElfMeta* elf = exe->elf;
     for (int i = 0; i < elf->header.e_shnum; i++) {
         Elf64_Shdr* header = elf->sheaders + i;
@@ -65,9 +65,9 @@ int is_external_offset(uint32_t offset) {
 ExeMeta* load_object(const char* filename) {
     ExeMeta* exe = loader_open_elf(filename);
     if (exe) {
+        libs[libs_count].native = 0;
         libs[libs_count].name = strdup(strrchr(filename, '/')+1);
-        libs[libs_count].wrapped = exe;
-        libs[libs_count].native = NULL;
+        libs[libs_count].object = exe;
         libs_count++;
         loader_map_segments(exe);
         loader_reloc_dependencies(exe);
@@ -107,7 +107,10 @@ void load_native_library(const char* filename) {
         lib = dlopen(fullpath, RTLD_LAZY | RTLD_GLOBAL);
         if (lib) {
             success("load: %s", fullpath);
-            libs[libs_count-1].native = lib;
+            libs[libs_count].native = 1;
+            libs[libs_count].object = lib;
+            libs[libs_count].name = strdup(filename);
+            libs_count++;
             return;
         }
     }
@@ -119,7 +122,8 @@ void* get_native_symbol(const char* symname) {
     void* sym = dlsym(RTLD_DEFAULT, symname);
     if (sym) return sym;
     for (int i = 1; i < libs_count; i++) {
-        void* sym = dlsym(libs[i].native, symname);
+        if (!libs[i].native) continue;
+        void* sym = dlsym(libs[i].object, symname);
         if (sym) return sym;
     }
     warning("No native symbol: %s", symname);
@@ -133,7 +137,8 @@ void* get_wrapped_symbol(const char* symname) {
     );
     uint32_t hash = my_hash(fullname);
     for (int i = 1; i < libs_count; i++) {
-        ExeMeta* exe = libs[i].wrapped;
+        if (libs[i].native) continue;
+        ExeMeta* exe = libs[i].object;
         ElfMeta* elf = exe->elf;
         char* symtab_str = elf->strtab; 
         for (int j = 1; j < elf->dynsymsz; j++) {
