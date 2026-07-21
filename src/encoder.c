@@ -346,9 +346,11 @@ void encode(X64_instruction* buf) {
             } else if (t0 == IMM) {
                 emit_movz(SC1, buf->op0.imm, 0);
                 emit_push_reg(SC1);
+                prev_instruction = NOP;
             } else if (t0&MEM) {
                 emit_load(x64_regs[SC1],&buf->op0, sf, buf->prefix);
                 emit_push_reg(SC1);
+                prev_instruction = NOP;
             } else panic("ENCODER::UNHANDLED_PUSH");
         } break;
         case LEAVE: {
