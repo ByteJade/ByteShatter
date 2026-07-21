@@ -20,11 +20,12 @@ static const char* types[] = {
     "jnp","jl", "jge",
     "jle","jg",
     // avx
+    "pxor", "adds", "muls",
     "cvtss2sd", "cvtsd2ss",
-    "pxor", "comis", "movq", "movapd",
+    "subs", "divs",
+    "comis", "movs",
+    "movq", "movapd",
     "cvtsd2si", "cvtsi2s",
-    "movs", "divs", "muls", "adds", "subs",
-
 };
 static const char* regs[] = {
     "ax", "cx", "dx", "bx",
@@ -55,9 +56,12 @@ typedef enum {
     JP, JNP, JL, JGE,
     JLE, JG,
     
-    CVTSS2SD, CVTSD2SS, PXOR, COMIS,
-    MOVQ, MOVAPD, CVTSD2SI, CVTSI2S,
-    MOVS, DIVS, MULS, ADDS, SUBS,
+    PXOR, ADDS, MULS,
+    CVTSS2SD, CVTSD2SS,
+    SUBS, DIVS,
+    COMIS, MOVS,
+    MOVQ, MOVAPD,
+    CVTSD2SI, CVTSI2S,
 
 } InstrTypes;
 
