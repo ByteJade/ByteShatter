@@ -12,6 +12,7 @@ static const char* ld_paths[] = {
     "/usr/lib",
     "/usr/lib64",
     "/lib/aarch64-linux-gnu",
+    "/system/lib64",
     "/data/data/com.termux/files/usr/lib",
     NULL
 };
