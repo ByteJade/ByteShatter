@@ -111,7 +111,7 @@ int emit_load(uint8_t rd, X64_instruction* buf) {
     if (buf->op1.type == (MEM|REG|IMM) &&
         buf->op1.imm > -256 &&
         buf->op1.imm < 255) {
-        emit32(sf|LDUR|((buf->op1.imm&0x1FF)<<12)|(buf->op1.reg<<5)|(rd));
+        emit32(sf|LDUR|((buf->op1.imm&0x1FF)<<12)|(x64_regs[buf->op1.reg]<<5)|(rd));
         return 1;
     } else {
         emit_address_decode(&buf->op1, buf->prefix);
@@ -245,7 +245,7 @@ void encode(X64_instruction* buf) {
                     emit32(sf|_construct_r_r_imm(ADD_IMM, r0, SC2, 0));
                 } else emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
             } else if (t1&MEM) {
-                emit_load(r0, buf);
+                emit_load(x64_regs[r0], buf);
             } else if (t0&MEM) {
                 if (t1 == IMM){
                     if (buf->op1.imm == 0) {
@@ -255,7 +255,7 @@ void encode(X64_instruction* buf) {
                         r1 = SC2;
                     }
                 }
-                emit_store(r1, buf);
+                emit_store(x64_regs[r1], buf);
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;
         case LEA:{
