@@ -279,9 +279,10 @@ int decode_instr(X64_instruction* buf) {
             buf->type = TST;
             decode_regrm(buf);
             break;
-        case 0x89:
+        case 0x88: case 0x89:
             buf->reverse = 1;
-        case 0x8B:
+        case 0x8A: case 0x8B:
+            if (!(byte&1)) buf->size = 8;
             buf->opcount = 2;
             buf->type = MOV;
             decode_regrm(buf);

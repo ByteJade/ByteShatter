@@ -74,39 +74,9 @@ void decode_0F(X64_instruction* buf) {
             if (buf->op1.type == REG)
                 buf->op1.type |= XMM;
             break;
-        case 0x84:
+        case 0x82 ... 0x8F:
             buf->opcount = 1;
-            buf->type = JE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            break;
-        case 0x85:
-            buf->opcount = 1;
-            buf->type = JNE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            break;
-        case 0x8C:
-            buf->opcount = 1;
-            buf->type = JL;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            break;
-        case 0x8D:
-            buf->opcount = 1;
-            buf->type = JGE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            break;
-        case 0x8E:
-            buf->opcount = 1;
-            buf->type = JLE;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            break;
-        case 0x8F:
-            buf->opcount = 1;
-            buf->type = JG;
+            buf->type = byte - 0x82 + JB;
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm32();
             break;
