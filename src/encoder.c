@@ -124,11 +124,11 @@ int emit_store(uint8_t rd, X64_instruction* buf) {
     if (buf->op0.type == (MEM|REG|IMM) &&
         buf->op0.imm > -256 &&
         buf->op0.imm < 255) {
-        emit32(sf|STUR|((buf->op0.imm&0x1FF)<<12)|(buf->op0.reg<<5)|(rd));
+        emit32(sf|STUR|((buf->op0.imm&0x1FF)<<12)|(x64_regs[buf->op0.reg]<<5)|(rd));
         return 1;
     } else {
         emit_address_decode(&buf->op0, buf->prefix);
-        emit32(sf|_construct_r_r_imm(STR32_REG, rd, SC1, 0));
+        emit32(sf|STR32_REG|(x64_regs[SC1]<<5)|rd);
         return 0;
     }
 }
