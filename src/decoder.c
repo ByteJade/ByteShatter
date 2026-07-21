@@ -333,27 +333,40 @@ int decode_instr(X64_instruction* buf) {
             buf->op0.type = IMM;
             buf->op0.imm = fetch_imm8();
             break;
-        case 0xD1:
+        case 0xD1:{
+            buf->reverse = 1;
+            buf->opcount = 2;
+            uint8_t modrm = fetch8();
+            decode_rm(&buf->op1, modrm);
+            buf->op0.type = IMM;
+            buf->op0.imm = 1;
+            decode_shift_table(buf, modrm);
+        } break;
         case 0xC1:{
             buf->reverse = 1;
             buf->opcount = 2;
             uint8_t modrm = fetch8();
             decode_rm(&buf->op1, modrm);
             buf->op0.type = IMM;
-            if (byte == 0xD1) buf->op0.imm = 1;
-            else buf->op0.imm = fetch_imm8();
+            buf->op0.imm = fetch_imm8();
             decode_shift_table(buf, modrm);
         } break;
         case 0xC6:
-        case 0xC7:
+            buf->reverse = 1;
             buf->size = 8;
+            buf->opcount = 2;
+            buf->type = MOV;
+            decode_rm(&buf->op1, fetch8());
+            buf->op0.type = IMM;
+            buf->op0.imm = fetch_imm8();
+            break;
+        case 0xC7:
             buf->reverse = 1;
             buf->opcount = 2;
             buf->type = MOV;
             decode_rm(&buf->op1, fetch8());
             buf->op0.type = IMM;
-            if (byte == 0xC6) buf->op0.imm = fetch_imm8();
-            else buf->op0.imm = fetch_imm32();
+            buf->op0.imm = fetch_imm32();
             break;
         case 0xC9:
             buf->opcount = 0;
