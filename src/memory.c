@@ -63,6 +63,10 @@ void emit32(uint32_t data) {
     *dst = data;
     hp += 4;
 }
+void patch32(uint32_t data) {
+    uint32_t* dst = (uint32_t*)(host + hp - 4);
+    *dst = data;
+}
 
 uint8_t fetch8(void) {
     uint8_t* src = (uint8_t*)(guest + gp);

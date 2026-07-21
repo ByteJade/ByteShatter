@@ -168,6 +168,9 @@ void encode8bit(X64_instruction* buf) {
             panic("ENCODER::UNKNOWN_8BIT_INSTRUCTION: %x", buf->type);
     }
 }
+static int prev_instruction = NOP;
+static int prev_register = NOP;
+
 void encode(X64_instruction* buf) {
     if (buf->size == 8) {
         encode8bit(buf);
@@ -178,6 +181,9 @@ void encode(X64_instruction* buf) {
     uint8_t t0 = buf->op0.type;
     uint8_t t1 = buf->op1.type;
     uint32_t sf = (buf->size == 64) * SF;
+    if (buf->type != PUSH && buf->type != POP) {
+        prev_instruction = NOP;
+    }
     switch (buf->type) {
         case SUB:{
             if (t0 == REG && t1 == REG) {
@@ -315,12 +321,26 @@ void encode(X64_instruction* buf) {
         } break;
         case POP:{
             if (t0 == REG) {
-                emit_pop_reg(r0);
+                if (prev_instruction == POP) {
+                    patch32(POPP | (r0<<10) | (prev_register));
+                    prev_instruction = NOP;
+                } else {
+                    emit_pop_reg(r0);
+                    prev_instruction = POP;
+                    prev_register = r0;
+                }
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
             if (t0 == REG) {
-                emit_push_reg(r0);
+                if (prev_instruction == PUSH) {
+                    patch32(PUSHP | (r0<<10) | (prev_register));
+                    prev_instruction = NOP;
+                } else {
+                    emit_push_reg(r0);
+                    prev_instruction = PUSH;
+                    prev_register = r0;
+                }
             } else if (t0 == IMM) {
                 emit_movz(SC1, buf->op0.imm, 0);
                 emit_push_reg(SC1);

@@ -52,6 +52,9 @@
 #define FMOVR_NEON 0x9E670000
 #define MOV_NEON 0x4EA01C00
 
+#define PUSHP 0xa9bf0380
+#define POPP 0xa8c10380
+
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
 #define _construct_r_r_r(op, rd, rn, rm) \
