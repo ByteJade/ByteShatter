@@ -106,28 +106,28 @@ void emit_neon(X64_instruction* buf, int opcode) {
         emit32(osf|opcode|(r0)|(r0<<5)|(16<<16));
     } else panic("ENCODER::UNHANDLED_NEON");
 }
-int emit_load(uint8_t rd, X64_instruction* buf) {
-    uint32_t sf = (buf->size == 64) * (SF>>1);
-    if (buf->op1.type == (MEM|REG|IMM) &&
-        buf->op1.imm > -256 &&
-        buf->op1.imm < 255) {
-        emit32(sf|LDUR|((buf->op1.imm&0x1FF)<<12)|(x64_regs[buf->op1.reg]<<5)|(rd));
+int emit_load(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
+    sf >>= 1;
+    if (op->type == (MEM|REG|IMM) &&
+        op->imm > -256 &&
+        op->imm < 255) {
+        emit32(sf|LDUR|((op->imm&0x1FF)<<12)|(x64_regs[op->reg]<<5)|(rd));
         return 1;
     } else {
-        emit_address_decode(&buf->op1, buf->prefix);
+        emit_address_decode(op, prefix);
         emit32(sf|LDR32_REG|(x64_regs[SC1]<<5)|rd);
         return 0;
     }
 }
-int emit_store(uint8_t rd, X64_instruction* buf) {
-    uint32_t sf = (buf->size == 64) * (SF>>1);
-    if (buf->op0.type == (MEM|REG|IMM) &&
-        buf->op0.imm > -256 &&
-        buf->op0.imm < 255) {
-        emit32(sf|STUR|((buf->op0.imm&0x1FF)<<12)|(x64_regs[buf->op0.reg]<<5)|(rd));
+int emit_store(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
+    sf >>= 1;
+    if (op->type == (MEM|REG|IMM) &&
+        op->imm > -256 &&
+        op->imm < 255) {
+        emit32(sf|STUR|((op->imm&0x1FF)<<12)|(x64_regs[op->reg]<<5)|(rd));
         return 1;
     } else {
-        emit_address_decode(&buf->op0, buf->prefix);
+        emit_address_decode(op, prefix);
         emit32(sf|STR32_REG|(x64_regs[SC1]<<5)|rd);
         return 0;
     }
@@ -185,7 +185,7 @@ void encode(X64_instruction* buf) {
             } else if (t0 == REG && t1 == IMM) {
                 emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->op1.imm&IMM12));
             } else if (t1&MEM) {
-                emit_load(x64_regs[SC2], buf);
+                emit_load(x64_regs[SC2], &buf->op1, sf, buf->prefix);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, SC2));
             } else panic("ENCODER::UNHANDLED_SUB");
         } break;
@@ -195,20 +195,20 @@ void encode(X64_instruction* buf) {
             else if (t0 == REG && t1 == IMM)
                 emit_add_signed(r0, r0, buf->op1.imm);
             else if (t0&MEM) {
-                uint8_t simple = emit_load(x64_regs[SC2], buf);
+                uint8_t simple = emit_load(x64_regs[SC2], &buf->op0, sf, buf->prefix);
                 if (t1 == REG) {
                     emit32(sf|_construct_r_r_r(ADD_REG|S, SC2, SC2, r1));
                 } else {
                     emit_add_signed(SC2, SC2, buf->op1.imm);
                 }
                 if (simple) {
-                    emit_store(x64_regs[SC2], buf);
+                    emit_store(x64_regs[SC2], &buf->op0, sf, buf->prefix);
                 } else {
                     sf >>= 1;
                     emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
                 }
             } else if (t1&MEM) {
-                emit_load(x64_regs[SC2], buf);
+                emit_load(x64_regs[SC2], &buf->op1, sf, buf->prefix);
                 emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, SC2));
             } else panic("ENCODER::UNHANDLED_ADD");
         } break;
@@ -246,7 +246,7 @@ void encode(X64_instruction* buf) {
                     emit32(sf|_construct_r_r_imm(ADD_IMM, r0, SC2, 0));
                 } else emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
             } else if (t1&MEM) {
-                emit_load(x64_regs[r0], buf);
+                emit_load(x64_regs[r0], &buf->op1, sf, buf->prefix);
             } else if (t0&MEM) {
                 if (t1 == IMM){
                     if (buf->op1.imm == 0) {
@@ -256,7 +256,7 @@ void encode(X64_instruction* buf) {
                         r1 = SC2;
                     }
                 }
-                emit_store(x64_regs[r1], buf);
+                emit_store(x64_regs[r1], &buf->op0, sf, buf->prefix);
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;
         case LEA:{
