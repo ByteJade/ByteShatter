@@ -136,6 +136,11 @@ void* get_wrapped_symbol(const char* symname) {
             fullname, sizeof(fullname),
             "my_%s", symname
         );
+    } else {
+        snprintf(
+            fullname, sizeof(fullname),
+            "%s", symname
+        );
     }
     uint32_t hash = my_hash(fullname);
     for (int i = 1; i < libs_count; i++) {
