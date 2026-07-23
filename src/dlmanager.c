@@ -117,6 +117,24 @@ void load_native_library(const char* filename) {
     warning("No library: %s", filename);
 }
 void* get_native_symbol(const char* symname) {
+    if (symname[0] == 'm' && symname[1] == 'y') {
+        const char* fullname = symname+3;
+        uint32_t hash = my_hash(fullname);
+        ExeMeta* exe = libs[0].object;
+        ElfMeta* elf = exe->elf;
+        char* symtab_str = elf->strtab; 
+        for (int j = 1; j < elf->dynsymsz; j++) {
+            Elf64_Sym* sym = &elf->dynsym[j];
+            
+            if (elf->sym_cache[j] == hash) {
+                const char* sym_name = symtab_str + sym->st_name;
+                if (strcmp(sym_name, fullname) == 0) {
+                    print("found %s in %s", fullname, libs[0].name);
+                    return exe->base + sym->st_value;
+                }
+            }
+        }
+    }
     // damn __libc_start_main is not accepted to be used in aarch64
     // so it's not here
     void* sym = dlsym(RTLD_DEFAULT, symname);
@@ -131,17 +149,10 @@ void* get_native_symbol(const char* symname) {
 }
 void* get_wrapped_symbol(const char* symname) {
     char fullname[1024];
-    if (symname[0] != 'm' && symname[1] != 'y') {
-        snprintf(
-            fullname, sizeof(fullname),
-            "my_%s", symname
-        );
-    } else {
-        snprintf(
-            fullname, sizeof(fullname),
-            "%s", symname
-        );
-    }
+    snprintf(
+        fullname, sizeof(fullname),
+        "my_%s", symname
+    );
     uint32_t hash = my_hash(fullname);
     for (int i = 1; i < libs_count; i++) {
         if (libs[i].native) continue;
