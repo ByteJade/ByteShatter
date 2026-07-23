@@ -160,7 +160,7 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
             case R_X86_64_JUMP_SLOT:
             case R_X86_64_GLOB_DAT: {
                 const char* symname = elf->strtab + sym->st_name;
-                void *sym_addr;
+                void *sym_addr = NULL;
                 if (exe->native) sym_addr = get_native_symbol(symname);
                 if (sym_addr == NULL) sym_addr = get_wrapped_symbol(symname);
     
@@ -180,7 +180,7 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
                 const char* symname = elf->strtab + sym->st_name;
                 //printf("R_X86_64_COPY: copying %lx bytes of %s\n",
                 //    sym->st_size, sym_name);
-                void *sym_addr;
+                void *sym_addr = NULL;
                 if (exe->native) sym_addr = get_native_symbol(symname);
                 if (sym_addr == NULL) sym_addr = get_wrapped_symbol(symname);
                 //printf("R_X86_64_COPY: copying %p %p %lx\n",
