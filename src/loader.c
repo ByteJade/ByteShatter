@@ -145,6 +145,7 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
         switch(t) {
             case R_X86_64_NONE:
                 break;
+            case R_AARCH64_ABS64:
             case R_X86_64_64:
                 *patch = (Elf64_Addr)(sym->st_value + rel->r_addend);
                 //printf("Apply R_X86_64_64 %lx\n", *patch);
