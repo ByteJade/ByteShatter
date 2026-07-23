@@ -131,10 +131,12 @@ void* get_native_symbol(const char* symname) {
 }
 void* get_wrapped_symbol(const char* symname) {
     char fullname[1024];
-    snprintf(
-        fullname, sizeof(fullname),
-        "my_%s", symname
-    );
+    if (symname[0] != 'm' && symname[1] != 'y') {
+        snprintf(
+            fullname, sizeof(fullname),
+            "my_%s", symname
+        );
+    }
     uint32_t hash = my_hash(fullname);
     for (int i = 1; i < libs_count; i++) {
         if (libs[i].native) continue;
