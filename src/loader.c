@@ -280,10 +280,6 @@ void loader_reloc_dependencies(ExeMeta* exe) {
         const char* sym_name = symtab_str + sym->st_name;
         elf->sym_cache[j] = my_hash(sym_name);
     }
-    if (elf->relr) reloc_relr(exe, elf->relr, elf->relrsz);
-    if (elf->rela) reloc_rela(exe, elf->rela, elf->relasz);
-    if (elf->jmprel) reloc_rela(exe, elf->jmprel, elf->pltrelsz);
-    
     dyn = (Elf64_Dyn*)(exe->base + dyn_phdr->p_vaddr);
     for (; dyn->d_tag != DT_NULL; dyn++) {
         if (dyn->d_tag == DT_NEEDED) {
@@ -292,6 +288,9 @@ void loader_reloc_dependencies(ExeMeta* exe) {
             else load_wrapped_library(name);
         }
     }
+    if (elf->relr) reloc_relr(exe, elf->relr, elf->relrsz);
+    if (elf->rela) reloc_rela(exe, elf->rela, elf->relasz);
+    if (elf->jmprel) reloc_rela(exe, elf->jmprel, elf->pltrelsz);
 }
 void loader_init_library(ExeMeta* exe) {
     if (exe->native) {
