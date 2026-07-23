@@ -6,6 +6,7 @@
 
 uint32_t my_hash(const char* str);
 
+void init_libraries();
 int is_external_offset(uint32_t offset);
 ExeMeta* load_object(const char* filename);
 void load_native_library(const char* filename);

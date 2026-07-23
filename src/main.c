@@ -45,6 +45,7 @@ int main(int argc, char** argv, const char** envp) {
     
     int end = read_argv(argc, argv);
     ExeMeta* exe = load_object(argv[end]);
+    init_libraries();
     finish_stack(exe);
     push_arg(0);
     for (int n = argc-1; n > end-1; n--) {

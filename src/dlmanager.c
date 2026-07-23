@@ -71,9 +71,14 @@ ExeMeta* load_object(const char* filename) {
         libs_count++;
         loader_map_segments(exe);
         loader_reloc_dependencies(exe);
-        loader_init_library(exe);
     }
     return exe;
+}
+void init_libraries() {
+    for (int i = 1; i < libs_count; i++) {
+        if (libs[i].native) continue;
+        loader_init_library(libs[i].object);
+    }
 }
 void load_wrapped_library(const char* filename) {
     for (int i = 0; i < libs_count; i++) {
