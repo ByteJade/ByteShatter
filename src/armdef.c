@@ -23,6 +23,7 @@ const char* types[] = {
     "comis", "movs",
     "movq", "movapd",
     "cvtsd2si", "cvtsi2s",
+    "cmova",
 };
 const char* regs[] = {
     "ax", "cx", "dx", "bx",

@@ -38,6 +38,11 @@ void decode_0F(X64_instruction* buf) {
             else buf->prefix = REP;
             buf->type = COMIS;
             goto set;
+        case 0x47:
+            buf->opcount = 2;
+            buf->type = CMOVA;
+            decode_regrm(buf);
+            break;
         case 0x57:
             buf->type = PXOR;
             goto set;

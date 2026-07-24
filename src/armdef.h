@@ -32,7 +32,7 @@ typedef enum {
     COMIS, MOVS,
     MOVQ, MOVAPD,
     CVTSD2SI, CVTSI2S,
-
+    CMOVA,
 } InstrTypes;
 
 enum mapped_registers {

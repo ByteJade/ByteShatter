@@ -403,6 +403,11 @@ void encode(X64_instruction* buf) {
                 emit32(sf|LDR_NEON | (x64_regs[SC1]<<5) | r0);
             } else panic("ENCODER::UNHANDLED_MOVSS");
         } break;
+        case CMOVA: {
+            if (t0 == REG && t1 == REG) {
+                emit32(_construct_r_r_r(CSELHI, r0, r1, r0));
+            }  else panic("ENCODER::UNHANDLED_CMOVA");
+        } break;
         case MULS:
             emit_neon(buf, MUL_NEON);
             break;

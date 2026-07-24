@@ -30,7 +30,8 @@
 #define STR64_REG 0xF9000000
 #define STUR 0xB8000000
 #define LDUR 0xB8400000
-#define GET_FS 0xd53bd040
+#define GET_FS 0xD53BD040
+#define CSELHI 0x9A808000
 
 #define FT 1<<22
 #define MFT 1<<30
