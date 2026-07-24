@@ -17,9 +17,11 @@ int64_t fetch_imm32(void) {
 void decode_sib(Operand* op) {
     uint8_t sib = fetch8();
     uint8_t base = sib&7;
-    op->type |= IDX;
+
     op->scale = sib>>6;
     op->idx = (sib>>3)&7;
+    if (op->idx != 4) op->type |= IDX;
+    
     if (base == 5 && (op->type&IMM) == 0) {
         op->type |= IMM;
         op->imm = fetch_imm32();
