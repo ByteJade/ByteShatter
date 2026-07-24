@@ -18,7 +18,7 @@ all: $(BUILD_DIR) $(LIB_BUILD_DIR) \
     $(LIB_BUILD_DIR)/my_libm.so.6 \
     $(LIB_BUILD_DIR)/my_libX11.so.6 \
     $(LIB_BUILD_DIR)/my_libGL.so.1 \
-    $(LIB_BUILD_DIR)/my_libSDL-2.0.so.0 \
+    $(LIB_BUILD_DIR)/my_libSDL2-2.0.so.0 \
     $(LIB_BUILD_DIR)/my_libSDL2_ttf-2.0.so.0 \
     $(LIB_BUILD_DIR)/my_libpng16.so.16 \
     $(LIB_BUILD_DIR)/my_libjpeg.so.8 \
@@ -55,9 +55,9 @@ $(LIB_BUILD_DIR)/my_libGL.o: $(LIB_DIR)/my_libGL.s | $(LIB_BUILD_DIR)
 $(LIB_BUILD_DIR)/my_libGL.so.1: $(LIB_BUILD_DIR)/my_libGL.o | $(LIB_BUILD_DIR)
 	$(CC) -fPIC -shared $< -o $@ -lGL
 
-$(LIB_BUILD_DIR)/my_libSDL-2.0.o: $(LIB_DIR)/my_libSDL2.s | $(LIB_BUILD_DIR)
+$(LIB_BUILD_DIR)/my_libSDL2-2.0.o: $(LIB_DIR)/my_libSDL2.s | $(LIB_BUILD_DIR)
 	$(AS) -I$(LIB_DIR) $< -o $@
-$(LIB_BUILD_DIR)/my_libSDL-2.0.so.0: $(LIB_BUILD_DIR)/my_libSDL-2.0.o | $(LIB_BUILD_DIR)
+$(LIB_BUILD_DIR)/my_libSDL2-2.0.so.0: $(LIB_BUILD_DIR)/my_libSDL2-2.0.o | $(LIB_BUILD_DIR)
 	$(CC) -fPIC -shared $< -o $@ -lSDL2
 
 $(LIB_BUILD_DIR)/my_libSDL2_ttf-2.0.o: $(LIB_DIR)/my_libSDL2_ttf.s | $(LIB_BUILD_DIR)
