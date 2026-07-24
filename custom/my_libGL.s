@@ -57,7 +57,7 @@ WRAP_FUNC_VOID glTexImage2D
 WRAP_FUNC_VOID glBlendFunc
 WRAP_FUNC_VOID glDrawArrays
 WRAP_FUNC_VOID glCullFace
-WRAP_FUNC_VOID glTexParametri
+WRAP_FUNC_VOID glTexParameteri
 WRAP_FUNC_VOID glVertexPointer
 
 WRAP_FUNC_VOID glColorPointer
