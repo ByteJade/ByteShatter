@@ -1,8 +1,18 @@
-.macro WRAP_FUNC alias
+.macro WRAP_FUNC_VOID alias
     .global my_\alias
     .extern \alias
     my_\alias:
         b \alias
+.endm
+.macro WRAP_FUNC alias
+    .global my_\alias
+    .extern \alias
+    my_\alias:
+        stp x28, x30, [sp, #-16]!
+        bl \alias
+        ldp x28, x30, [sp], #16
+        mov x9, x0
+        ret
 .endm
 .macro WRAP_BIG_FUNC alias
     .global my_\alias
@@ -24,6 +34,7 @@
         stp x20, x21, [x28, #16]
         ldp x20, x21, [sp], #16
         stp x20, x21, [x28]
+        mov x9, x0
         ret
 .endm
 .macro WRAP_MED_FUNC alias
@@ -35,5 +46,6 @@
         add x28, x28, #16
         bl \alias
         ldp x28, x30, [sp], #16
+        mov x9, x0
         ret
 .endm

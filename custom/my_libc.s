@@ -41,7 +41,7 @@ WRAP_BIG_FUNC printf
 WRAP_BIG_FUNC vsnprintf
 WRAP_BIG_FUNC fprintf
 WRAP_BIG_FUNC sprintf
-WRAP_FUNC exit
+WRAP_FUNC_VOID exit
 WRAP_FUNC puts
 WRAP_FUNC malloc
 WRAP_FUNC memcpy
@@ -49,7 +49,7 @@ WRAP_FUNC memset
 WRAP_FUNC memcmp
 WRAP_FUNC realloc
 WRAP_FUNC calloc
-WRAP_FUNC free
+WRAP_FUNC_VOID free
 WRAP_FUNC strlen
 WRAP_FUNC strstr
 WRAP_FUNC strcmp
@@ -76,7 +76,7 @@ WRAP_FUNC fputs
 WRAP_FUNC dcgettext
 WRAP_FUNC qsort
 WRAP_FUNC rand
-WRAP_FUNC srand
+WRAP_FUNC_VOID srand
 
 WRAP_FUNC feof
 WRAP_FUNC fseek
