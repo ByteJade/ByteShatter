@@ -60,9 +60,9 @@ $(LIB_BUILD_DIR)/my_libSDL-2.0.o: $(LIB_DIR)/my_libSDL2.s | $(LIB_BUILD_DIR)
 $(LIB_BUILD_DIR)/my_libSDL-2.0.so.0: $(LIB_BUILD_DIR)/my_libSDL-2.0.o | $(LIB_BUILD_DIR)
 	$(CC) -fPIC -shared $< -o $@ -lSDL2
 
-$(LIB_BUILD_DIR)/my_libSDL_ttf-2.0.o: $(LIB_DIR)/my_libSDL2_ttf.s | $(LIB_BUILD_DIR)
+$(LIB_BUILD_DIR)/my_libSDL2_ttf-2.0.o: $(LIB_DIR)/my_libSDL2_ttf.s | $(LIB_BUILD_DIR)
 	$(AS) -I$(LIB_DIR) $< -o $@
-$(LIB_BUILD_DIR)/my_libSDL_ttf-2.0.so.0: $(LIB_BUILD_DIR)/my_libSDL_ttf-2.0.o | $(LIB_BUILD_DIR)
+$(LIB_BUILD_DIR)/my_libSDL2_ttf-2.0.so.0: $(LIB_BUILD_DIR)/my_libSDL2_ttf-2.0.o | $(LIB_BUILD_DIR)
 	$(CC) -fPIC -shared $< -o $@ -lSDL2_ttf
 
 $(LIB_BUILD_DIR)/my_libpng16.o: $(LIB_DIR)/my_libpng16.s | $(LIB_BUILD_DIR)
