@@ -92,7 +92,7 @@ void cache_block_end(void) {
     cache_flush(bp-1);
 }
 uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset) {
-    if (offset < INT16_MIN || offset > INT16_MAX) {
+    if (offset < INT32_MIN || offset > INT32_MAX) {
         /* I don't know yet how to
            work with such jumps */
         panic("CACHE::JUMPS::BAD_OFFSET");
@@ -101,9 +101,8 @@ uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset) {
     uint16_t block = bp - 1;
     jump->type = type;
     jump->meta = meta;
-    jump->block = block;
     // where to jump (relative to the start of the block)
-    jump->guest_off = get_gp() - blocks_cache[block].gp + offset;
+    jump->guest_off = get_gp() + offset;
     return ++pp;
 }
 uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {

@@ -9,8 +9,7 @@ typedef struct {
 } OffsetUnit;
 
 typedef struct {
-    uint16_t block;
-    int16_t guest_off;
+    int32_t guest_off;
     uint8_t type;
     uint8_t meta;
 } PatchUnit;
