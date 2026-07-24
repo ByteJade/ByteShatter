@@ -113,6 +113,9 @@ int emit_load(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
         op->imm < 255) {
         emit32(sf|LDUR|((op->imm&0x1FF)<<12)|(x64_regs[op->reg]<<5)|(rd));
         return 1;
+    } else if (op->type == (MEM|REG)) {
+        emit32(sf|LDR32_REG|(x64_regs[op->reg]<<5)|rd);
+        return 1;
     } else {
         emit_address_decode(op, prefix);
         emit32(sf|LDR32_REG|(x64_regs[SC1]<<5)|rd);
