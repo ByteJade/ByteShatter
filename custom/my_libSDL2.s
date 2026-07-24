@@ -52,5 +52,6 @@ WRAP_FUNC SDL_GL_GetAttribute
 WRAP_FUNC SDL_GL_SetAttribute
 WRAP_FUNC SDL_GL_SetSwapInterval
 WRAP_FUNC SDL_GL_CreateContext
+WRAP_FUNC SDL_GL_GetProcAddress
 WRAP_FUNC_VOID SDL_GL_DeleteContext
 WRAP_FUNC_VOID SDL_GL_SwapWindow
