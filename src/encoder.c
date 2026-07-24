@@ -388,7 +388,6 @@ void encode(X64_instruction* buf) {
         case CALL:{
             emit32(0xf81f8f9e);
             emit_branch(buf, BLR_REG, CALL);
-            emit_add_imm(RAX, RDI, 0);
             emit32(0xf840879e);
         } break;
         case RET: emit_ret(); break;
