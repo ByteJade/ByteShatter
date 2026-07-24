@@ -33,7 +33,7 @@ $(LIB_BUILD_DIR):
 	mkdir -p $@
 
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^
+	$(CC) -o $(BUILD_DIR)$@ $^
 
 $(LIB_BUILD_DIR)/my_libc.o: $(LIB_DIR)/my_libc.s | $(LIB_BUILD_DIR)
 	$(AS) -I$(LIB_DIR) $< -o $@
