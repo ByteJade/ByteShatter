@@ -8,6 +8,7 @@
 static const char* ld_paths[] = {
     ".",
     "/lib",
+    "./lib",
     "/lib64",
     "/usr/lib",
     "/usr/lib64",

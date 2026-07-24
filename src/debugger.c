@@ -14,7 +14,6 @@ static int enabled = 0;
 uint64_t breakp = 0;
 uint64_t break_pc = 0;
 uint64_t break_block = -1;
-static uint64_t break_point = 0;
 static uint32_t prev_instr = 0;
 static uint32_t* prev_instrp = NULL;
 
@@ -65,9 +64,9 @@ void help(void) {
 }
 int has_access(void* ptr) {
     memory_check_mode();
-    char i = *(char*)ptr;
+    uint64_t i = *(uint64_t*)ptr;
     if (memory_fail()) {
-        printf("No access to memory\n");
+        printf("No access to memory %lx\n", i);
         return 0;
     }
     return 1;
