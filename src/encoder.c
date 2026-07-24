@@ -17,8 +17,8 @@ void emit_rip(uint8_t rd, int32_t offset) {
     uint64_t full = (uint64_t)(get_guest() + offset);
     int64_t target = full & ~0xFFF;
     int64_t current = (uint64_t)(get_host() + get_hp()) & ~0xFFF;
-    int32_t delta = (target - current) >> 12;
-    if (delta < -524288 || delta > 524287) {
+    int64_t delta = (target - current) >> 12;
+    if (delta < -4294967296LL || delta > 4294967296LL) {
         panic("ENCODER::TOO_LARGE_DISTANCE");
     }
     emit_adrp(SC1, delta);
