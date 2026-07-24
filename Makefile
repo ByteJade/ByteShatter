@@ -80,7 +80,7 @@ $(LIB_BUILD_DIR)/my_libvorbisfile.o: $(LIB_DIR)/my_libvorbisfile.s | $(LIB_BUILD
 $(LIB_BUILD_DIR)/my_libvorbisfile.so.3: $(LIB_BUILD_DIR)/my_libvorbisfile.o | $(LIB_BUILD_DIR)
 	$(CC) -fPIC -shared $< -o $@ -lvorbisfile
 
-$(LIB_BUILD_DIR)/my_libstdc++.so.6: $(LIB_BUILD_DIR)/my_libstdc++.o | $(LIB_BUILD_DIR)
+$(LIB_BUILD_DIR)/my_libstdc++.so.6: $(LIB_BUILD_DIR)/my_libstdc++.cpp | $(LIB_BUILD_DIR)
 	$(CXX) -fPIC -shared $< -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
