@@ -1,0 +1,23 @@
+.include "./wrapper.inc"
+
+.section .text
+
+WRAP_FUNC png_malloc
+WRAP_FUNC png_free
+WRAP_FUNC png_read_image
+WRAP_FUNC png_read_end
+WRAP_FUNC png_read_update_info
+WRAP_FUNC png_create_info_struct
+WRAP_FUNC png_destroy_read_struct
+WRAP_FUNC png_destroy_write_struct
+WRAP_FUNC png_write_image
+WRAP_FUNC png_write_info
+WRAP_FUNC png_get_image_height
+WRAP_FUNC png_get_image_width
+WRAP_FUNC png_get_color_type
+WRAP_FUNC png_get_io_ptr
+WRAP_FUNC png_set_strip_16
+WRAP_FUNC png_set_longjmp_fn
+WRAP_FUNC png_set_read_fn
+WRAP_FUNC png_set_filler
+WRAP_FUNC png_set_expand

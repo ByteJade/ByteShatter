@@ -94,6 +94,7 @@ WRAP_FUNC fopen64
 WRAP_FUNC fwrite
 WRAP_FUNC fread
 WRAP_FUNC fclose
+WRAP_FUNC access
 
 WRAP_FUNC setenv
 WRAP_FUNC getenv
