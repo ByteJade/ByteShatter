@@ -2,6 +2,7 @@
 
 .section .text
 
+WRAP_FUNC glScalef
 WRAP_FUNC glGetString
 WRAP_FUNC glTranslated
 WRAP_FUNC glNormal3f
@@ -29,8 +30,40 @@ WRAP_FUNC glLightfv
 WRAP_FUNC glMaterialfv
 WRAP_FUNC glClearColor
 WRAP_FUNC glOrtho
-WRAP_FUNC glColor3f
 WRAP_FUNC glDisable
+WRAP_FUNC glLightModelf
+WRAP_FUNC glTexEnvi
+WRAP_FUNC glDepthFunc
+WRAP_FUNC glDrawElements
+WRAP_FUNC glPointSize
+WRAP_FUNC glPolygonMode
+WRAP_FUNC glTexGeni
+WRAP_FUNC glDepthMask
+WRAP_FUNC glNormalPointer
+WRAP_FUNC glMultMatrixf
+WRAP_FUNC glPolygonOffset
+WRAP_FUNC glScissor
+WRAP_FUNC glReadPixels
+WRAP_FUNC glEnableClientState
+WRAP_FUNC glGetIntegerv
+WRAP_FUNC glClipPlane
+WRAP_FUNC glAlphaFunc
+WRAP_FUNC glLightModeli
+WRAP_FUNC glPixelStorei
+WRAP_FUNC glTexCoordPointer
+WRAP_FUNC glTexImage2D
+WRAP_FUNC glBlendFunc
+WRAP_FUNC glDrawArrays
+WRAP_FUNC glCullFace
+
+WRAP_FUNC glColorPointer
+WRAP_FUNC glColor4ub
+WRAP_FUNC glColor3f
+WRAP_FUNC glColor4f
+
+WRAP_FUNC glGenTextures
+WRAP_FUNC glDeleteTextures
+WRAP_FUNC glBindTexture
 
 WRAP_FUNC glXMakeCurrent
 WRAP_FUNC glXGetProcAddressARB
