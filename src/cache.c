@@ -98,7 +98,6 @@ uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset) {
         panic("CACHE::JUMPS::BAD_OFFSET");
     }
     PatchUnit* jump = jumps_cache + pp;
-    uint16_t block = bp - 1;
     jump->type = type;
     jump->meta = meta;
     // where to jump (relative to the start of the block)
