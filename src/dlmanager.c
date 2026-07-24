@@ -8,7 +8,6 @@
 static const char* ld_paths[] = {
     ".",
     "/lib",
-    "./lib",
     "/lib64",
     "/usr/lib",
     "/usr/lib64",
@@ -90,7 +89,7 @@ void load_wrapped_library(const char* filename) {
     char fullpath[1024];
     snprintf(
         fullpath, sizeof(fullpath),
-        "./my_%s", filename
+        "./lib/my_%s", filename
     );
     ExeMeta* exe = load_object(fullpath);
     if (!exe) {
