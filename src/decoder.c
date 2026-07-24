@@ -21,7 +21,7 @@ void decode_sib(Operand* op) {
     op->scale = sib>>6;
     op->idx = (sib>>3)&7;
     if (op->idx != 4) op->type |= IDX;
-    
+
     if (base == 5 && (op->type&IMM) == 0) {
         op->type |= IMM;
         op->imm = fetch_imm32();
@@ -305,6 +305,15 @@ int decode_instr(X64_instruction* buf) {
         case 0x99:
             buf->opcount = 0;
             buf->type = CLTD;
+            break;
+        case 0xA8:
+            buf->size = 8;
+            buf->opcount = 2;
+            buf->type = TST;
+            buf->op0.type = REG;
+            buf->op0.reg = RAX;
+            buf->op1.type = IMM;
+            buf->op1.imm = fetch_imm8();
             break;
         case 0xB8 ... 0xBF:
             buf->reverse = 1;
