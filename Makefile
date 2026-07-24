@@ -19,7 +19,7 @@ all: $(BUILD_DIR) $(LIB_BUILD_DIR) \
     $(LIB_BUILD_DIR)/my_libX11.so.6 \
     $(LIB_BUILD_DIR)/my_libGL.so.1 \
     $(LIB_BUILD_DIR)/my_libSDL-2.0.so.0 \
-    $(LIB_BUILD_DIR)/my_libSDL_ttf-2.0.so.0 \
+    $(LIB_BUILD_DIR)/my_libSDL2_ttf-2.0.so.0 \
     $(LIB_BUILD_DIR)/my_libpng16.so.16 \
     $(LIB_BUILD_DIR)/my_libjpeg.so.8 \
     $(LIB_BUILD_DIR)/my_libvorbisfile.so.3 \
