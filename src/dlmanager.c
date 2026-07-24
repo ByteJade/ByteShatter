@@ -22,7 +22,7 @@ typedef struct {
     void* object;
 } Library;
 
-Library libs[16];
+Library libs[32];
 int libs_count = 0;
 
 uint32_t my_hash(const char* str) {
