@@ -124,7 +124,8 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
         default:
             panic("PATCHER::UNKNOWN_PATCH");
     }
-    __builtin___clear_cache(sc->pc, sc->pc + 4);
+    void* clear = (void*)sc->pc;
+    __builtin___clear_cache(clear, clear + 4);
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
