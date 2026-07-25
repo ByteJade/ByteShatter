@@ -396,14 +396,12 @@ void encode(X64_instruction* buf) {
             if (prev_instruction == CALL) {
                 patch32();
                 cache_back();
-                emit_branch(buf, BLR_REG, CALL);
-                emit32(0xf840879e);
             } else {
                 prev_instruction = CALL;
                 emit32(0xf81f8f9e);
-                emit_branch(buf, BLR_REG, CALL);
-                emit32(0xf840879e);
             }
+            emit_branch(buf, BLR_REG, CALL);
+            emit32(0xf840879e);
         } break;
         case RET: emit_ret(); break;
         case EBR: emit_bti(); break;
