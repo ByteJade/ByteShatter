@@ -394,7 +394,6 @@ void encode(X64_instruction* buf) {
         } break;
         case CALL:{
             if (prev_instruction == CALL) {
-                prev_instruction = NOP;
                 patch32();
                 cache_back();
                 emit_branch(buf, BLR_REG, CALL);
