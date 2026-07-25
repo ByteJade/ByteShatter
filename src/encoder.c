@@ -189,7 +189,7 @@ void encode(X64_instruction* buf) {
     uint8_t t0 = buf->op0.type;
     uint8_t t1 = buf->op1.type;
     uint32_t sf = (buf->size == 64) * SF;
-    if (buf->type != PUSH && buf->type != POP) {
+    if (buf->type != PUSH && buf->type != POP && buf->type != CALL) {
         prev_instruction = NOP;
     }
     switch (buf->type) {
@@ -330,7 +330,8 @@ void encode(X64_instruction* buf) {
         case POP:{
             if (t0 == REG) {
                 if (prev_instruction == POP) {
-                    patch32(POPP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
+                    patch32();
+                    emit32(POPP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
                     cache_back();
                     prev_instruction = NOP;
                 } else {
@@ -343,7 +344,8 @@ void encode(X64_instruction* buf) {
         case PUSH:{
             if (t0 == REG) {
                 if (prev_instruction == PUSH) {
-                    patch32(PUSHP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
+                    patch32();
+                    emit32(PUSHP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
                     cache_back();
                     prev_instruction = NOP;
                 } else {
@@ -391,9 +393,18 @@ void encode(X64_instruction* buf) {
             emit_branch(buf, BR_REG, JMP);
         } break;
         case CALL:{
-            emit32(0xf81f8f9e);
-            emit_branch(buf, BLR_REG, CALL);
-            emit32(0xf840879e);
+            if (prev_instruction == CALL) {
+                prev_instruction = NOP;
+                patch32();
+                cache_back();
+                emit_branch(buf, BLR_REG, CALL);
+                emit32(0xf840879e);
+            } else {
+                prev_instruction = CALL;
+                emit32(0xf81f8f9e);
+                emit_branch(buf, BLR_REG, CALL);
+                emit32(0xf840879e);
+            }
         } break;
         case RET: emit_ret(); break;
         case EBR: emit_bti(); break;
