@@ -16,7 +16,7 @@ void emit16(uint16_t data);
 /* emit 4 bytes to host memory */
 void emit32(uint32_t data);
 /* replace 32 bytes */
-void patch32();
+void patch32(uint32_t data);
 
 /* fetch byte from guest memory */
 uint8_t fetch8(void);
