@@ -8,12 +8,6 @@ void my___libc_start_main(
     void (*init)(void), void (*fini)(void),
     void (*rtld_fini)(void), void* stack_end)
 {
-    asm volatile(
-        "mov x27, x30\n"
-        "bl strtol\n"
-        "mov x30, x27\n"
-        "mov x9, x0\n"
-    );
     if (init) init();
     int out = main(argc, argv, NULL);
     if (fini) fini();
