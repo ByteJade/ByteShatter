@@ -12,29 +12,6 @@ TODO:
 - encoding for 8, 16 and 32 bit instructions
 - clean emitter
 */
-void emit_rip(uint8_t rd, int32_t offset) {
-    uint64_t full = (uint64_t)(get_guest() + offset);
-    int64_t target = full & ~0xFFF;
-    int64_t current = (uint64_t)(get_host() + get_hp()) & ~0xFFF;
-    int64_t delta = (target - current) >> 12;
-    if (delta < -4294967296LL || delta > 4294967296LL) {
-        panic("ENCODER::TOO_LARGE_DISTANCE");
-    }
-    emit_adrp(SC1, delta);
-    emit_add_imm(rd, SC1, full & 0xFFF);
-}
-void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
-    if (buf->op0.type == REG) {
-        emit32(code | (x64_regs[buf->op0.reg] << 5));
-    } else if (buf->op0.type == IMM) {
-        emit_brk(cache_patch_point(type, 0, buf->op0.imm));
-    } else if (buf->op0.type == (MEM|IMM)) {
-        int32_t offset = get_gp() + buf->op0.imm;
-        emit_rip(SC1, offset);
-        emit_ldr_reg(SC1, SC1, 0);
-        emit32(code | (x64_regs[SC1] << 5));
-    }
-}
 void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
     if (imm > 0)
         emit_add_imm(r0, r1, imm);
@@ -48,7 +25,15 @@ void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
         return;
     }
     if (t == (MEM|IMM)) {
-        emit_rip(reg, get_gp() + op->imm);
+        uint64_t full = (uint64_t)(get_guest() + get_gp() + op->imm);
+        int64_t target = full & ~0xFFF;
+        int64_t current = (uint64_t)(get_host() + get_hp()) & ~0xFFF;
+        int64_t delta = (target - current) >> 12;
+        if (delta < -4294967296LL || delta > 4294967296LL) {
+            panic("ENCODER::TOO_LARGE_DISTANCE");
+        }
+        emit_adrp(SC1, delta);
+        emit_add_imm(reg, SC1, full & 0xFFF);
         return;
     }
     if (t&IDX) {
@@ -68,6 +53,17 @@ void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
         } else {
             emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, 0));
         }
+    }
+}
+void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
+    if (buf->op0.type == REG) {
+        emit32(code | (x64_regs[buf->op0.reg] << 5));
+    } else if (buf->op0.type == IMM) {
+        emit_brk(cache_patch_point(type, 0, buf->op0.imm));
+    } else if (buf->op0.type&MEM) {
+        emit_address_decode(&buf->op0, SC1, 0);
+        emit_ldr_reg(SC1, SC1, 0);
+        emit32(code | (x64_regs[SC1] << 5));
     }
 }
 void emit_imm(Operand* op) {
