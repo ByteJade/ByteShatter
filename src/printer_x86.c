@@ -103,7 +103,8 @@ void sprint_x86_64(Instruction* buf, char* out) {
     if (buf->a.type) {
         out = sprint_op(buf, out, &buf->a);
         if (buf->b.type) {
-            sprint_op(buf, out, &buf->b);
+            out = sprint_op(buf, out, &buf->b);
         }
     }
+    sprintf(out, "\033[0m");
 }

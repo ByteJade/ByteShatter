@@ -177,8 +177,6 @@ void cache_print(int block) {
         set_gp(unit->gp + unit->offsets[x].goff);
         decode_instr(&buf);
         char out[64];
-        sprint_x86_64(&buf, out);
-        printf(" : %s\n", out);
         int end;
         int start = unit->offsets[x].hoff;
         if (x+1 == unit->offsetssz) end = start+4;
