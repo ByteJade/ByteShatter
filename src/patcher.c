@@ -6,6 +6,7 @@
 #include "arm64emitter.h"
 #include "armdef.h"
 #include "debugger.h"
+#include <cstdint>
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -143,7 +144,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
             block = get_host() + get_hp();
             decode(sc->pc);
         }
-        sc->pc = block;
+        sc->pc = (uint64_t)block;
         return;
     }
     print_cpu();

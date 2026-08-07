@@ -87,7 +87,7 @@ typedef struct {
 static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
     Search_data* search = data;
     Elf64_Addr base = info->dlpi_addr;
-    Elf64_Dyn* dyn;
+    Elf64_Dyn* dyn = NULL;
     for (int i = 0; i < info->dlpi_phnum; i++) {
         const Elf64_Phdr* phdr = &info->dlpi_phdr[i];
         
