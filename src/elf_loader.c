@@ -24,15 +24,7 @@ void mmap_base(Elf* elf) {
     }
     min &= ~(PAGE_SIZE - 1);
     max = (max + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-    elf->base = (uint8_t*)mmap(
-        NULL, max - min,
-        PROT_WRITE | PROT_READ
-    #ifndef __aarch64__
-        | PROT_EXEC
-    #endif
-        , MAP_ANON | MAP_PRIVATE,
-        -1, 0
-    );
+    elf->base = (uint8_t*)mmap_guest(max - min);
     memory_init(max);
     elf->base -= min;
 }
