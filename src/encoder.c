@@ -381,8 +381,7 @@ void encode(X64_instruction* buf) {
             emit_branch(buf, BLR_REG, CALL);
         } break;
         case RET: emit_ret(); break;
-        case EBR: emit_bti(); break;
-        case NOP: break;
+        case EBR: case NOP: break;
         case MOVS: {
             sf = (buf->prefix == REPN) * MFT;
             if (t0 & MEM) {
