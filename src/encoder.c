@@ -106,20 +106,23 @@ void emit_neon(X64_instruction* buf, int opcode) {
         emit32(osf|opcode|(r0)|(r0<<5)|(16<<16));
     } else panic("ENCODER::UNHANDLED_NEON");
 }
-void emit_load(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
+int emit_load(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
     sf >>= 1;
     if (op->type == (MEM|REG|IMM) &&
         op->imm > -256 &&
         op->imm < 255) {
         emit32(sf|LDUR|((op->imm&0x1FF)<<12)|(x64_regs[op->reg]<<5)|(rd));
+        return 1;
     } else if (op->type == (MEM|REG)) {
         emit32(sf|LDR32_REG|(x64_regs[op->reg]<<5)|rd);
+        return 1;
     } else {
         emit_address_decode(op, prefix);
         emit32(sf|LDR32_REG|(x64_regs[SC1]<<5)|rd);
+        return 0;
     }
 }
-int emit_store(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix, uint8_t address) {
+int emit_store(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
     sf >>= 1;
     if (op->type == (MEM|REG|IMM) &&
         op->imm > -256 &&
@@ -127,7 +130,7 @@ int emit_store(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix, uint8_t add
         emit32(sf|STUR|((op->imm&0x1FF)<<12)|(x64_regs[op->reg]<<5)|(rd));
         return 1;
     } else {
-        if (address) emit_address_decode(op, prefix);
+        emit_address_decode(op, prefix);
         emit32(sf|STR32_REG|(x64_regs[SC1]<<5)|rd);
         return 0;
     }
@@ -201,22 +204,27 @@ void encode(X64_instruction* buf) {
             } else panic("ENCODER::UNHANDLED_SUB");
         } break;
         case ADD:{
-            if (t1&MEM) {
+            if (t0 == REG && t1 == REG)
+                emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, r1));
+            else if (t0 == REG && t1 == IMM)
+                emit_add_signed(r0, r0, buf->op1.imm);
+            else if (t0&MEM) {
+                uint8_t simple = emit_load(x64_regs[SC2], &buf->op0, sf, buf->prefix);
+                if (t1 == REG) {
+                    emit32(sf|_construct_r_r_r(ADD_REG|S, SC2, SC2, r1));
+                } else {
+                    emit_add_signed(SC2, SC2, buf->op1.imm);
+                }
+                if (simple) {
+                    emit_store(x64_regs[SC2], &buf->op0, sf, buf->prefix);
+                } else {
+                    sf >>= 1;
+                    emit32(sf|_construct_r_r_imm(STR32_REG, SC2, SC1, 0));
+                }
+            } else if (t1&MEM) {
                 emit_load(x64_regs[SC2], &buf->op1, sf, buf->prefix);
                 emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, SC2));
-                r1 = SC2;
-            } else if (t0&MEM) {
-                emit_load(x64_regs[SC2], &buf->op0, sf, buf->prefix);
-                r0 = SC2;
-            }
-            if (t1 == REG) {
-                emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, r1));
-            } else {
-                emit_add_signed(r0, r0, buf->op1.imm);
-            }
-            if (t0&MEM) {
-                emit_store(x64_regs[SC2], &buf->op0, sf, buf->prefix, 0);
-            }
+            } else panic("ENCODER::UNHANDLED_ADD");
         } break;
         case SHL:{
             if (t0 == REG && t1 == IMM)
@@ -262,7 +270,7 @@ void encode(X64_instruction* buf) {
                         r1 = SC2;
                     }
                 }
-                emit_store(x64_regs[r1], &buf->op0, sf, buf->prefix, 1);
+                emit_store(x64_regs[r1], &buf->op0, sf, buf->prefix);
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;
         case LEA:{
@@ -319,7 +327,7 @@ void encode(X64_instruction* buf) {
                 }
             } else panic("ENCODER::UNHANDLED_AND");
         } break;
-        case POP:{
+case POP:{
             if (t0 == REG) {
                 if (r0 == RBP) {
                     emit32(POPP | (29<<10) | 30);
@@ -391,7 +399,9 @@ void encode(X64_instruction* buf) {
             emit_branch(buf, BR_REG, JMP);
         } break;
         case CALL:{
+            emit32(0xf81f8f9e);
             emit_branch(buf, BLR_REG, CALL);
+            emit32(0xf840879e);
         } break;
         case RET: emit_ret(); break;
         case EBR: emit_bti(); break;
