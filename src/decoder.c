@@ -121,6 +121,7 @@ void decode_GRP3(Instruction* buf, uint8_t code) {
 int decode_instr(Instruction* buf) {
     buf->size = 32;
     uint8_t rex = 0;
+    uint8_t ret = 0;
     uint8_t byte = fetch8();
     if ((byte >= FS && byte <= OS) ||
     (byte >= REPN && byte <= REPE)) {
@@ -250,7 +251,8 @@ int decode_instr(Instruction* buf) {
         case 0xC3:
             buf->type = RET;
             buf->a.type = NONE;
-            return 1;
+            ret = 1;
+            break;
         case 0xC6:
             buf->size = 8;
             buf->reverse = 1;
@@ -276,14 +278,15 @@ int decode_instr(Instruction* buf) {
             buf->a.type = IMM;
             buf->a.imm = fetch_imm32();
             buf->b.type = NONE;
-            if (buf->type == JMP) return 1;
+            if (buf->type == JMP) ret = 1;
             break;
         case 0xEB:
             buf->type = JMP;
             buf->a.type = IMM;
             buf->a.imm = fetch_imm8();
             buf->b.type = NONE;
-            return 1;
+            ret = 1;
+            break;
         case 0xF7: {
             uint8_t byte = fetch8();
             if ((byte&0b11111000) == 0xF8) {
@@ -302,7 +305,7 @@ int decode_instr(Instruction* buf) {
             uint8_t code = (modrm >> 3) & 7;
             decode_rm(&buf->a, modrm);
             decode_GRP3(buf, code);
-            if (buf->type == JMP) return 1;
+            if (buf->type == JMP) ret = 1;
         } break;
         default: panic("DECODER::UNKNOWN_SYMBOL: %X", byte);
     }
@@ -312,7 +315,7 @@ int decode_instr(Instruction* buf) {
         sprint_x86_64(buf, out);
         print("%s", out);
     }
-    return 0;
+    return ret;
 }
 int decode_step() {
     uint8_t brk = 0;
