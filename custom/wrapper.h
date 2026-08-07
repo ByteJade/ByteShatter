@@ -30,7 +30,7 @@
             "ldp x6, x7, [x28], #16\n" \
             "mov sp, x28\n" \
             "bl " #func "\n" \
-            "sub x28, #16\n" \
+            "sub x28, x28, #16\n" \
             "mov x30, x27\n" \
             "mov x9, x0\n" \
         ); \
