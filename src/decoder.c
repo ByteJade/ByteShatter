@@ -119,6 +119,7 @@ void decode_GRP3(Instruction* buf, uint8_t code) {
 }
 
 int decode_instr(Instruction* buf) {
+    buf->prefix = 0;
     buf->size = 32;
     uint8_t rex = 0;
     uint8_t ret = 0;
