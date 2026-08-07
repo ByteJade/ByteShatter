@@ -6,7 +6,6 @@
 #include "arm64emitter.h"
 #include "armdef.h"
 #include "debugger.h"
-#include <cstdint>
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
