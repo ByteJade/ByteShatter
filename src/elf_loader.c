@@ -2,6 +2,7 @@
 #include "cache.h"
 #include "elf_manager.h"
 #include "core.h"
+#include "memory.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,6 +33,7 @@ void mmap_base(Elf* elf) {
         , MAP_ANON | MAP_PRIVATE,
         -1, 0
     );
+    memory_init(max);
     elf->base -= min;
 }
 
