@@ -29,12 +29,12 @@ void my___isoc23_sscanf() {
         "mov x9, x0\n"
     );
 }
-
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(vsnprintf)
 WRAP_BIG_FUNC(fprintf)
 WRAP_BIG_FUNC(sprintf)
 WRAP_FUNC_VOID(exit)
+WRAP_FUNC_VOID(__stack_chk_fail)
 WRAP_FUNC(puts)
 WRAP_FUNC(malloc)
 WRAP_FUNC(memcpy)
@@ -66,7 +66,6 @@ WRAP_FUNC(time)
 WRAP_FUNC(setlocale)
 WRAP_FUNC(ftell)
 WRAP_FUNC(fputs)
-WRAP_FUNC(dcgettext)
 WRAP_FUNC(qsort)
 WRAP_FUNC(rand)
 WRAP_FUNC_VOID(srand)
