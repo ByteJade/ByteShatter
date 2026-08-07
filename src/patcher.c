@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "decoder.h"
 #include "arm64emitter.h"
+#include "printer_x86.h"
 #include "debugger.h"
 #include <stdint.h>
 #include <string.h>
@@ -17,7 +18,7 @@ static int memory_check = 0;
 uint64_t get_reg(const char* name) {
     name++;
     for (int i = 0; i < 16; i++) {
-        if (strcmp(name, regs[i]) == 0)
+        if (strcmp(name, regs64[i]) == 0)
             return sc->regs[x64_regs[i]];
     }
     return 0;
@@ -42,7 +43,7 @@ void print_flags(void) {
 void print_cpu(void) {
     printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 16; i++) {
-        printf("r%s: %llX\n", regs[i], sc->regs[x64_regs[i]]);
+        printf("r%s: %llX\n", regs64[i], sc->regs[x64_regs[i]]);
     }
     print_flags();
 }
