@@ -12,7 +12,12 @@ void decode_0F(Instruction* buf) {
             fetch8();
             break;
         case 0x11:
-            buf->reverse = 1;
+            buf->type = MOVS;
+            decode_rm_r(buf);
+            buf->a.type |= XMM;
+            if (buf->b.type == REG)
+                buf->b.type |= XMM;
+            break;
         case 0x10:
             buf->type = MOVS;
             goto set;
@@ -21,13 +26,12 @@ void decode_0F(Instruction* buf) {
             goto set;
         case 0x2A:
             buf->type = CVTSI2S;
-            decode_regrm(buf);
+            decode_r_rm(buf);
             buf->a.type |= XMM;
             break;
         case 0x2C:
-            buf->reverse = 1;
             buf->type = CVTSD2SI;
-            decode_regrm(buf);
+            decode_rm_r(buf);
             buf->a.type |= XMM;
             break;
         case 0x2f:
@@ -37,7 +41,7 @@ void decode_0F(Instruction* buf) {
             goto set;
         case 0x47:
             buf->type = CMOVA;
-            decode_regrm(buf);
+            decode_r_rm(buf);
             break;
         case 0x57:
             buf->type = PXOR;
@@ -59,16 +63,19 @@ void decode_0F(Instruction* buf) {
             buf->type = DIVS;
             goto set;
         case 0x7e:
-            buf->reverse = 1;
+            buf->type = MOVQ;
+            decode_rm_r(buf);
+            buf->a.type |= XMM;
+            break;
         case 0x6e:
             buf->type = MOVQ;
-            decode_regrm(buf);
+            decode_r_rm(buf);
             buf->a.type |= XMM;
             break;
         case 0xEF:
             buf->type = PXOR;
         set:
-            decode_regrm(buf);
+            decode_r_rm(buf);
             buf->a.type |= XMM;
             if (buf->b.type == REG)
                 buf->b.type |= XMM;
@@ -81,7 +88,7 @@ void decode_0F(Instruction* buf) {
             break;
         case 0xB6:
             buf->type = MOVZX;
-            decode_regrm(buf);
+            decode_r_rm(buf);
             break;
         default: panic("DECODER::UNKNOWN_F0_SYMBOL: %X", byte);
     }

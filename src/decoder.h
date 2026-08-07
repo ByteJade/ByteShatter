@@ -73,8 +73,8 @@ typedef struct {
 
 int64_t fetch_imm8(void);
 int64_t fetch_imm32(void);
-void decode_rm(Operand* op, uint8_t modrm);
-void decode_regrm(Instruction* buf);
+void decode_r_rm(Instruction* buf);
+void decode_rm_r(Instruction* buf);
 void decode_0F(Instruction* buf);
 int decode_instr(Instruction* buf);
 void decode(uint32_t gp);
