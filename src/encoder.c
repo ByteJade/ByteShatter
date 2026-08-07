@@ -300,7 +300,8 @@ void encode(Instruction* buf) {
                     break;
                 }
                 if (prev_instruction == POP) {
-                    patch32(POPP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
+                    patch32();
+                    emit32(POPP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
                     cache_back();
                     prev_instruction = NOP;
                 } else {
@@ -311,13 +312,41 @@ void encode(Instruction* buf) {
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
+            if (t0 == IMM) {
+                if (prev_instruction == PUSH) {
+                    patch32();
+                    emit_imm(buf->a.imm, SC1);
+                    emit32(PUSHP | (x64_regs[SC1]<<10) | (x64_regs[prev_register]));
+                    cache_back();
+                    prev_instruction = NOP;
+                    break;
+                } else {
+                    emit_imm(buf->a.imm, SC1);
+                    r0 = SC1;
+                    t0 = REG;
+                }
+            } else if (t0&MEM) {
+                if (prev_instruction == PUSH) {
+                    patch32();
+                    emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
+                    emit32(PUSHP | (x64_regs[SC1]<<10) | (x64_regs[prev_register]));
+                    cache_back();
+                    prev_instruction = NOP;
+                    break;
+                } else {
+                    emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
+                    r0 = SC1;
+                    t0 = REG;
+                }
+            }
             if (t0 == REG) {
                 if (r0 == RBP) {
                     emit32(PUSHP | (29<<10) | 30);
                     break;
                 }
                 if (prev_instruction == PUSH) {
-                    patch32(PUSHP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
+                    patch32();
+                    emit32(PUSHP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
                     cache_back();
                     prev_instruction = NOP;
                 } else {
@@ -325,14 +354,6 @@ void encode(Instruction* buf) {
                     prev_instruction = PUSH;
                     prev_register = r0;
                 }
-            } else if (t0 == IMM) {
-                emit_movz(SC1, buf->a.imm, 0);
-                emit_push_reg(SC1);
-                prev_instruction = NOP;
-            } else if (t0&MEM) {
-                emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
-                emit_push_reg(SC1);
-                prev_instruction = NOP;
             } else panic("ENCODER::UNHANDLED_PUSH");
         } break;
         case LEAVE: {
