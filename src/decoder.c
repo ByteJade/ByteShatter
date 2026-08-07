@@ -225,7 +225,7 @@ int decode_instr(Instruction* buf) {
             buf->b.type = NONE;
             break;
         case 0xB0 ... 0xBF:
-            buf->reverse = 0;
+            buf->reverse = 1;
             buf->type = MOV;
             buf->a.type = REG;
             buf->a.reg = byte&7;
