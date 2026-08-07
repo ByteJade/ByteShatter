@@ -2,15 +2,11 @@
 #include <stdlib.h>
 
 // just call main and return
-int my___libc_start_main(
-    int (*main)(int, char **, char **),
-    int argc, char** argv,
-    void (*init)(void), void (*fini)(void),
-    void (*rtld_fini)(void), void* stack_end)
+void my___libc_start_main()
 {
-    if (init) init();
-    int out = main(argc, argv, NULL);
-    if (fini) fini();
+    asm volatile(
+        "blr x0\n"
+    );
     exit(0);
 }
 void my___isoc23_strtol() {
