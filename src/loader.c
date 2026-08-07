@@ -146,7 +146,7 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
             case R_X86_64_GLOB_DAT: {
                 const char* symname = elf->strtab + sym->st_name;
                 void *sym_addr = NULL;
-                sym_addr = get_symbol(symname);
+                sym_addr = get_symbol_wrapped(symname);
 
                 if (sym_addr) {
                     *patch = (Elf64_Addr)sym_addr;
