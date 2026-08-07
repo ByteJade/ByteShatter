@@ -37,7 +37,7 @@ void decode_rm(Operand* op, uint8_t modrm) {
             op->type |= IMM;
             op->imm = fetch_imm32();
         } else {
-            op->type = REG;
+            op->type |= REG;
             op->reg = rm;
         }
         if (mod == 1) {
