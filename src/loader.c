@@ -79,7 +79,7 @@ void loader_map_segments(ExeMeta* exe) {
     }
     exe->basesz = ALIGN_U(addr_max) - ALIGN_D(addr_min);
     /* TODO: non-obvious initialization, needs to be moved */
-    if (exe->native) memory_init(exe->basesz);
+    memory_init(exe->basesz);
     exe->base = (uint8_t*)mmap_guest(exe->basesz);
     print("base done %p", exe->base);
     for (int i = 0; i < elf->header.e_phnum; i++) {
@@ -90,8 +90,6 @@ void loader_map_segments(ExeMeta* exe) {
             fread(dst, 1, phdr->p_filesz, elf->fp);
             /* Usually we use protection here
                but during emulation it will interfere */
-            if (exe->native) mprotect(dst, phdr->p_filesz, 
-                PROT_READ | PROT_WRITE | PROT_EXEC);
             print("map %lx, %lx", phdr->p_vaddr, phdr->p_filesz);
             /* fill .bss */
             if(phdr->p_filesz != phdr->p_memsz) {
