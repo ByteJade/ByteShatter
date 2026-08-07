@@ -320,11 +320,6 @@ int decode_step() {
     cache_block_point();
     Instruction buf;
     int type = decode_instr(&buf);
-    if (debug_enabled()) {
-        char out[64];
-        sprint_x86_64(&buf, out);
-        print("%s", out);
-    }
     encode(&buf);
     if (brk) set_break();
     return type;
