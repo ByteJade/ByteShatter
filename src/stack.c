@@ -66,19 +66,19 @@ void set_envp(const char** envp) {
         envc++;
     }
 }
-void finish_stack(ExeMeta* exe) {
+void finish_stack(Elf* elf) {
     Elf64_auxv_t auxv[] = {
         {AT_SYSINFO_EHDR, {0}},
         {AT_MINSIGSTKSZ, {0x5f0}},
         {AT_HWCAP,     {0x26}},
         {AT_PAGESZ,    {sysconf(_SC_PAGESIZE)}},
         {AT_CLKTCK,    {sysconf(_SC_CLK_TCK)}},
-        {AT_PHDR,      {(uint64_t)exe->base + exe->elf->header.e_phoff}},
-        {AT_PHENT,     {exe->elf->header.e_phentsize}},
-        {AT_PHNUM,     {exe->elf->header.e_phnum}},
+        {AT_PHDR,      {(uint64_t)elf->base + elf->head.e_phoff}},
+        {AT_PHENT,     {elf->head.e_phentsize}},
+        {AT_PHNUM,     {elf->head.e_phnum}},
         {AT_BASE,      {0}},
         {AT_FLAGS,     {0}},
-        {AT_ENTRY,     {(uint64_t)exe->base + exe->elf->header.e_entry}},
+        {AT_ENTRY,     {(uint64_t)elf->base + elf->head.e_entry}},
         {AT_UID,       {getuid()}},
         {AT_EUID,      {geteuid()}},
         {AT_GID,       {getgid()}},

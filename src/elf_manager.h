@@ -1,7 +1,7 @@
 #ifndef ELF_MANAGER_H
 #define ELF_MANAGER_H
 
-#include "loader.h"
+#include "elf_loader.h"
 
 void open_library(const char* filename);
 char* get_symbol(const char* symbol);

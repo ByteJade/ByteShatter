@@ -1,7 +1,7 @@
 #include "core.h"
 #include "memory.h"
 #include "cache.h"
-#include "loader.h"
+#include "elf_loader.h"
 #include "patcher.h"
 #include "stack.h"
 #include "executer.h"
@@ -44,11 +44,10 @@ int main(int argc, char** argv, const char** envp) {
     set_envp(envp);
     
     int end = read_argv(argc, argv);
-    ExeMeta* exe = loader_open_elf(argv[end]);
-    loader_map_segments(exe);
-    loader_reloc_dependencies(exe);
-    loader_init_library(exe);
-    finish_stack(exe);
+    Elf* elf = elf_load(argv[argc-1]);
+    elf_read_dynamic(elf);
+    elf_init(elf);
+    finish_stack(elf);
     push_arg(0);
     for (int n = argc-1; n > end-1; n--) {
         push_arg(argv[n]);
@@ -57,11 +56,10 @@ int main(int argc, char** argv, const char** envp) {
     
     
     debug_wait();
-    set_guest((uint64_t)exe->base);
-    execute(exe->elf->header.e_entry);
+    set_guest((uint64_t)elf->base);
+    execute(elf->head.e_entry);
 
-    loader_close_elf(exe);
-    loader_close_exe(exe);
+    elf_close(elf);
     cahce_fini();
     memory_fini();
     stack_fini();

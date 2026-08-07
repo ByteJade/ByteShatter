@@ -14,7 +14,7 @@ void push_envp(const char* env);
 void set_envp(const char** envp);
 void set_auxv(Elf64_auxv_t* auxv, int auxc);
 
-void finish_stack(ExeMeta* exe);
+void finish_stack(Elf* elf);
 void* get_sp(void);
 
 #endif
