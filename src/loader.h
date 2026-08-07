@@ -10,8 +10,6 @@ typedef struct {
     Elf64_Ehdr header;
     Elf64_Phdr* pheaders;
     Elf64_Shdr* sheaders;
-    Elf64_Sym* dynsym;
-    int dynsymsz;
     Elf64_Sym* symtab;
     char* strtab;
     char* shstrtab;
@@ -21,7 +19,6 @@ typedef struct {
     int pltrelsz;
     Elf64_Relr* relr;
     int relrsz;
-    uint32_t* sym_cache;
 } ElfMeta;
 
 typedef struct {

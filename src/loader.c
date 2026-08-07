@@ -1,7 +1,7 @@
 #include "loader.h"
 #include "core.h"
 #include "memory.h"
-#include "dlmanager.h"
+#include "elf_manager.h"
 #include "executer.h"
 #include <elf.h>
 #include <stdint.h>
@@ -102,15 +102,6 @@ void loader_map_segments(ExeMeta* exe) {
             }
         }
     }
-    /* get file symbols */
-    for (int i = 0; i < elf->header.e_shnum; i++) {
-        Elf64_Shdr* head = elf->sheaders + i;
-        if (head->sh_type == SHT_DYNSYM) {
-            elf->dynsym = (Elf64_Sym*)(exe->base + head->sh_addr);
-            elf->dynsymsz = head->sh_size / head->sh_entsize;
-            break;
-        }
-    }
 }
 void reloc_relr(ExeMeta* exe, Elf64_Relr* relr, int size) {
     print("process relr");
@@ -145,48 +136,38 @@ void reloc_rela(ExeMeta* exe, Elf64_Rela* rela, int size) {
         switch(t) {
             case R_X86_64_NONE:
                 break;
-            case R_AARCH64_ABS64:
             case R_X86_64_64:
                 *patch = (Elf64_Addr)(sym->st_value + rel->r_addend);
-                //printf("Apply R_X86_64_64 %lx\n", *patch);
                 break;
-            case R_AARCH64_RELATIVE:
             case R_X86_64_RELATIVE:
                 *patch = (Elf64_Addr)(exe->base + rel->r_addend);
-                //printf("Apply R_X86_64_RELATIVE %lx\n", *patch);
                 break;
-            case R_AARCH64_JUMP_SLOT:
-            case R_AARCH64_GLOB_DAT:
             case R_X86_64_JUMP_SLOT:
             case R_X86_64_GLOB_DAT: {
                 const char* symname = elf->strtab + sym->st_name;
                 void *sym_addr = NULL;
-                if (exe->native) sym_addr = get_native_symbol(symname);
-                else sym_addr = get_wrapped_symbol(symname);
-    
+                sym_addr = get_symbol(symname);
+
                 if (sym_addr) {
                     *patch = (Elf64_Addr)sym_addr;
-                    //printf("GLOB_DAT: %lx %s -> %p\n", rel->r_offset, sym_name, sym_addr);
                 } else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK) {
                     *patch = 0;
-                    //printf("GLOB_DAT: %s -> 0 (weak)\n", sym_name);
                 } else {
                     warning("LOADER::UNDEFINED_SYMBOL %s", symname);
                     *patch = 0;
                 }
             } break;
-            case R_AARCH64_COPY:
             case R_X86_64_COPY: {
                 const char* symname = elf->strtab + sym->st_name;
-                //printf("R_X86_64_COPY: copying %lx bytes of %s\n",
-                //    sym->st_size, sym_name);
                 void *sym_addr = NULL;
-                sym_addr = get_native_symbol(symname);
-                //printf("R_X86_64_COPY: copying %p %p %lx\n",
-                //    (uint64_t*)patch, sym_addr, *(uint64_t*)sym_addr);
+                sym_addr = get_symbol(symname);
                 size_t size = sym->st_size;
                 if (sym_addr && size) {
                     memmove(patch, sym_addr, size);
+                    patch_library_got(symname, patch);
+                } else {
+                    *patch = 0;
+                    warning("LOADER::UNDEFINED_SYMBOL %s", symname);
                 }
             } break;
             default:
@@ -271,20 +252,11 @@ void loader_reloc_dependencies(ExeMeta* exe) {
         }
     }
     /* create cache */
-    elf->sym_cache = malloc(elf->dynsymsz * sizeof(uint32_t));
-    char* symtab_str = elf->strtab; 
-    for (int j = 1; j < elf->dynsymsz; j++) {
-        Elf64_Sym* sym = &elf->dynsym[j];
-        
-        const char* sym_name = symtab_str + sym->st_name;
-        elf->sym_cache[j] = my_hash(sym_name);
-    }
     dyn = (Elf64_Dyn*)(exe->base + dyn_phdr->p_vaddr);
     for (; dyn->d_tag != DT_NULL; dyn++) {
         if (dyn->d_tag == DT_NEEDED) {
             const char* name = elf->strtab + dyn->d_un.d_val;
-            if (exe->native) load_native_library(name);
-            else load_wrapped_library(name);
+            open_library(name);
         }
     }
     if (elf->relr) reloc_relr(exe, elf->relr, elf->relrsz);
@@ -292,37 +264,17 @@ void loader_reloc_dependencies(ExeMeta* exe) {
     if (elf->jmprel) reloc_rela(exe, elf->jmprel, elf->pltrelsz);
 }
 void loader_init_library(ExeMeta* exe) {
-    if (exe->native) {
-        __builtin___clear_cache(exe->base, exe->base + exe->basesz);
-        if (exe->init) {
-            void* init = exe->base + exe->init;
-            ((void (*)(void))init)();
-        }
-        if (exe->init_array) {
-            size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
-            uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
-            
-            for (size_t i = 0; i < count; i++) {
-                if (init_funcs[i]) {
-                    uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
-                    print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
-                    ((void (*)(void))init_funcs[i])();
-                }
-            }
-        }
-    } else {
-        set_guest((uint64_t)exe->base);
-        if (exe->init) execute(exe->init);
-        if (exe->init_array) {
-            size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
-            uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
-            
-            for (size_t i = 0; i < count; i++) {
-                if (init_funcs[i]) {
-                    uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
-                    print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
-                    execute(pos);
-                }
+    set_guest((uint64_t)exe->base);
+    if (exe->init) execute(exe->init);
+    if (exe->init_array) {
+        size_t count = exe->init_arraysz / sizeof(Elf64_Addr);
+        uint64_t* init_funcs = (uint64_t*)(exe->base + exe->init_array);
+        
+        for (size_t i = 0; i < count; i++) {
+            if (init_funcs[i]) {
+                uint64_t pos = init_funcs[i] - (uint64_t)exe->base;
+                print("Calling INIT_ARRAY[%zu] at %lx\n", i, pos);
+                execute(pos);
             }
         }
     }

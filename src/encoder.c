@@ -4,7 +4,6 @@
 #include "decoder.h"
 #include "memory.h"
 #include "cache.h"
-#include "dlmanager.h"
 #include "arm64emitter.h"
 #include <stdint.h>
 
@@ -276,13 +275,7 @@ void encode(X64_instruction* buf) {
         case LEA:{
             if (t1 == (MEM|IMM)) {
                 int32_t offset = get_gp() + buf->op1.imm;
-                if (is_external_offset(offset)) {
-                    emit_rip(r0, offset);
-                } else {
-                    if (buf->op1.imm > INT16_MAX || buf->op1.imm < INT16_MIN) panic("ENCODER::ILLEGAL_OFFSET");
-                    emit_brk(cache_patch_point(LEA, r0, buf->op1.imm));
-                    warning("ENCODER::ILLEGAL_RIP");
-                }
+                emit_rip(r0, offset);
             } else if (t1&MEM) {
                 emit_address_decode(&buf->op1, buf->prefix);
                 emit_add_imm(r0, SC1, 0);
