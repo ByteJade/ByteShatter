@@ -319,7 +319,7 @@ void encode(Instruction* buf) {
                 }
                 if (prev_instruction == PUSH) {
                     patch32();
-                    emit32(PUSHP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
+                    emit32(PUSHP | (x64_regs[prev_register]<<10) | (x64_regs[r0]));
                     cache_back();
                     prev_instruction = NOP;
                 } else {
@@ -330,20 +330,29 @@ void encode(Instruction* buf) {
             } else if (t0 == IMM) {
                 if (prev_instruction == PUSH) {
                     patch32();
-                    emit_movz(SC1, buf->a.imm, 0);
-                    emit32(PUSHP | (x64_regs[SC1]<<10) | (x64_regs[prev_register]));
+                    emit_imm(buf->a.imm, SC1);
+                    emit32(PUSHP | (x64_regs[prev_register]<<10) | (x64_regs[SC1]));
                     cache_back();
                     prev_instruction = NOP;
                 } else {
-                    emit_movz(SC1, buf->a.imm, 0);
+                    emit_imm(buf->a.imm, SC1);
                     emit_push_reg(SC1);
                     prev_instruction = PUSH;
                     prev_register = SC1;
                 }
             } else if (t0&MEM) {
-                emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
-                emit_push_reg(SC1);
-                prev_instruction = NOP;
+                if (prev_instruction == PUSH) {
+                    patch32();
+                    emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
+                    emit32(PUSHP | (x64_regs[prev_register]<<10) | (x64_regs[SC1]));
+                    cache_back();
+                    prev_instruction = NOP;
+                } else {
+                    emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
+                    emit_push_reg(SC1);
+                    prev_instruction = PUSH;
+                    prev_register = SC1;
+                }
             } else panic("ENCODER::UNHANDLED_PUSH");
         } break;
         case LEAVE: {
