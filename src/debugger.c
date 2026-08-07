@@ -4,6 +4,7 @@
 #include "patcher.h"
 #include "memory.h"
 #include "decoder.h"
+#include "printer_x86.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -150,7 +151,7 @@ void debug_wait(void) {
                         set_gp(unit->gp + unit->offsets[x].goff);
                         decode_instr(&buf);
                         char out[32];
-                        sprint_instr(out, &buf);
+                        sprint_x86_64(&buf, out);
                         printf("%s\n", out);
                     }
                 }
