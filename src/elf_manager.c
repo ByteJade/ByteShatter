@@ -36,30 +36,28 @@ void open_library(const char* filename) {
         lib_capacity += 4;
         libs = realloc(libs, lib_capacity * sizeof(Lib));
     }
+    char fullpath[512];
+    Lib* lib = libs + lib_count;
+    snprintf(
+        fullpath, sizeof(fullpath),
+        "./lib/my_%s", filename
+    );
+    lib->wrapper = dlopen(fullpath, RTLD_NOW);
+    if (!lib->wrapper) panic("WRAPPER_NOT_FOUND %s", filename);
+    success("Wrap %s", fullpath);
+    lib->name = strdup(filename);
+    lib_count++;
     for (int i = 0; ld_paths[i]; i++) {
-        char fullpath[1024];
         snprintf(
             fullpath, sizeof(fullpath),
             "%s/%s", ld_paths[i], filename
         );
-        void* object = dlopen(fullpath, RTLD_NOW);
-        if (!object) continue;
+        lib->object = dlopen(fullpath, RTLD_NOW);
+        if (!lib->object) continue;
         success("Open %s", fullpath);
-
-        Lib* lib = libs + lib_count;
-        lib->object = object;
-        snprintf(
-            fullpath, sizeof(fullpath),
-            "./lib/my_%s", filename
-        );
-        lib->wrapper = dlopen(fullpath, RTLD_NOW);
-        if (!lib->wrapper) panic("WRAPPER_NOT_FOUND %s", filename);
-        success("Wrap %s", fullpath);
-        lib->name = strdup(filename);
-        lib_count++;
         return;
     }
-    panic("LIBRARY_NOT_FOUND %s", filename);
+    warning("LIBRARY_NOT_FOUND %s", filename);
 }
 char* get_symbol(const char* symbol) {
     for (int i = 0; i < lib_count; i++) {
