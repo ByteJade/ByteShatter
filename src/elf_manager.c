@@ -22,6 +22,8 @@ const char* ld_paths[] = {
     ".",
     "/lib",
     "/lib64",
+    "/system/lib64",
+    "/data/data/com.termux/files/usr/lib",
     NULL
 };
 
