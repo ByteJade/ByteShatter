@@ -337,6 +337,8 @@ void encode(Instruction* buf) {
                 } else {
                     emit_movz(SC1, buf->a.imm, 0);
                     emit_push_reg(SC1);
+                    prev_instruction = PUSH;
+                    prev_register = SC1;
                 }
             } else if (t0&MEM) {
                 emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
