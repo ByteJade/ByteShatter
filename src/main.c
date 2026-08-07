@@ -45,6 +45,7 @@ int main(int argc, char** argv, const char** envp) {
     
     int end = read_argv(argc, argv);
     Elf* elf = elf_load(argv[argc-1]);
+    set_guest((uint64_t)elf->base);
     elf_read_dynamic(elf);
     elf_init(elf);
     finish_stack(elf);
@@ -56,7 +57,6 @@ int main(int argc, char** argv, const char** envp) {
     
     
     debug_wait();
-    set_guest((uint64_t)elf->base);
     execute(elf->head.e_entry);
 
     elf_close(elf);
