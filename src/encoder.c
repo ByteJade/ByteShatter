@@ -1,5 +1,4 @@
 #include "encoder.h"
-#include "armdef.h"
 #include "core.h"
 #include "decoder.h"
 #include "memory.h"
@@ -19,7 +18,7 @@ void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
 }
 void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
     uint8_t t = op->type;
-    if (prefix==TLS) {
+    if (prefix==FS) {
         emit32(GET_FS | x64_regs[SC1]);
         emit_add_signed(reg, reg, op->imm);
         return;
@@ -143,7 +142,7 @@ void encode8bit(Instruction* buf) {
                 }
             } else panic("ENCODER::UNHANDLED_MOV");
         } break;
-        case TST:{
+        case TEST:{
             if (t0 == REG && t1 == REG) {
                 emit32(0x12001c00 | (x64_regs[r0]<<5) | (x64_regs[SC1])); 
                 emit32(0x12001c00 | (x64_regs[r1]<<5) | (x64_regs[SC2])); 
@@ -227,7 +226,7 @@ void encode(Instruction* buf) {
                 emit_asr_imm(r0, r1, buf->b.imm);
             else panic("ENCODER::UNHANDLED_SAR");
         } break;
-        case MOVSLQ: {
+        case MOVSX: {
             if (t0 == REG && t1 == REG) {
                 emit32(0x93407c00 | (x64_regs[r0]<<5) | (x64_regs[r1]));
             }else panic("ENCODER::UNHANDLED_MOVSLQ");
@@ -257,7 +256,7 @@ void encode(Instruction* buf) {
                 emit_address_decode(&buf->b, r0, buf->prefix);
             } else panic("ENCODER::UNHANDLED_LEA");
         } break;
-        case TST:{
+        case TEST:{
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_r(ANDS_REG, XZR, r0, r1));
             } else panic("ENCODER::UNHANDLED_TST");
