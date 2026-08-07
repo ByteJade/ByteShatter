@@ -205,6 +205,10 @@ int decode_instr(Instruction* buf) {
             buf->type = LEA;
             decode_r_rm(buf);
             break;
+        case 0x90: 
+            buf->type = NOP;
+            buf->a.type = NONE;
+            break;
         case 0x98:
             buf->type = CLTQ;
             buf->a.type = NONE;
