@@ -6,6 +6,7 @@
 #include "arm64emitter.h"
 #include "armdef.h"
 #include "debugger.h"
+#include <stdint.h>
 #include <string.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -141,7 +142,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         if (block == NULL) {
             warning("PATCHER::NOT_FOUND %lx", sc->pc);
             block = get_host() + get_hp();
-            decode(sc->pc);
+            decode(sc->pc - (uint64_t)get_guest());
         }
         sc->pc = (uint64_t)block;
         return;
