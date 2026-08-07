@@ -17,7 +17,7 @@ enum OpType {
     MEM = 1<<1,
     IDX = 1<<2,
     IMM = 1<<3,
-    XMM = 1<<3,
+    XMM = 1<<4,
 };
 enum Registers {
     RAX,RCX,RDX,RBX,
