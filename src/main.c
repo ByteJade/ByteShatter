@@ -44,7 +44,7 @@ int main(int argc, char** argv, const char** envp) {
     set_envp(envp);
     
     int end = read_argv(argc, argv);
-    Elf* elf = elf_load(argv[argc-1]);
+    Elf* elf = elf_load(argv[end]);
     set_guest((uint64_t)elf->base);
     elf_read_dynamic(elf);
     elf_init(elf);
