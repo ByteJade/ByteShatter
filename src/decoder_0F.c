@@ -14,9 +14,9 @@ void decode_0F(Instruction* buf) {
         case 0x11:
             buf->type = MOVS;
             decode_rm_r(buf);
-            buf->a.type |= XMM;
-            if (buf->b.type == REG)
-                buf->b.type |= XMM;
+            if (buf->a.type == REG)
+                buf->a.type |= XMM;
+            buf->b.type |= XMM;
             break;
         case 0x10:
             buf->type = MOVS;
@@ -32,7 +32,7 @@ void decode_0F(Instruction* buf) {
         case 0x2C:
             buf->type = CVTSD2SI;
             decode_rm_r(buf);
-            buf->a.type |= XMM;
+            buf->b.type |= XMM;
             break;
         case 0x2f:
             if (buf->prefix == OS) buf->prefix = REPN;
@@ -65,7 +65,7 @@ void decode_0F(Instruction* buf) {
         case 0x7e:
             buf->type = MOVQ;
             decode_rm_r(buf);
-            buf->a.type |= XMM;
+            buf->b.type |= XMM;
             break;
         case 0x6e:
             buf->type = MOVQ;
