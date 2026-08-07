@@ -328,9 +328,16 @@ void encode(Instruction* buf) {
                     prev_register = r0;
                 }
             } else if (t0 == IMM) {
-                emit_movz(SC1, buf->a.imm, 0);
-                emit_push_reg(SC1);
-                prev_instruction = NOP;
+                if (prev_instruction == PUSH) {
+                    patch32();
+                    emit_movz(SC1, buf->a.imm, 0);
+                    emit32(PUSHP | (x64_regs[SC1]<<10) | (x64_regs[prev_register]));
+                    cache_back();
+                    prev_instruction = NOP;
+                } else {
+                    emit_movz(SC1, buf->a.imm, 0);
+                    emit_push_reg(SC1);
+                }
             } else if (t0&MEM) {
                 emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
                 emit_push_reg(SC1);
