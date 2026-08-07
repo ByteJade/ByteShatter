@@ -1,14 +1,14 @@
 #include "core.h"
 #include "memory.h"
 #include "cache.h"
-#include "dlmanager.h"
+#include "loader.h"
 #include "patcher.h"
 #include "stack.h"
 #include "executer.h"
 #include "debugger.h"
 #include <stdint.h>
 #include <stdlib.h>
-
+#include <stdio.h>
 
 void usage(void) {
     printf("Usage: shatter [commands] <file> [arguments]\n");
@@ -44,8 +44,10 @@ int main(int argc, char** argv, const char** envp) {
     set_envp(envp);
     
     int end = read_argv(argc, argv);
-    ExeMeta* exe = load_object(argv[end]);
-    init_libraries();
+    ExeMeta* exe = loader_open_elf(argv[end]);
+    loader_map_segments(exe);
+    loader_reloc_dependencies(exe);
+    loader_init_library(exe);
     finish_stack(exe);
     push_arg(0);
     for (int n = argc-1; n > end-1; n--) {

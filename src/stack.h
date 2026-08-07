@@ -2,7 +2,7 @@
 #define STACK_H
 
 #include <elf.h>
-#include "dlmanager.h"
+#include "elf_manager.h"
 
 void stack_init(void);
 void stack_fini(void);
