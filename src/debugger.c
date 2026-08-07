@@ -150,9 +150,6 @@ void debug_wait(void) {
                         Instruction buf;
                         set_gp(unit->gp + unit->offsets[x].goff);
                         decode_instr(&buf);
-                        char out[32];
-                        sprint_x86_64(&buf, out);
-                        printf("%s\n", out);
                     }
                 }
                 set_break_point(break_pc + 4);
