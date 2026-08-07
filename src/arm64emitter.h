@@ -2,7 +2,15 @@
 #define EMITTER_H
 
 #include "memory.h"
-#include "armdef.h"
+
+static uint8_t x64_regs[] = {
+    9,3,2,14,
+    28,29,1,0,
+    4,5,10,11,
+    16,17,18,19,
+    12, 13, 30,
+    6, 7, 31
+};
 
 #define SF 1<<31
 #define S 1<<29

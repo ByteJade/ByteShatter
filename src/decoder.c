@@ -1,12 +1,10 @@
 #include "decoder.h"
-#include "armdef.h"
-#include "debugger.h"
 #include "memory.h"
+#include "printer_x86.h"
+#include "debugger.h"
 #include "encoder.h"
 #include "cache.h"
 #include "core.h"
-#include <stdint.h>
-#include <stdio.h>
 
 int64_t fetch_imm8(void) {
     return (int64_t)(int8_t)fetch8();
@@ -14,20 +12,18 @@ int64_t fetch_imm8(void) {
 int64_t fetch_imm32(void) {
     return (int64_t)(int32_t)fetch32();
 }
-void decode_sib(Operand* op) {
+void decode_sib(Operand* op, uint8_t mod) {
     uint8_t sib = fetch8();
-    uint8_t base = sib&7;
-
-    op->scale = sib>>6;
+    op->reg = sib&7;
     op->idx = (sib>>3)&7;
+    op->scale = sib>>6;
     if (op->idx != 4) op->type |= IDX;
 
-    if (base == 5 && (op->type&IMM) == 0) {
+    if (op->reg == 5 && mod == 0) {
         op->type |= IMM;
         op->imm = fetch_imm32();
     } else {
         op->type |= REG;
-        op->reg = base;
     }
 }
 void decode_rm(Operand* op, uint8_t modrm) {
@@ -35,21 +31,20 @@ void decode_rm(Operand* op, uint8_t modrm) {
     uint8_t rm = modrm & 7;
     if (mod < 3) {
         op->type = MEM;
-        if (mod == 1 || mod == 2) {
-            op->type |= IMM;
-        }
-        if (mod == 0 && rm == 5) {
+        if (rm == 4) {
+            decode_sib(op, mod);
+        } else if (mod == 0 && rm == 5) {
             op->type |= IMM;
             op->imm = fetch_imm32();
-        } else if (rm == 4) {
-            decode_sib(op);
         } else {
-            op->type |= REG;
+            op->type = REG;
             op->reg = rm;
         }
         if (mod == 1) {
+            op->type |= IMM;
             op->imm = fetch_imm8();
         } else if (mod == 2) {
+            op->type |= IMM;
             op->imm = fetch_imm32();
         }
     } else {
@@ -57,398 +52,277 @@ void decode_rm(Operand* op, uint8_t modrm) {
         op->reg = rm;
     }
 }
-void decode_regrm(X64_instruction* buf) {
+void decode_r_rm(Instruction* buf) {
     uint8_t byte = fetch8();
-    buf->op0.type = REG;
-    buf->op0.reg = (byte >> 3)&7;
-    decode_rm(&buf->op1, byte);
-}
-void decode_shift_table(X64_instruction* buf, uint8_t modrm) {
-    uint8_t shift = (modrm >> 3)&7;
-    switch (shift) {
-        case 4: buf->type = SHL; break;
-        case 5: buf->type = SHR; break;
-        case 7: buf->type = SAR; break;
-        default: panic("DECODER::UNKNOWN_SHIFT_SYMBOL: %X", shift);
-    }
-}
-void decode_grp1(X64_instruction* buf, uint8_t modrm) {
-    uint8_t shift = (modrm >> 3)&7;
-    switch (shift) {
-        case 0: buf->type = ADD; break;
-        //case 1: break; // or
-        //case 2: break; // adc
-        //case 3: break; // sbb
-        case 4: buf->type = AND; break;
-        case 5: buf->type = SUB; break;
-        case 6: buf->type = XOR; break;
-        case 7: buf->type = CMP; break;
-    default: panic("DECODER::UNKNOWN_GRP1: %X", shift);
-    }
-}
-void print_op(char** ptr, X64_instruction* buf, Operand* op) {
-    char* out = *ptr;
-    if (op->type == REG) {
-        if (buf->size == 64) {
-            out += sprintf(out, "r%s ", regs[op->reg]);
-        } else if (buf->size == 32) {
-            out += sprintf(out, "e%s ", regs[op->reg]);
-        } else {
-            out += sprintf(out, "%s ", regs[op->reg]);
-        }
-    } else if (op->type == (REG | XMM)) {
-        out += sprintf(out, "xmm%i ", op->reg);
-    } else if (op->type == IMM) {
-        out += sprintf(out, "%lx ", op->imm);
-    } else {
-        out += sprintf(out, "[ ");
-        if (op->type&REG) {
-            out += sprintf(out, "r%s ", regs[op->reg]);
-            if (op->type&IDX) out += sprintf(out, "+ ");
-        }
-        if (op->type&IDX) {
-            if (buf->prefix == TLS)
-                out += sprintf(out, "fs ");
-            else out += sprintf(out, "r%s ", regs[op->idx]);
-            if (op->scale == 1) {
-                out += sprintf(out, "* 2 ");
-            } else if (op->scale == 2) {
-                out += sprintf(out, "* 4 ");
-            } else if (op->scale == 3) {
-                out += sprintf(out, "* 8 ");
-            }
-        }
-        if (op->type&IMM) {
-            if (op->type == (MEM|IMM)) {
-                out += sprintf(out, "rip ");
-            }
-            if (op->imm > 0) out += sprintf(out, "+ %lx ", op->imm);
-            if (op->imm < 0) out += sprintf(out, "- %lx ", -op->imm);
-        }
-        out += sprintf(out, "] ");
-    }
-    *ptr = out;
-}
-void sprint_instr(char* out, X64_instruction* buf) {
-    char prefix = ' ';
-    if (buf->prefix == REP) prefix = 's';
-    if (buf->prefix == REPN) prefix = 'd';
-    out += sprintf(out, "\033[34m%s%c \033[32m",
-        types[buf->type], prefix);
-    if (buf->opcount > 0)
-        print_op(&out, buf, &buf->op0);
-    if (buf->opcount > 1)
-        print_op(&out, buf, &buf->op1);
-    out += sprintf(out, "\033[0m");
-}
-int decode_instr(X64_instruction* buf) {
-    int ret = 0;
     buf->reverse = 0;
+    buf->a.type = REG;
+    buf->a.reg = (byte >> 3) & 7;
+    decode_rm(&buf->b, byte);
+}
+void decode_rm_r(Instruction* buf) {
+    uint8_t byte = fetch8();
+    buf->reverse = 1;
+    buf->b.type = REG;
+    buf->b.reg = (byte >> 3) & 7;
+    decode_rm(&buf->a, byte);
+}
+void decode_rex(Instruction* buf, uint8_t rex) {
+    if (rex&8) buf->size = 64;
+    if (buf->reverse) {
+        if (rex&4) buf->b.reg += 8;
+        if (rex&2) buf->a.idx += 8;
+        if (rex&1) buf->a.reg += 8;
+    } else {
+        if (rex&4) buf->a.reg += 8;
+        if (rex&2) buf->b.idx += 8;
+        if (rex&1) buf->b.reg += 8;
+    }
+}
+void decode_GRP0(Instruction* buf, uint8_t byte) {
+    if (!(byte&1)) buf->size = 8;
+    uint8_t grp = byte&7;
+    if (grp < 2) {
+        decode_rm_r(buf);
+    } else if (grp < 4) {
+        decode_r_rm(buf);
+    } else {
+        buf->reverse = 0;
+        buf->a.type = REG;
+        buf->a.reg = RAX;
+        buf->b.type = IMM;
+        if (buf->size == 8)
+            buf->b.imm = fetch_imm8();
+        else buf->b.imm = fetch_imm32();
+    }
+}
+void decode_GRP3(Instruction* buf, uint8_t code) {
+    if (code > 1) {
+        buf->size = 64;
+        buf->b.type = NONE;
+    }
+    switch (code) {
+        case 0:
+            buf->type = ADD;
+            buf->b.type = IMM;
+            buf->b.imm = 1;
+            break;
+        case 1:
+            buf->type = SUB;
+            buf->b.type = IMM;
+            buf->b.imm = 1;
+            break;
+        case 2: buf->type = CALL; break;
+        case 4: buf->type = JMP; break;
+        case 6: buf->type = PUSH; break;
+        default: panic("UNKNOWN_GRP3: %x", code);
+    }
+}
+
+int decode_instr(Instruction* buf) {
+    buf->size = 32;
     uint8_t rex = 0;
     uint8_t byte = fetch8();
-    buf->size = 32;
-    buf->prefix = 0;
-    if (byte == P66) {
-        buf->prefix = P66;
-        byte = fetch8();
-    } if (byte == REP) {
-        buf->prefix = REP;
-        byte = fetch8();
-    } else if (byte == REPN) {
-        buf->prefix = REPN;
-        byte = fetch8();
-    } else if (byte == 0x64) {
-        buf->prefix = TLS;
+    if ((byte >= FS && byte <= OS) ||
+    (byte >= REPN && byte <= REPE)) {
+        buf->prefix = byte;
         byte = fetch8();
     }
-    if (byte >> 4 == 0x4) {
+    if ((byte&0xF0) == 0x40) {
         rex = byte & 0xF;
         byte = fetch8();
     }
     switch (byte) {
-        case 0x00: case 0x01:
-            buf->reverse = 1;
-        case 0x02: case 0x03:
-            if (!(byte&1)) buf->size = 8;
-            buf->opcount = 2;
-            buf->type = ADD;
-            decode_regrm(buf);
-            break;
-        case 0x0F: {
-            decode_0F(buf);
-        } break;
-        case 0x28: case 0x29:
-            buf->reverse = 1;
-        case 0x2A: case 0x2B:
-            if (!(byte&1)) buf->size = 8;
-            buf->opcount = 2;
-            buf->type = SUB;
-            decode_regrm(buf);
-            break;
-        case 0x31:
-            buf->opcount = 2;
-            buf->type = XOR;
-            decode_regrm(buf);
-            break;
-        case 0x38: case 0x39:
-            buf->reverse = 1;
-        case 0x3A: case 0x3B:
-            if (!(byte&1)) buf->size = 8;
-            buf->opcount = 2;
-            buf->type = CMP;
-            decode_regrm(buf);
-            break;
-        case 0x3C:
-            buf->size = 8;
-            buf->opcount = 2;
-            buf->type = CMP;
-            buf->op0.type = REG;
-            buf->op0.reg = byte - 0x3C;
-            buf->op1.type = IMM;
-            buf->op1.imm = fetch8();
+        case 0x00 ... 0x3F:
+            if (byte == 0x0F) {
+                decode_0F(buf);
+            } else {
+                buf->type = ADD + ((byte >> 3) & 7);
+                decode_GRP0(buf, byte);
+            }
             break;
         case 0x50 ... 0x57:
-            buf->reverse = 1;
             buf->size = 64;
-            buf->opcount = 1;
+            buf->reverse = 0;
             buf->type = PUSH;
-            buf->op1.type = REG;
-            buf->op1.reg = byte - 0x50;
+            buf->a.type = REG;
+            buf->a.reg = byte&7;
+            buf->b.type = NONE;
             break;
         case 0x58 ... 0x5F:
             buf->size = 64;
-            buf->opcount = 1;
+            buf->reverse = 0;
             buf->type = POP;
-            buf->op0.type = REG;
-            buf->op0.reg = byte - 0x58;
+            buf->a.type = REG;
+            buf->a.reg = byte&7;
+            buf->b.type = NONE;
             break;
         case 0x63:
-            buf->opcount = 2;
-            buf->type = MOVSLQ;
-            decode_regrm(buf);
+            buf->type = MOVSX;
+            decode_r_rm(buf);
             break;
         case 0x68:
-            buf->opcount = 1;
             buf->type = PUSH;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
+            buf->a.type = IMM;
+            buf->a.imm = fetch_imm32();
+            buf->b.type = NONE;
             break;
         case 0x6A:
-            buf->opcount = 1;
             buf->type = PUSH;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
+            buf->a.type = IMM;
+            buf->a.imm = fetch_imm8();
+            buf->b.type = NONE;
             break;
-        case 0x72 ... 0x7F:
-            buf->opcount = 1;
-            buf->type = byte - 0x72 + JB;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
+        case 0x70 ... 0x7F:
+            buf->type = JO + byte - 0x70;
+            buf->a.type = IMM;
+            buf->a.imm = fetch_imm8();
+            buf->b.type = NONE;
             break;
-        case 0x80:
+        case 0x80: 
             buf->size = 8;
-            buf->opcount = 2;
-            buf->type = CMP;
-            decode_rm(&buf->op0, fetch8());
-            buf->op1.type = IMM;
-            buf->op1.imm = fetch8();
-            break;
-        case 0x81: {
-            buf->opcount = 2;
+            [[fallthrough]];
+        case 0x81: case 0x83: {
             uint8_t modrm = fetch8();
-            decode_rm(&buf->op0, modrm);
-            buf->op1.type = IMM;
-            buf->op1.imm = fetch_imm32();
-            decode_grp1(buf, modrm);
-        } break;
-        case 0x83: {
             buf->reverse = 1;
-            buf->opcount = 2;
-            uint8_t modrm = fetch8();
-            decode_rm(&buf->op1, modrm);
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            decode_grp1(buf, modrm);
+            buf->type = ADD + ((modrm >> 3) & 7);
+            decode_rm(&buf->a, modrm);
+            buf->b.type = IMM;
+            if (byte == 0x81) {
+                buf->b.imm = fetch_imm32();
+            } else buf->b.imm = fetch_imm8();
         } break;
-        case 0x84:
-            buf->size = 8;
-            buf->opcount = 2;
-            buf->type = TST;
-            decode_regrm(buf);
+        case 0x84: case 0x85:
+            buf->type = TEST;
+            decode_rm_r(buf);
             break;
-        case 0x85:
-            buf->opcount = 2;
-            buf->type = TST;
-            decode_regrm(buf);
-            break;
-        case 0x88: case 0x89:
-            buf->reverse = 1;
-        case 0x8A: case 0x8B:
-            if (!(byte&1)) buf->size = 8;
-            buf->opcount = 2;
+        case 0x88 ... 0x8B:
             buf->type = MOV;
-            decode_regrm(buf);
+            decode_GRP0(buf, byte);
             break;
         case 0x8D:
-            buf->opcount = 2;
             buf->type = LEA;
-            decode_regrm(buf);
-            break;
-        case 0x90: 
-            buf->opcount = 0;
-            buf->type = NOP;
+            decode_r_rm(buf);
             break;
         case 0x98:
-            buf->opcount = 0;
             buf->type = CLTQ;
+            buf->a.type = NONE;
             break;
         case 0x99:
-            buf->opcount = 0;
             buf->type = CLTD;
+            buf->a.type = NONE;
             break;
-        case 0xA8:
-            buf->size = 8;
-            buf->opcount = 2;
-            buf->type = TST;
-            buf->op0.type = REG;
-            buf->op0.reg = RAX;
-            buf->op1.type = IMM;
-            buf->op1.imm = fetch8();
-            break;
-        case 0xB8 ... 0xBF:
+        case 0x9F:
+            buf->size = 64;
             buf->reverse = 1;
-            buf->opcount = 2;
+            buf->type = POP;
+            decode_rm(&buf->a, fetch8());
+            buf->b.type = NONE;
+            break;
+        case 0xB0 ... 0xBF:
+            buf->reverse = 0;
             buf->type = MOV;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            buf->op1.type = REG;
-            buf->op1.reg = byte - 0xB8;
+            buf->a.type = REG;
+            buf->a.reg = byte&7;
+            buf->b.type = IMM;
+            if (byte < 0xB8) {
+                buf->size = 8;
+                buf->b.imm = fetch_imm8();
+            }else buf->b.imm = fetch_imm32();
             break;
-        case 0xE8:
-            buf->opcount = 1;
-            buf->type = CALL;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            break;
-        case 0xE9:
-            buf->opcount = 1;
-            buf->type = JMP;
-            ret = JMP;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
-            break;
-        case 0xEb:
-            buf->opcount = 1;
-            buf->type = JMP;
-            ret = JMP;
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            break;
-        case 0xD1:{
-            buf->reverse = 1;
-            buf->opcount = 2;
+        case 0xC0: case 0xC1:
+        case 0xD0: case 0xD1:
+        case 0xD2: case 0xD3:{
+            if (!(byte&1)) buf->size = 8;
             uint8_t modrm = fetch8();
-            decode_rm(&buf->op1, modrm);
-            buf->op0.type = IMM;
-            buf->op0.imm = 1;
-            decode_shift_table(buf, modrm);
-        } break;
-        case 0xC1:{
             buf->reverse = 1;
-            buf->opcount = 2;
-            uint8_t modrm = fetch8();
-            decode_rm(&buf->op1, modrm);
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
-            decode_shift_table(buf, modrm);
+            buf->type = ROL + ((modrm >> 3) & 7);
+            decode_rm(&buf->a, modrm);
+            if (byte < 0xD2) {
+                buf->b.type = IMM;
+                if (byte > 0xC1) buf->b.imm = 1;
+                else buf->b.imm = fetch_imm8();
+            } else {
+                buf->b.type = REG;
+                buf->b.reg = RCX;
+            }
         } break;
+        case 0xF4:
+        case 0xC3:
+            buf->type = RET;
+            buf->a.type = NONE;
+            return 1;
         case 0xC6:
-            buf->reverse = 1;
             buf->size = 8;
-            buf->opcount = 2;
+            buf->reverse = 1;
             buf->type = MOV;
-            decode_rm(&buf->op1, fetch8());
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm8();
+            decode_rm(&buf->a, fetch8());
+            buf->b.type = IMM;
+            buf->b.imm = fetch_imm8();
             break;
         case 0xC7:
             buf->reverse = 1;
-            buf->opcount = 2;
             buf->type = MOV;
-            decode_rm(&buf->op1, fetch8());
-            buf->op0.type = IMM;
-            buf->op0.imm = fetch_imm32();
+            decode_rm(&buf->a, fetch8());
+            buf->b.type = IMM;
+            buf->b.imm = fetch_imm32();
             break;
         case 0xC9:
-            buf->opcount = 0;
             buf->type = LEAVE;
+            buf->a.type = NONE;
             break;
-        case 0xC3:
-        case 0xF4: // actualy hlt
-            buf->opcount = 0;
-            buf->type = RET;
-            ret = RET;
+        case 0xE8:
+        case 0xE9:
+            buf->type = CALL + (byte - 0xE8);
+            buf->a.type = IMM;
+            buf->a.imm = fetch_imm32();
+            buf->b.type = NONE;
+            if (buf->type == JMP) return 1;
             break;
+        case 0xEB:
+            buf->type = JMP;
+            buf->a.type = IMM;
+            buf->a.imm = fetch_imm8();
+            buf->b.type = NONE;
+            return 1;
         case 0xF7: {
             uint8_t byte = fetch8();
             if ((byte&0b11111000) == 0xF8) {
-                buf->opcount = 1;
                 buf->type = IDIV;
-                buf->op0.type = REG;
-                buf->op0.reg = byte&0x7;
+                buf->a.type = REG;
+                buf->a.reg = byte&0x7;
+                buf->b.reg = NONE;
             } else panic("Unhandled F7");
         } break;
-        case 0xff: {
-            buf->size = 64;
+        case 0xFE:
+            buf->size = 8;
+            [[fallthrough]];
+        case 0xFF: {
             buf->reverse = 1;
-            buf->opcount = 1;
             uint8_t modrm = fetch8();
-            decode_rm(&buf->op1, modrm);
-            switch ((modrm >> 3)&7) {
-                case 0:
-                    buf->opcount = 2;
-                    buf->type = ADD;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = 1;
-                    break; // inc
-                case 1:
-                    buf->opcount = 2;
-                    buf->type = SUB;
-                    buf->op0.type = IMM;
-                    buf->op0.imm = 1;
-                    break; // dec
-                case 2: case 3:
-                    buf->type = CALL; break; // call
-                case 4: case 5:
-                    buf->type = JMP; ret = JMP; break; // jmps
-                case 6: buf->type = PUSH; break; // push
-            }
+            uint8_t code = (modrm >> 3) & 7;
+            decode_rm(&buf->a, modrm);
+            decode_GRP3(buf, code);
+            if (buf->type == JMP) return 1;
         } break;
-        default:
-            panic("DECODER::UNKNOWN_SYMBOL: %X", byte);
+        default: panic("DECODER::UNKNOWN_SYMBOL: %X", byte);
     }
-    if (rex) {
-        if (rex&8) buf->size = 64;
-        if (rex&4) buf->op0.reg += 8;
-        if (rex&2) buf->op1.idx += 8;
-        if (rex&1) buf->op1.reg += 8;
+    if (rex) decode_rex(buf, rex);
+    if (get_log_level() >= LOG_PRINT) {
+        char out[128];
+        sprint_x86_64(buf, out);
+        print("%s", out);
     }
-    if (buf->reverse) {
-        Operand tmp = buf->op0;
-        buf->op0 = buf->op1;
-        buf->op1 = tmp;
-    }
-    return ret;
+    return 0;
 }
 int decode_step() {
     uint8_t brk = 0;
     if (get_gp() == debug_breakp()) brk = 1;
     cache_block_point();
-    X64_instruction buf;
+    Instruction buf;
     int type = decode_instr(&buf);
     if (debug_enabled()) {
         char out[64];
-        sprint_instr(out, &buf);
+        sprint_x86_64(&buf, out);
         print("%s", out);
     }
     encode(&buf);

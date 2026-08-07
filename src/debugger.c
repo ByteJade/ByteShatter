@@ -146,7 +146,7 @@ void debug_wait(void) {
                 CacheUnit* unit = cache_get_block(break_block);
                 for (int x = 0; x < unit->offsetssz; x++) {
                     if (break_pc == unit->offsets[x].hoff*4) {
-                        X64_instruction buf;
+                        Instruction buf;
                         set_gp(unit->gp + unit->offsets[x].goff);
                         decode_instr(&buf);
                         char out[32];

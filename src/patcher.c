@@ -4,7 +4,6 @@
 #include "memory.h"
 #include "decoder.h"
 #include "arm64emitter.h"
-#include "armdef.h"
 #include "debugger.h"
 #include <stdint.h>
 #include <string.h>

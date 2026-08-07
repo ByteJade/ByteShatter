@@ -19,6 +19,9 @@ void set_log_level(char level) {
         default: panic("CORE::UNKNOWN_LOG_LEVEL");
     }
 }
+int get_log_level() {
+    return log_level;
+}
 void log_message(LogLevel level, const char* format, ...) {
     if ((int)level > log_level) return;
     if (prefixes[level][0]) printf("%s", prefixes[level]);

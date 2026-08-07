@@ -1,9 +1,9 @@
 #include "cache.h"
-#include "armdef.h"
 #include "memory.h"
 #include "core.h"
 #include "decoder.h"
 #include "arm64printer.h"
+#include "printer_x86.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -173,11 +173,11 @@ void cache_print(int block) {
     printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
     for (int x = 0; x < unit->offsetssz; x++) {
-        X64_instruction buf;
+        Instruction buf;
         set_gp(unit->gp + unit->offsets[x].goff);
         decode_instr(&buf);
         char out[64];
-        sprint_instr(out, &buf);
+        sprint_x86_64(&buf, out);
         printf(" : %s\n", out);
         int end;
         int start = unit->offsets[x].hoff;

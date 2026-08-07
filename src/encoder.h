@@ -3,6 +3,6 @@
 
 #include "decoder.h"
 
-void encode(X64_instruction* buf);
+void encode(Instruction* buf);
 
 #endif

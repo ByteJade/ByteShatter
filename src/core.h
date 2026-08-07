@@ -11,6 +11,7 @@ typedef enum {
 } LogLevel;
 
 void set_log_level(char level);
+int get_log_level();
 void log_message(LogLevel level, const char* format, ...);
 
 #define panic(...)   log_message(LOG_PANIC, __VA_ARGS__)
