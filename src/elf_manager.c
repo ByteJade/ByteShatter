@@ -9,7 +9,6 @@
 #include <sys/mman.h>
 
 typedef struct {
-    void* object;
     void* wrapper;
     const char* name;
 } Lib;
@@ -43,29 +42,17 @@ void open_library(const char* filename) {
         "./lib/my_%s", filename
     );
     lib->wrapper = dlopen(fullpath, RTLD_NOW);
-    if (!lib->wrapper) panic("WRAPPER_NOT_FOUND %s", fullpath);
+    if (!lib->wrapper) {
+        print("%s", dlerror());
+        panic("WRAPPER_NOT_FOUND %s", fullpath);
+    }
     success("Wrap %s", fullpath);
     lib->name = strdup(filename);
     lib_count++;
-    for (int i = 0; ld_paths[i]; i++) {
-        snprintf(
-            fullpath, sizeof(fullpath),
-            "%s/%s", ld_paths[i], filename
-        );
-        lib->object = dlopen(fullpath, RTLD_NOW);
-        if (!lib->object) continue;
-        success("Open %s", fullpath);
-        return;
-    }
-    warning("LIBRARY_NOT_FOUND %s", filename);
 }
 char* get_symbol(const char* symbol) {
-    for (int i = 0; i < lib_count; i++) {
-        Lib* lib = libs + i;
-        void* sym = dlsym(lib->object, symbol);
-        if (sym) return sym;
-    }
-    return NULL;
+    void* sym = dlsym(RTLD_DEFAULT, symbol);
+    return sym;
 }
 char* get_symbol_wrapped(const char* symbol) {
     char my_symbol[1024];
