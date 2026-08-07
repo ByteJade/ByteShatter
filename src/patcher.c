@@ -135,7 +135,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         memory_check = 0;
         return;
     }
-    if (info->si_code == SEGV_ACCERR) {
+    if (info->si_code == SEGV_ACCERR || sc->pc%4 != 0) {
         success("found unhandled jump");
         const uint8_t* block = cache_search(sc->pc);
         if (block == NULL) {
@@ -148,9 +148,12 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     }
     print_cpu();
     uint32_t* code = (uint32_t*)sc->pc;
+    const char* name;
+    if (sig == SIGBUS) name = "SIGBUS";
+    else name = "segfault";
     if (code) {
-        panic("segfault: %x", *code);
-    } else panic("segfault");
+        panic("%s: %x", name, *code);
+    } else panic("%s", name);
 }
 void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
@@ -175,5 +178,6 @@ void patcher_init(void) {
     sigaction(SIGTRAP, &sa_trap, NULL);
     sigaction(SIGSEGV, &sa_segv, NULL);
     sigaction(SIGILL, &sa_segv, NULL);
+    sigaction(SIGBUS, &sa_segv, NULL);
     sigaction(SIGINT, &sa_segi, NULL);
 }
