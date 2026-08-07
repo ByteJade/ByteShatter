@@ -327,7 +327,7 @@ void encode(X64_instruction* buf) {
                 }
             } else panic("ENCODER::UNHANDLED_AND");
         } break;
-case POP:{
+        case POP:{
             if (t0 == REG) {
                 if (r0 == RBP) {
                     emit32(POPP | (29<<10) | 30);
@@ -399,9 +399,7 @@ case POP:{
             emit_branch(buf, BR_REG, JMP);
         } break;
         case CALL:{
-            emit32(0xf81f8f9e);
             emit_branch(buf, BLR_REG, CALL);
-            emit32(0xf840879e);
         } break;
         case RET: emit_ret(); break;
         case EBR: emit_bti(); break;
