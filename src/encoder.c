@@ -19,7 +19,7 @@ void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
 void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
     uint8_t t = op->type;
     if (prefix==FS) {
-        emit32(GET_FS | x64_regs[SC1]);
+        emit32(GET_FS | x64_regs[reg]);
         emit_add_signed(reg, reg, op->imm);
         return;
     }
@@ -31,17 +31,17 @@ void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
         if (delta < -4294967296LL || delta > 4294967296LL) {
             panic("ENCODER::TOO_LARGE_DISTANCE");
         }
-        emit_adrp(SC1, delta);
-        emit_add_imm(reg, SC1, full & 0xFFF);
+        emit_adrp(reg, delta);
+        emit_add_imm(reg, reg, full & 0xFFF);
         return;
     }
     if (t&IDX) {
-        emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->idx, 0));
+        emit32(_construct_r_r_imm(SF|ADD_IMM, reg, op->idx, 0));
         if (op->scale != 0) {
             emit_lsl_imm(reg, reg, op->scale);
         }
         if (t&REG) {
-            emit32(_construct_r_r_r(SF|ADD_REG, SC1, SC1, op->reg));
+            emit32(_construct_r_r_r(SF|ADD_REG, reg, reg, op->reg));
         }
         if ((t&IMM) && op->imm != 0) {
             emit_add_signed(reg, reg, op->imm);
@@ -50,7 +50,7 @@ void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
         if (t&IMM) {
             emit_add_signed(reg, op->reg, op->imm);
         } else {
-            emit32(_construct_r_r_imm(SF|ADD_IMM, SC1, op->reg, 0));
+            emit32(_construct_r_r_imm(SF|ADD_IMM, reg, op->reg, 0));
         }
     }
 }
