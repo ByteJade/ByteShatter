@@ -144,7 +144,7 @@ int decode_instr(Instruction* buf) {
             break;
         case 0x50 ... 0x57:
             buf->size = 64;
-            buf->reverse = 0;
+            buf->reverse = 1;
             buf->type = PUSH;
             buf->a.type = REG;
             buf->a.reg = byte&7;
