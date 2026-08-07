@@ -79,7 +79,7 @@ char* sprint_op(Instruction* buf, char* out, Operand* op) {
         if (op->type&IDX) {
             if (buf->prefix == FS)
                 out += sprintf(out, "fs ");
-            else out += sprintf(out, "%s ", regs64[op->reg]);
+            else out += sprintf(out, "%s ", regs64[op->idx]);
             out += sprintf(out, "%s", scale[op->scale]);
         }
         if (op->type&IMM) {
