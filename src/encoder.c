@@ -5,7 +5,6 @@
 #include "memory.h"
 #include "cache.h"
 #include "arm64emitter.h"
-#include <cstdint>
 #include <stdint.h>
 
 /*
