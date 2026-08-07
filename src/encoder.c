@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "cache.h"
 #include "arm64emitter.h"
+#include <cstdint>
 #include <stdint.h>
 
 /*
@@ -66,41 +67,36 @@ void emit_branch(X64_instruction* buf, uint32_t code, uint8_t type) {
         emit32(code | (x64_regs[SC1] << 5));
     }
 }
-void emit_imm(Operand* op) {
-    if (op->imm >= 0) {
-        if (op->imm <= INT16_MAX) emit_movz(SC2, op->imm, 0);
+void emit_imm(int64_t imm, uint8_t rd) {
+    if (imm >= 0) {
+        if (imm <= INT16_MAX) emit_movz(rd, imm, 0);
         else {
-            emit_mov32(SC2, op->imm);
+            emit_mov32(rd, imm);
         }
     } else {
-        if (~op->imm <= INT16_MAX) emit_movn(SC2, ~op->imm, 0);
+        if (~imm <= INT16_MAX) emit_movn(rd, ~imm, 0);
         else {
-            emit_mov32(SC2, op->imm);
-            emit32(SXTW_REG | (x64_regs[SC2] << 5) | x64_regs[SC2]);
+            emit_mov32(rd, imm);
+            emit32(SXTW_REG | (x64_regs[rd] << 5) | x64_regs[rd]);
         }
     }
 }
 void emit_neon(X64_instruction* buf, int opcode) {
     uint8_t r0 = buf->op0.reg;
     uint8_t r1 = buf->op1.reg;
-    uint8_t t0 = buf->op0.type;
-    uint8_t t1 = buf->op1.type;
     uint32_t osf = (buf->prefix == REPN) * FT;
-
     uint32_t msf = (buf->prefix == REPN) * MFT;
-    if (t0 & MEM) {
+    if (buf->op0.type & MEM) {
         emit_address_decode(&buf->op0, SC1, buf->prefix);
         emit32(msf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
         r0 = 16;
-    } else if (t1 & MEM) {
+    } else if (buf->op1.type & MEM) {
         emit_address_decode(&buf->op1,  SC1, buf->prefix);
         emit32(msf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
         r1 = 16;
     }
     emit32(osf|opcode|(r0)|(r0<<5)|(r1<<16));
-    if (t0 & MEM) {
-        emit32(msf|STR_NEON | (x64_regs[SC1]<<5) | 16);
-    }
+    if (buf->op0.type & MEM) emit32(msf|STR_NEON | (x64_regs[SC1]<<5) | 16);
 }
 int emit_load(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
     sf >>= 1;
@@ -219,9 +215,8 @@ void encode(X64_instruction* buf) {
         case SHL:{
             if (t0 == REG && t1 == IMM)
                 emit_lsl_imm(r0, r1, buf->op1.imm);
-            else panic("ENCODER::UNHANDLED_SHL");
-            break;
-        }
+            else panic("ENCODER::UNHANDLED_SHL");  
+        } break;
         case SHR:{
             if (t0 == REG && t1 == IMM)
                 emit_lsr_imm(r0, r1, buf->op1.imm);
@@ -232,8 +227,7 @@ void encode(X64_instruction* buf) {
             if (t0 == REG && t1 == IMM)
                 emit_asr_imm(r0, r1, buf->op1.imm);
             else panic("ENCODER::UNHANDLED_SAR");
-            break;
-        }
+        } break;
         case MOVSLQ: {
             if (t0 == REG && t1 == REG) {
                 emit32(0x93407c00 | (x64_regs[r0]<<5) | (x64_regs[r1]));
@@ -244,11 +238,7 @@ void encode(X64_instruction* buf) {
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_imm(ADD_IMM, r0, r1, 0));
             }else if (t0 == REG && t1 == IMM){
-                int64_t imm = buf->op1.imm;
-                if (imm < 0 || imm > UINT16_MAX) {
-                    emit_imm(&buf->op1);
-                    emit32(sf|_construct_r_r_imm(ADD_IMM, r0, SC2, 0));
-                } else emit32(sf | MOVZ_IMM | (imm << 5) | x64_regs[r0]);
+                emit_imm(buf->op1.imm, r0);
             } else if (t1&MEM) {
                 emit_load(x64_regs[r0], &buf->op1, sf, buf->prefix);
             } else if (t0&MEM) {
@@ -256,7 +246,7 @@ void encode(X64_instruction* buf) {
                     if (buf->op1.imm == 0) {
                         r1 = XZR;
                     } else {
-                        emit_imm(&buf->op1);
+                        emit_imm(buf->op1.imm, SC2);
                         r1 = SC2;
                     }
                 }
@@ -296,15 +286,13 @@ void encode(X64_instruction* buf) {
             } else panic("ENCODER::UNHANDLED_XOR");
         } break;
         case AND:{
+            if (t1 == IMM) {
+                emit_imm(buf->op1.imm, SC2);
+                r1 = SC2;
+                t1 = REG;
+            }
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_r(AND_REG, r0, r0, r1));
-            } else if (t0 == REG && t1 == IMM) {
-                uint64_t imm = buf->op1.imm;
-                if (imm == 0xFFFFFFFFFFFFFFF0) {
-                    emit_and_imm(r0, r1, 7995);
-                } else {
-                    emit_and_imm(r0, r1, imm);
-                }
             } else panic("ENCODER::UNHANDLED_AND");
         } break;
         case POP:{
