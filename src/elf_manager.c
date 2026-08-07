@@ -43,7 +43,7 @@ void open_library(const char* filename) {
         "./lib/my_%s", filename
     );
     lib->wrapper = dlopen(fullpath, RTLD_NOW);
-    if (!lib->wrapper) panic("WRAPPER_NOT_FOUND %s", filename);
+    if (!lib->wrapper) panic("WRAPPER_NOT_FOUND %s", fullpath);
     success("Wrap %s", fullpath);
     lib->name = strdup(filename);
     lib_count++;
