@@ -335,8 +335,7 @@ void decode(uint32_t gp) {
     }
     while (1) {
         jump_type = decode_step();
-        if (jump_type == RET || jump_type == JMP)
-            break;
+        if (jump_type) break;
         /*
         TODO: Static analysis of block jumps. 
         Cache lookups are resource-intensive.
