@@ -41,7 +41,7 @@ void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
             (((63 - op->scale) & 0x3F) << 10) | (x64_regs[op->idx] << 5) | reg);
         } else emit32(SF|ADD_IMM | (reg) | (x64_regs[op->idx]<<5));
         if (t&REG) {
-            emit32(_construct_r_r_r(SF|ADD_REG, reg, reg, x64_regs[op->reg]));
+            emit32(SF|ADD_REG | (reg) | (reg<<5) | (x64_regs[op->reg]<<16));
         }
         if ((t&IMM) && op->imm != 0) {
             emit_add_signed(reg, reg, op->imm);
