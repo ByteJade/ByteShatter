@@ -1,9 +1,0 @@
-newmtl mtrl/brick
-map_Kd textures/mtrl/brick.jpg
-
-newmtl mtrl/turf-green-check
-map_Kd textures/mtrl/turf-green-check.jpg
-
-newmtl mtrl/turf-grey
-map_Kd textures/mtrl/turf-grey.jpg
-
