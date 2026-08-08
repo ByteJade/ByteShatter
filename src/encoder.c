@@ -6,6 +6,8 @@
 #include "arm64emitter.h"
 #include <stdint.h>
 
+#define SC1R 12
+#define SC2R 13
 /*
 TODO:
 - encoding for 8, 16 and 32 bit instructions
@@ -58,11 +60,11 @@ void emit_branch(Instruction* buf, uint32_t code, uint8_t type) {
     if (buf->a.type == REG) {
         emit32(code | (x64_regs[buf->a.reg] << 5));
     } else if (buf->a.type == IMM) {
-        emit_brk(cache_patch_point(type, 0, buf->a.imm));
+        emit32(0xD4200000 | (cache_patch_point(type, 0, buf->a.imm) << 5));
     } else if (buf->a.type&MEM) {
-        emit_address_decode(&buf->a, x64_regs[SC1], 0);
-        emit_ldr_reg(SC1, SC1, 0);
-        emit32(code | (x64_regs[SC1] << 5));
+        emit_address_decode(&buf->a, SC1R, 0);
+        emit32((LDR64_REG | (SC1R << 5) | SC1R));
+        emit32(code | (SC1R << 5));
     }
 }
 void emit_imm(int64_t imm, uint8_t rd) {
@@ -85,16 +87,16 @@ void emit_neon(Instruction* buf, int opcode) {
     uint32_t osf = (buf->prefix == REPN) * FT;
     uint32_t msf = (buf->prefix == REPN) * MFT;
     if (buf->a.type & MEM) {
-        emit_address_decode(&buf->a, x64_regs[SC1], buf->prefix);
-        emit32(msf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
+        emit_address_decode(&buf->a, SC1R, buf->prefix);
+        emit32(msf|LDR_NEON | (SC1R<<5) | 16);
         r0 = 16;
     } else if (buf->b.type & MEM) {
-        emit_address_decode(&buf->b,  x64_regs[SC1], buf->prefix);
-        emit32(msf|LDR_NEON | (x64_regs[SC1]<<5) | 16);
+        emit_address_decode(&buf->b,  SC1R, buf->prefix);
+        emit32(msf|LDR_NEON | (SC1R<<5) | 16);
         r1 = 16;
     }
     emit32(osf|opcode|(r0)|(r0<<5)|(r1<<16));
-    if (buf->a.type & MEM) emit32(msf|STR_NEON | (x64_regs[SC1]<<5) | 16);
+    if (buf->a.type & MEM) emit32(msf|STR_NEON | (SC1R<<5) | 16);
 }
 int emit_load(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
     sf >>= 1;
@@ -107,8 +109,8 @@ int emit_load(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix) {
         emit32(sf|LDR32_REG|(x64_regs[op->reg]<<5)|rd);
         return 1;
     } else {
-        emit_address_decode(op, x64_regs[SC1], prefix);
-        emit32(sf|LDR32_REG|(x64_regs[SC1]<<5)|rd);
+        emit_address_decode(op, SC1R, prefix);
+        emit32(sf|LDR32_REG|(SC1R<<5)|rd);
         return 0;
     }
 }
@@ -120,8 +122,8 @@ int emit_store(uint8_t rd, Operand* op, uint32_t sf, uint8_t prefix, uint8_t add
         emit32(sf|STUR|((op->imm&0x1FF)<<12)|(x64_regs[op->reg]<<5)|(rd));
         return 1;
     } else {
-        if (address) emit_address_decode(op, x64_regs[SC1], prefix);
-        emit32(sf|STR32_REG|(x64_regs[SC1]<<5)|rd);
+        if (address) emit_address_decode(op, SC1R, prefix);
+        emit32(sf|STR32_REG|(SC1R<<5)|rd);
         return 0;
     }
 }
@@ -133,7 +135,7 @@ void encode8bit(Instruction* buf) {
     switch (buf->type) {
         case MOV: {
             if (t0&MEM) {
-                emit_address_decode(&buf->a, x64_regs[SC1], buf->prefix);
+                emit_address_decode(&buf->a, SC1R, buf->prefix);
                 if (t1 == REG){
                     emit32(_construct_r_r_imm(STR8_REG, r1, SC1, 0));
                 } else {
@@ -144,11 +146,11 @@ void encode8bit(Instruction* buf) {
         } break;
         case TEST:{
             if (t0 == REG && t1 == REG) {
-                emit32(0x12001c00 | (x64_regs[r0]<<5) | (x64_regs[SC1])); 
-                emit32(0x12001c00 | (x64_regs[r1]<<5) | (x64_regs[SC2])); 
+                emit32(0x12001c00 | (x64_regs[r0]<<5) | (SC1R)); 
+                emit32(0x12001c00 | (x64_regs[r1]<<5) | (SC2R)); 
                 emit32(_construct_r_r_r(ANDS_REG, XZR, SC1, SC2));
             } else if (t0 == REG && t1 == IMM) {
-                emit32(0x12001c00 | (x64_regs[r0]<<5) | (x64_regs[SC1])); 
+                emit32(0x12001c00 | (x64_regs[r0]<<5) | (SC1R)); 
                 emit_movz(SC2, buf->b.imm, 0);
                 emit32(_construct_r_r_r(ANDS_REG, XZR, SC1, SC2));
             } else panic("ENCODER::UNHANDLED_TST");
@@ -157,7 +159,7 @@ void encode8bit(Instruction* buf) {
             if (t0 == REG) {
                 emit32(_construct_r_r_r(SUB_IMM|S, XZR, r0, buf->b.imm));
             } else if (t0&MEM) {
-                emit_address_decode(&buf->a, x64_regs[SC1], buf->prefix);
+                emit_address_decode(&buf->a, SC1R, buf->prefix);
                 emit32(_construct_r_r_imm(LDR8_REG, SC1, SC1, 0));
                 emit32(_construct_r_r_imm(SUB_IMM|S, XZR, SC1, buf->b.imm));
             } else panic("ENCODER::UNHANDLED_CMP");
@@ -189,16 +191,16 @@ void encode(Instruction* buf) {
             } else if (t0 == REG && t1 == IMM) {
                 emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->b.imm&IMM12));
             } else if (t1&MEM) {
-                emit_load(x64_regs[SC2], &buf->b, sf, buf->prefix);
+                emit_load(SC2R, &buf->b, sf, buf->prefix);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, SC2));
             } else panic("ENCODER::UNHANDLED_SUB");
         } break;
         case ADD:{
             if (t1&MEM) {
-                emit_load(x64_regs[SC2], &buf->b, sf, buf->prefix);
+                emit_load(SC2R, &buf->b, sf, buf->prefix);
                 r1 = SC2;
             }else if (t0&MEM) {
-                emit_load(x64_regs[SC2], &buf->a, sf, buf->prefix);
+                emit_load(SC2R, &buf->a, sf, buf->prefix);
                 r0 = SC2;
             }
             if (t1 == REG) {
@@ -207,7 +209,7 @@ void encode(Instruction* buf) {
                 emit_add_signed(x64_regs[r0], x64_regs[r0], buf->b.imm);
             }
             if (t0&MEM) {
-                emit_store(x64_regs[SC2], &buf->a, sf, buf->prefix, 0);
+                emit_store(SC2R, &buf->a, sf, buf->prefix, 0);
             }
         } break;
         case SHL:{
@@ -268,10 +270,10 @@ void encode(Instruction* buf) {
                 emit_movz(SC2, buf->b.imm, 0);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, r0, SC2));
             } else if (t1&MEM) {
-                emit_load(x64_regs[SC1], &buf->b, sf, buf->prefix);
+                emit_load(SC1R, &buf->b, sf, buf->prefix);
                 emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, r0, SC1));
             } else if (t0&MEM) {
-                emit_load(x64_regs[SC1], &buf->a, sf, buf->prefix);
+                emit_load(SC1R, &buf->a, sf, buf->prefix);
                 if (t1 == IMM) {
                     emit_movz(SC2, buf->b.imm, 0);
                     emit32(sf|_construct_r_r_r(SUB_REG|S, XZR, SC1, SC2));
@@ -320,7 +322,7 @@ void encode(Instruction* buf) {
                 emit_imm(buf->a.imm, SC1);
                 r0 = SC1;
             } else if (t0&MEM) {
-                emit_load(x64_regs[SC1],&buf->a, sf, buf->prefix);
+                emit_load(SC1R,&buf->a, sf, buf->prefix);
                 r0 = SC1;
             }else if (r0 == RBP) {
                 emit32(PUSHP | (29<<10) | 30);
@@ -347,7 +349,7 @@ void encode(Instruction* buf) {
             emit32(0x937ffd22); // asr x2, x9, #63
         } break;
         case IDIV: {
-            emit_add_imm(x64_regs[SC1], x64_regs[RAX], 0);
+            emit_add_imm(SC1R, x64_regs[RAX], 0);
             emit32(0x9ac00d89 | (x64_regs[r0]<<16)); // sdiv	x9, x12, r0
             emit32(0x9b00b122 | (x64_regs[r0]<<16)); // msub	x2, x9, r0, x12
         } break;
@@ -372,11 +374,11 @@ void encode(Instruction* buf) {
         case MOVS: {
             sf = (buf->prefix == REPN) * MFT;
             if (t0 & MEM) {
-                emit_address_decode(&buf->a, x64_regs[SC1], buf->prefix);
-                emit32(sf|STR_NEON | (x64_regs[SC1]<<5) | r1);
+                emit_address_decode(&buf->a, SC1R, buf->prefix);
+                emit32(sf|STR_NEON | (SC1R<<5) | r1);
             }else if (t1 & MEM) {
-                emit_address_decode(&buf->b, x64_regs[SC1], buf->prefix);
-                emit32(sf|LDR_NEON | (x64_regs[SC1]<<5) | r0);
+                emit_address_decode(&buf->b, SC1R, buf->prefix);
+                emit32(sf|LDR_NEON | (SC1R<<5) | r0);
             } else panic("ENCODER::UNHANDLED_MOVSS");
         } break;
         case CMOVA: {
@@ -414,9 +416,9 @@ void encode(Instruction* buf) {
             if (buf->prefix == REPN) instr = SCVTD_NEON;
             else instr = SCVTF_NEON;
             if (t1&MEM) {
-                emit_address_decode(&buf->b, x64_regs[SC1], buf->prefix);
+                emit_address_decode(&buf->b, SC1R, buf->prefix);
                 emit32(_construct_r_r_imm(LDR32_REG, SC1, SC1, 0));
-                emit32(instr | (r0) | (x64_regs[SC1] << 5));
+                emit32(instr | (r0) | (SC1R << 5));
             } else if (t1 == REG) {
                 emit32(instr | (r0) | (x64_regs[r1]<<5));
             } else panic("ENCODER::UNHANDLED_CVTSI2SD");
@@ -430,8 +432,8 @@ void encode(Instruction* buf) {
             if (t0 == (REG|XMM) && t1 == (REG|XMM)) {
                 emit32(FCVTU_NEON | (r0) | (r1 << 5));
             } else if (t1 & MEM) {
-                emit_address_decode(&buf->b, x64_regs[SC1], buf->prefix);
-                emit32(LDR_NEON | (16) | (x64_regs[SC1]<<5));
+                emit_address_decode(&buf->b, SC1R, buf->prefix);
+                emit32(LDR_NEON | (16) | (SC1R<<5));
                 emit32(FCVTU_NEON | (r0) | (16 << 5));
             } else panic("ENCODER::UNHANDLED_CVTSS2SD");
             break;
