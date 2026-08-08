@@ -18,6 +18,11 @@ void emit_add_signed(uint8_t r0, uint8_t r1, int64_t imm) {
         emit32(SF|ADD_IMM | (r0) | (r1<<5) | (imm<<10));
     else emit32(SF|SUB_IMM | (r0) | (r1<<5) | (-imm<<10));
 }
+void emit_sub_signed(uint8_t r0, uint8_t r1, int64_t imm) {
+    if (imm > 0)
+        emit32(SF|SUB_IMM | (r0) | (r1<<5) | (imm<<10));
+    else emit32(SF|ADD_IMM | (r0) | (r1<<5) | (-imm<<10));
+}
 void emit_address_decode(Operand* op, uint8_t reg, uint8_t prefix) {
     uint8_t t = op->type;
     if (prefix==FS) {
@@ -190,19 +195,28 @@ void encode(Instruction* buf) {
     }
     switch (buf->type) {
         case SUB:{
-            if (t0 == REG && t1 == REG) {
-                emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, r1));
-            } else if (t0 == REG && t1 == IMM) {
-                emit32(sf|_construct_r_r_imm(SUB_IMM|S, r0, r0, buf->b.imm&IMM12));
-            } else if (t1&MEM) {
+            if (t1&MEM) {
                 emit_load(SC2R, &buf->b, sf, buf->prefix);
-                emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, SC2));
-            } else panic("ENCODER::UNHANDLED_SUB");
+                r1 = SC2;
+                t1 = REG;
+            }else if (t0&MEM) {
+                emit_load(SC2R, &buf->a, sf, buf->prefix);
+                r0 = SC2;
+            }
+            if (t1 == REG) {
+                emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, r1));
+            } else {
+                emit_sub_signed(x64_regs[r0], x64_regs[r0], buf->b.imm);
+            }
+            if (t0&MEM) {
+                emit_store(SC2R, &buf->a, sf, buf->prefix, 0);
+            }
         } break;
         case ADD:{
             if (t1&MEM) {
                 emit_load(SC2R, &buf->b, sf, buf->prefix);
                 r1 = SC2;
+                t1 = REG;
             }else if (t0&MEM) {
                 emit_load(SC2R, &buf->a, sf, buf->prefix);
                 r0 = SC2;
