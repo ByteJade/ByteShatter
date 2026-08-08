@@ -72,6 +72,7 @@ typedef struct {
     void* new_got;
 } Search_data;
 static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
+    ((void)size);
     Search_data* search = data;
     Elf64_Addr base = info->dlpi_addr;
     Elf64_Dyn* dyn = NULL;

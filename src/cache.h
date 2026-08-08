@@ -11,7 +11,6 @@ typedef struct {
 typedef struct {
     int32_t guest_off;
     uint8_t type;
-    uint8_t meta;
 } PatchUnit;
 
 typedef struct {
@@ -35,7 +34,7 @@ void cache_block_point(void);
 /* set end point of code block cache */
 void cache_block_end(void);
 /* save patch in cache for patching */
-uint16_t cache_patch_point(uint8_t type, uint8_t meta, int offset);
+uint16_t cache_patch_point(uint8_t type, int offset);
 
 /* get pointer to host instruction at guest pointer */
 uint8_t* cache_search(uint32_t gp);

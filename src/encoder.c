@@ -60,7 +60,7 @@ void emit_branch(Instruction* buf, uint32_t code, uint8_t type) {
     if (buf->a.type == REG) {
         emit32(code | (x64_regs[buf->a.reg] << 5));
     } else if (buf->a.type == IMM) {
-        emit32(0xD4200000 | (cache_patch_point(type, 0, buf->a.imm) << 5));
+        emit32(0xD4200000 | (cache_patch_point(type, buf->a.imm) << 5));
     } else if (buf->a.type&MEM) {
         emit_address_decode(&buf->a, SC1R, 0);
         emit32((LDR64_REG | (SC1R << 5) | SC1R));
@@ -365,7 +365,7 @@ void encode(Instruction* buf) {
         case JBE:
         case JAE:
         case JE:{
-            emit_brk(cache_patch_point(buf->type, 0, buf->a.imm));
+            emit_brk(cache_patch_point(buf->type, buf->a.imm));
         } break;
         case JMP:{
             emit_branch(buf, BR_REG, JMP);

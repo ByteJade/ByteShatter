@@ -43,7 +43,7 @@ void print_flags(void) {
 void print_cpu(void) {
     printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
     for (int i = 0; i < 16; i++) {
-        printf("r%s: %llX\n", regs64[i], sc->regs[x64_regs[i]]);
+        printf("%s: %llX\n", regs64[i], sc->regs[x64_regs[i]]);
     }
     print_flags();
 }
@@ -75,52 +75,48 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
         block = get_host() + get_hp();
         decode(patch->guest_off);
     }
-    int32_t offset = (uint64_t)block - sc->pc;
+    int32_t offset = ((uint64_t)block - sc->pc)/4;
     print("offset: %i", offset);
     switch (patch->type) {
         case JL:
             print("patch JL");
-            *code = BLT_IMM | (((offset/4) & 0x7FFFF) << 5);
+            *code = BLT_IMM | ((offset & 0x7FFFF) << 5);
             break;
         case JLE:
             print("patch JL");
-            *code = 0x5400000D | (((offset/4) & 0x7FFFF) << 5);
+            *code = 0x5400000D | ((offset & 0x7FFFF) << 5);
             break;
         case JE:
             print("patch JE");
-            *code = 0x54000000 | (((offset/4) & 0x7FFFF) << 5);
+            *code = 0x54000000 | ((offset & 0x7FFFF) << 5);
             break;
         case JAE:
             print("patch JAE");
-            *code = 0x54000002 | (((offset/4) & 0x7FFFF) << 5);
+            *code = 0x54000002 | ((offset & 0x7FFFF) << 5);
             break;
         case JNE:
             print("patch JNE");
-            *code = 0x54000001 | (((offset/4) & 0x7FFFF) << 5);
+            *code = 0x54000001 | ((offset & 0x7FFFF) << 5);
             break;
         case JG:
             print("patch JG");
-            *code = 0x5400000C | (((offset/4) & 0x7FFFF) << 5);
+            *code = 0x5400000C | ((offset & 0x7FFFF) << 5);
             break;
         case JGE:
             print("patch JGE");
-            *code = 0x5400000A | (((offset/4) & 0x7FFFF) << 5);
+            *code = 0x5400000A | ((offset & 0x7FFFF) << 5);
             break;
         case JBE:
             print("patch JBE");
-            *code = 0x54000009 | (((offset/4) & 0x7FFFF) << 5);
-            break;
-        case LEA:
-            print("patch LEA");
-            *code = 0x10000000 | ((offset & 0x3) << 29) | ((offset & 0x1FFFFC) << 3) | x64_regs[patch->meta];
+            *code = 0x54000009 | ((offset & 0x7FFFF) << 5);
             break;
         case JMP:
             print("patch JMP");
-            *code = BR_IMM | ((offset/4) & 0x3FFFFFF);
+            *code = BR_IMM | (offset & 0x3FFFFFF);
             break;
         case CALL:
             print("patch CALL");
-            *code = BLR_IMM | ((offset/4) & 0x3FFFFFF);
+            *code = BLR_IMM | (offset & 0x3FFFFFF);
             break;
         default:
             panic("PATCHER::UNKNOWN_PATCH");
