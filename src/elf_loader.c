@@ -102,6 +102,7 @@ void reloc_rela(Elf* elf, Elf64_Rela* rela, int relasz) {
             case R_X86_64_JUMP_SLOT:
             case R_X86_64_GLOB_DAT: {
                 void *sym_addr = get_symbol_wrapped(symname);
+                if (!sym_addr) sym_addr = get_symbol(symname);
                 if (sym_addr) {
                     *patch = (Elf64_Addr)sym_addr;
                 } else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK) {
