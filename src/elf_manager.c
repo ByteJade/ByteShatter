@@ -73,7 +73,7 @@ typedef struct {
 } Search_data;
 static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
     ((void)size);
-    Search_data* search = data;
+    Search_data* search = (Search_data*)data;
     Elf64_Addr base = info->dlpi_addr;
     Elf64_Dyn* dyn = NULL;
     for (int i = 0; i < info->dlpi_phnum; i++) {
@@ -92,13 +92,13 @@ static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
     for (; dyn->d_tag != DT_NULL; ++dyn) {
         switch (dyn->d_tag) {
             case DT_STRTAB:
-                strtab = (const char*)dyn->d_un.d_ptr;
+                strtab = (const char*)(base + dyn->d_un.d_ptr);
                 break;
             case DT_SYMTAB:
-                symtab = (Elf64_Sym*)dyn->d_un.d_ptr;
+                symtab = (Elf64_Sym*)(base + dyn->d_un.d_ptr);
                 break;
             case DT_RELA:
-                rela = (Elf64_Rela*)dyn->d_un.d_ptr;
+                rela = (Elf64_Rela*)(base + dyn->d_un.d_ptr);
                 break;
             case DT_RELASZ:
                 rela_size = dyn->d_un.d_val;
