@@ -55,7 +55,7 @@ char* get_symbol(const char* symbol) {
     return sym;
 }
 char* get_symbol_wrapped(const char* symbol) {
-    char my_symbol[1024];
+    char my_symbol[512];
     snprintf(
         my_symbol, sizeof(my_symbol),
         "my_%s", symbol
@@ -82,7 +82,6 @@ static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
         if (phdr->p_type == PT_DYNAMIC) {
             dyn = (Elf64_Dyn*)(info->dlpi_addr + phdr->p_vaddr);
             success("Found .dynamic at 0x%lx", dyn);
-            return 1;
         }
     }
 
