@@ -78,10 +78,9 @@ static int patch_library(struct dl_phdr_info* info, size_t size, void* data) {
     Elf64_Dyn* dyn = NULL;
     for (int i = 0; i < info->dlpi_phnum; i++) {
         const Elf64_Phdr* phdr = &info->dlpi_phdr[i];
-        
         if (phdr->p_type == PT_DYNAMIC) {
             dyn = (Elf64_Dyn*)(info->dlpi_addr + phdr->p_vaddr);
-            success("Found .dynamic at 0x%lx", dyn);
+            break;
         }
     }
 
