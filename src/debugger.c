@@ -13,7 +13,7 @@
 static int enabled = 0;
 uint64_t breakp = 0;
 uint64_t break_pc = 0;
-uint64_t break_block = -1;
+uint64_t break_block = 0;
 static uint32_t prev_instr = 0;
 static uint32_t* prev_instrp = NULL;
 
@@ -157,7 +157,7 @@ void debug_wait(void) {
                 break_block++;
                 break;
             } else if (strcmp(com, "run") == 0) {
-                if (break_block != -1) 
+                if (break_block) 
                     printf("Stop at break point\n");
                 break;
             } else if (strcmp(com, "exit") == 0) {
