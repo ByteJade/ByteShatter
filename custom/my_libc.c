@@ -29,13 +29,13 @@ void my___isoc23_sscanf() {
         "mov x9, x0\n"
     );
 }
+extern char __libc_single_threaded = 1;
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(vsnprintf)
 WRAP_BIG_FUNC(fprintf)
 WRAP_BIG_FUNC(sprintf)
 WRAP_FUNC_VOID(exit)
 WRAP_FUNC_VOID(__stack_chk_fail)
-WRAP_FUNC_VOID(__libc_single_threaded)
 WRAP_FUNC(puts)
 WRAP_FUNC(malloc)
 WRAP_FUNC(memcpy)
