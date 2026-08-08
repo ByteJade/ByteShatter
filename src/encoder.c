@@ -69,15 +69,19 @@ void emit_branch(Instruction* buf, uint32_t code, uint8_t type) {
 }
 void emit_imm(int64_t imm, uint8_t rd) {
     if (imm >= 0) {
-        if (imm <= INT16_MAX) emit_movz(rd, imm, 0);
+        if (imm <= INT16_MAX)
+            emit32(0xD2800000 | (imm << 5) | rd);
         else {
-            emit_mov32(rd, imm);
+            emit32(0xD2800000 | ((imm&0xFFFF) << 5) | rd);
+            emit32(0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
         }
     } else {
-        if (~imm <= INT16_MAX) emit_movn(rd, ~imm, 0);
+        if (~imm <= INT16_MAX)
+            emit32(0x92800000 | (~imm << 5) | rd);
         else {
-            emit_mov32(rd, imm);
-            emit32(SXTW_REG | (x64_regs[rd] << 5) | x64_regs[rd]);
+            emit32(0xD2800000 | ((imm&0xFFFF) << 5) | rd);
+            emit32(0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
+            emit32(SXTW_REG | (rd << 5) | rd);
         }
     }
 }
@@ -238,7 +242,7 @@ void encode(Instruction* buf) {
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_imm(ADD_IMM, r0, r1, 0));
             }else if (t0 == REG && t1 == IMM){
-                emit_imm(buf->b.imm, r0);
+                emit_imm(buf->b.imm, x64_regs[r0]);
             } else if (t1&MEM) {
                 emit_load(x64_regs[r0], &buf->b, sf, buf->prefix);
             } else if (t0&MEM) {
@@ -246,7 +250,7 @@ void encode(Instruction* buf) {
                     if (buf->b.imm == 0) {
                         r1 = XZR;
                     } else {
-                        emit_imm(buf->b.imm, SC2);
+                        emit_imm(buf->b.imm, SC2R);
                         r1 = SC2;
                     }
                 }
@@ -287,7 +291,7 @@ void encode(Instruction* buf) {
         } break;
         case AND:{
             if (t1 == IMM) {
-                emit_imm(buf->b.imm, SC2);
+                emit_imm(buf->b.imm, SC2R);
                 r1 = SC2;
                 t1 = REG;
             }
@@ -319,7 +323,7 @@ void encode(Instruction* buf) {
                 cache_back();
             }
             if (t0 == IMM) {
-                emit_imm(buf->a.imm, SC1);
+                emit_imm(buf->a.imm, SC1R);
                 r0 = SC1;
             } else if (t0&MEM) {
                 emit_load(SC1R,&buf->a, sf, buf->prefix);

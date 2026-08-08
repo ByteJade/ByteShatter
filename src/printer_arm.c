@@ -1,6 +1,7 @@
-#include "arm64printer.h"
+#include "printer_arm.h"
 #include <stdint.h>
 #include <stdio.h>
+
 int comp(const char* cond, uint64_t opcode) {
     uint32_t mask = 0;
     uint32_t check = 0;

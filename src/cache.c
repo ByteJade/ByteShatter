@@ -2,8 +2,7 @@
 #include "memory.h"
 #include "core.h"
 #include "decoder.h"
-#include "arm64printer.h"
-#include "printer_x86.h"
+#include "printer_arm.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>

@@ -4,7 +4,6 @@
 #include "patcher.h"
 #include "memory.h"
 #include "decoder.h"
-#include "printer_x86.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
