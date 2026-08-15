@@ -17,7 +17,7 @@ extern "C" {
     }
     void my__ZNKSt9basic_iosIcSt11char_traitsIcEE4failEv(std::basic_ios<char, std::char_traits<char>>* self) {
         bool data = (self->rdstate() & (std::ios_base::failbit | std::ios_base::badbit)) != 0;
-        RETURN(data)
+        RETURN()
     }
     void my__ZNSt8__detail15_List_node_base7_M_hookEPS0_(
         std::__detail::_List_node_base* self, 
@@ -31,11 +31,11 @@ extern "C" {
     }
     void my__Znwm(size_t size) {
         void* data = new char[size];
-        RETURN(data)
+        RETURN()
     }
     void my__Znam(size_t size) {
         void* data = new char[size];
-        RETURN(data)
+        RETURN()
     }
     void my__ZdaPv(void* ptr) {
         ::operator delete (ptr);
@@ -51,51 +51,51 @@ extern "C" {
     }
     void my__ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(std::ostream& os, const char* str) {
         os << str;
-        RETURN(os)
+        RETURN()
     }
     void my__ZNSolsEl(std::ostream& os, long n) {
         os << n;
-        RETURN(os)
+        RETURN()
     }
     void my__ZNSolsEi(std::ostream& os, int n) {
         os << n;
-        RETURN(os)
+        RETURN()
     }
     void my__ZNSolsEf(std::ostream& os, float n) {
         os << n;
-        RETURN(os)
+        RETURN()
     }
     void my__ZNSolsEd(std::ostream& os, double n) {
         os << n;
-        RETURN(os)
+        RETURN()
     }
     void my__ZNSolsEm(std::ostream& os, unsigned long n) {
         os << n;
-        RETURN(os)
+        RETURN()
     }
     void my__ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(std::ostream& os) {
         os << std::endl;
-        RETURN(os)
+        RETURN()
     }
     void my__ZNSolsEPFRSoS_E(std::ostream& os, std::ostream& (*pf)(std::ostream&)) {
         std::ostream& pfos = pf(os);
-        RETURN(pfos)
+        RETURN()
     }
     void my__ZNSirsERj(std::istream* self, unsigned int& n) {
         self->operator>>(n);
-        RETURN(self)
+        RETURN()
     }
     void my__ZNSirsERt(std::istream* self, unsigned short& n) {
         self->operator>>(n);
-        RETURN(self)
+        RETURN()
     }
     void my__ZNSirsERi(std::istream* self, int& n) {
         self->operator>>(n);
-        RETURN(self)
+        RETURN()
     }
     void my__ZNSirsERf(std::istream* self, float& f) {
         self->operator>>(f);
-        RETURN(self)
+        RETURN()
     }
     void my__ZNSo5flushEv(std::ostream& os) {
         os.flush();

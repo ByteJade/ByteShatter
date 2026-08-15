@@ -38,7 +38,7 @@
             "mov x9, x0\n" \
         ); \
     }
-#define RETURN(state) asm volatile("mov x9, %0" : : "r" ((state)));
+#define RETURN() asm volatile("mov x9, x0");
 #else
 #define JUMP(func) \
     __attribute__((naked)) \
