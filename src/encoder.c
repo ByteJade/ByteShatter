@@ -253,7 +253,7 @@ void encode(Instruction* buf) {
         } break;
         case MOVSX: {
             if (t0 == REG && t1 == REG) {
-                emit32(0x93407c00 | (x64_regs[r0]<<5) | (x64_regs[r1]));
+                emit32(0x93407c00 | (x64_regs[r1]<<5) | (x64_regs[r0]));
             }else panic("ENCODER::UNHANDLED_MOVSLQ");
         } break;
         case MOVZX:
