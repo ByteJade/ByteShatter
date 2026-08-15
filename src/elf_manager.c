@@ -57,10 +57,12 @@ char* get_symbol(const char* symbol) {
 char* get_cpp_symbol(const char* symbol) {
     static const char* symbols[] = {
         "_ZSt4cout",
+        "_ZSt4cerr",
         NULL
     };
     static const char* targets[] = {
-        "_ZNSt3__14coutE",
+        "_ZNSt6__ndk14coutE",
+        "_ZNSt6__ndk14cerrE",
         NULL
     };
     for (int position = 0; symbols[position]; position++) {
