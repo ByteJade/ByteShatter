@@ -1,8 +1,8 @@
 #ifdef __aarch64__
 #define WRAP_FUNC_VOID(func) \
+    __attribute__((naked)) \
     void my_##func() { \
         asm volatile("b " #func); \
-        __builtin_unreachable(); \
     }
 #define WRAP_FUNC(func) \
     void my_##func() { \
@@ -40,9 +40,9 @@
     }
 #else
 #define JUMP(func) \
+    __attribute__((naked)) \
     void my_##func() { \
         asm volatile("jmp " #func); \
-        __builtin_unreachable(); \
     }
 
 #define WRAP_FUNC_VOID(func)  JUMP(func)
