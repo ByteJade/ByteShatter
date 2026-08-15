@@ -7,19 +7,19 @@
 #define WRAP_FUNC(func) \
     void my_##func() { \
         asm volatile( \
-            "stp x28, x30, [sp, #-16]!\n" \
+            "mov x20, x30\n" \
             "bl " #func "\n" \
-            "ldp x28, x30, [sp], #16\n" \
+            "mov x30, x20\n" \
             "mov x9, x0\n" \
         ); \
     }
 #define WRAP_MED_FUNC(func) \
     void my_##func() { \
         asm volatile( \
-            "stp x28, x30, [sp, #-16]!\n" \
+            "mov x20, x30\n" \
             "ldp x6, x7, [x28]\n" \
             "bl " #func "\n" \
-            "ldp x28, x30, [sp], #16\n" \
+            "mov x30, x20\n" \
             "mov x9, x0\n" \
         ); \
     }
