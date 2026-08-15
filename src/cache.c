@@ -62,6 +62,7 @@ uint16_t cache_block_start(void) {
 }
 void cache_block_point(void) {
     uint16_t goff = get_gp() - last_block->gp;
+    if (goff == 0) return;
     uint16_t hogg = get_hp() - last_block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
