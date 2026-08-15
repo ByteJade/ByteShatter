@@ -1,6 +1,6 @@
 #include "wrapper.h"
 #include <iostream>
-#include <set>
+#include <bits/stl_tree.h>
 #include <sstream>
 
 namespace std {
