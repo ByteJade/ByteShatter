@@ -54,6 +54,22 @@ char* get_symbol(const char* symbol) {
     void* sym = dlsym(RTLD_DEFAULT, symbol);
     return sym;
 }
+char* get_cpp_symbol(const char* symbol) {
+    static const char* symbols[] = {
+        "_ZSt4cout",
+        NULL
+    };
+    static const char* targets[] = {
+        "_ZNSt3__14coutE",
+        NULL
+    };
+    for (int position = 0; symbols[position]; position++) {
+        if (strcmp(symbol, symbols[position]) == 0) {
+            return get_symbol(targets[position]);
+        }
+    }
+    return NULL;
+}
 char* get_symbol_wrapped(const char* symbol) {
     char my_symbol[512];
     snprintf(
