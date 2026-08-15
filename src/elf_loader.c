@@ -117,9 +117,6 @@ void reloc_rela(Elf* elf, Elf64_Rela* rela, int relasz) {
             } break;
             case R_X86_64_COPY: {
                 void *sym_addr = get_symbol(symname);
-                if (!sym_addr && symname[0] == '_' && symname[1] == 'Z') {
-                    sym_addr = get_cpp_symbol(symname);
-                }
                 size_t size = sym->st_size;
                 if (sym_addr && size) {
                     memmove(patch, sym_addr, size);

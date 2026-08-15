@@ -62,6 +62,7 @@ void open_library(const char* filename) {
 }
 char* get_symbol(const char* symbol) {
     void* sym = dlsym(RTLD_DEFAULT, symbol);
+    if (!sym) sym = get_cpp_symbol(symbol);
     return sym;
 }
 char* get_cpp_symbol(const char* symbol) {
