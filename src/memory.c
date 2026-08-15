@@ -16,8 +16,8 @@ uint32_t gp = 0;
 uint32_t hp = 0;
 
 void memory_init(uint32_t guest_size) {
-    hostsz = guest_size * 1.5;
-    // host code ~1.5 times larger, than guest
+    hostsz = guest_size * 2;
+    // host code ~2 times larger, than guest
     host = mmap(
         NULL, hostsz,
         PROT_READ | PROT_WRITE | PROT_EXEC,
@@ -27,7 +27,7 @@ void memory_init(uint32_t guest_size) {
     if (host == MAP_FAILED) {
         panic("MMAP::FAIL");
     }
-    success("host and guest mmap");
+    success("host mmap %li", hostsz);
 }
 void memory_fini(void) {
     if (host) munmap(host, hostsz);
