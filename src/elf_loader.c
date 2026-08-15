@@ -207,5 +207,6 @@ void elf_init(Elf* elf) {
             ((void(*)(void))elf->init_array[i])();
         }
     }
+    memory_clear_host();
     cache_clear();
 }

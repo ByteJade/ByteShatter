@@ -49,9 +49,7 @@ void memory_clear_host(void) {
 }
 // TODO: check host overflow
 void emit32(uint32_t data) {
-    uint32_t* dst = (uint32_t*)(host + hp);
-    *dst = data;
-    hp += 1;
+    host[hp++] = data;
 }
 void patch32() {
     hp -= 1;
