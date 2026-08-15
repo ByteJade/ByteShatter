@@ -3,6 +3,7 @@
 #include "cache.h"
 #include "memory.h"
 #include "decoder.h"
+#include "stack.h"
 #include "arm64emitter.h"
 #include "printer_x86.h"
 #include "debugger.h"
