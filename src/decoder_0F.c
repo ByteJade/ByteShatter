@@ -81,13 +81,13 @@ void decode_0F(Instruction* buf) {
                 buf->b.type |= XMM;
             break;
         case 0x80 ... 0x8F:
-            buf->type = byte - 0x82 + JO;
+            buf->type = byte - 0x80 + JO;
             buf->a.type = IMM;
             buf->a.imm = fetch_imm32();
             buf->b.type = NONE;
             break;
         case 0x90 ... 0x9F:
-            buf->type = byte - 0x82 + SETO;
+            buf->type = byte - 0x90 + SETO;
             decode_rm(&buf->a, fetch8());
             break;
         case 0xB6:
