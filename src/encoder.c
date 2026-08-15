@@ -411,7 +411,7 @@ void encode(Instruction* buf) {
         } break;
         case SETNE: {
             if (t0 == REG) {
-                emit32(CSETNE | r0);
+                emit32(CSETNE | x64_regs[r0]);
             }  else panic("ENCODER::UNHANDLED_SETNE");
         } break;
         case MULS:
