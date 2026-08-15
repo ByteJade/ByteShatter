@@ -17,14 +17,24 @@ Lib* libs = NULL;
 int lib_count = 0;
 int lib_capacity = 0;
 
-const char* ld_paths[] = {
-    ".",
-    "/lib",
-    "/lib64",
-    "/system/lib",
-    "/data/data/com.termux/files/usr/lib",
+static const char* cpp_symbols[] = {
+    "_ZSt4cout",
+    "_ZSt4cerr",
     NULL
 };
+#if defined (__TERMUX__)
+static const char* cpp_targets[] = {
+    "_ZNSt6__ndk14coutE",
+    "_ZNSt6__ndk14cerrE",
+    NULL
+};
+#else
+static const char* cpp_targets[] = {
+    "_ZNSt3__14coutE",
+    "_ZNSt3__14cerrE",
+    NULL
+};
+#endif
 
 void open_library(const char* filename) {
     for (int i = 0; i < lib_count; i++) {
@@ -55,19 +65,9 @@ char* get_symbol(const char* symbol) {
     return sym;
 }
 char* get_cpp_symbol(const char* symbol) {
-    static const char* symbols[] = {
-        "_ZSt4cout",
-        "_ZSt4cerr",
-        NULL
-    };
-    static const char* targets[] = {
-        "_ZNSt6__ndk14coutE",
-        "_ZNSt6__ndk14cerrE",
-        NULL
-    };
-    for (int position = 0; symbols[position]; position++) {
-        if (strcmp(symbol, symbols[position]) == 0) {
-            return get_symbol(targets[position]);
+    for (int position = 0; cpp_symbols[position]; position++) {
+        if (strcmp(symbol, cpp_symbols[position]) == 0) {
+            return get_symbol(cpp_targets[position]);
         }
     }
     return NULL;
