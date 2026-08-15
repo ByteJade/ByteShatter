@@ -193,7 +193,10 @@ int decode_instr(Instruction* buf) {
                 buf->b.imm = fetch_imm32();
             } else buf->b.imm = fetch_imm8();
         } break;
-        case 0x84: case 0x85:
+        case 0x84:
+            buf->size = 8;
+            [[fallthrough]];
+        case 0x85:
             buf->type = TEST;
             decode_rm_r(buf);
             break;

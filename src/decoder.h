@@ -42,6 +42,16 @@ enum InstrTypes {
     JS, JNS, JP, JPO,
     JL, JGE, JLE, JG,
 
+    CMOVO, CMOVNO, CMOVB, CMOVAE,
+    CMOVE, CMOVNE, CMOVBE, CMOVA,
+    CMOVS, CMOVNS, CMOVP, CMOVPO,
+    CMOVL, CMOVGE, CMOVLE, CMOVG,
+
+    SETO, SETNO, SETB, SETAE,
+    SETE, SETNE, SETBE, SETA,
+    SETS, SETNS, SETP, SETPO,
+    SETL, SETGE, SETLE, SETG,
+
     TEST, LEA, NOP, EBR,
     RET, LEAVE, CALL, JMP,
 
@@ -51,7 +61,7 @@ enum InstrTypes {
     COMIS, MOVS,
     MOVQ, MOVAPD,
     CVTSD2SI, CVTSI2S,
-    CMOVA, MOVZX, IDIV,
+    MOVZX, IDIV,
     CLTQ, CLTD
 };
 typedef struct {
@@ -75,6 +85,7 @@ int64_t fetch_imm8(void);
 int64_t fetch_imm32(void);
 void decode_r_rm(Instruction* buf);
 void decode_rm_r(Instruction* buf);
+void decode_rm(Operand* op, uint8_t modrm);
 void decode_0F(Instruction* buf);
 int decode_instr(Instruction* buf);
 void decode(uint32_t gp);

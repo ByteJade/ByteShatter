@@ -39,8 +39,8 @@ void decode_0F(Instruction* buf) {
             else buf->prefix = REPE;
             buf->type = COMIS;
             goto set;
-        case 0x47:
-            buf->type = CMOVA;
+        case 0x40 ... 0x4F:
+            buf->type = byte - 0x40 + CMOVO;
             decode_r_rm(buf);
             break;
         case 0x57:
@@ -80,11 +80,15 @@ void decode_0F(Instruction* buf) {
             if (buf->b.type == REG)
                 buf->b.type |= XMM;
             break;
-        case 0x82 ... 0x8F:
-            buf->type = byte - 0x82 + JB;
+        case 0x80 ... 0x8F:
+            buf->type = byte - 0x82 + JO;
             buf->a.type = IMM;
             buf->a.imm = fetch_imm32();
             buf->b.type = NONE;
+            break;
+        case 0x90 ... 0x9F:
+            buf->type = byte - 0x82 + SETO;
+            decode_rm(&buf->a, fetch8());
             break;
         case 0xB6:
             buf->type = MOVZX;
