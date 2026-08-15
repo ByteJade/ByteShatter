@@ -29,25 +29,24 @@ int debug_break(void) {
 uint64_t debug_breakp(void) {
     return breakp;
 }
-void set_break_point(uint32_t pc) {
-    break_pc = pc;
-    CacheUnit* cache = cache_get_block(break_block);
-    uint32_t* instr = (get_host() + cache->hp + pc);
+inline void bp(uint32_t* instr) {
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
     __builtin___clear_cache(instr, instr+4);
 }
+void set_break_point(uint32_t pc) {
+    break_pc = pc;
+    CacheUnit* cache = cache_get_block(break_block);
+    uint32_t* instr = (get_host() + cache->hp + pc);
+    bp(instr);
+}
 void set_break() {
     break_block = cache_search_block(get_hp());
     CacheUnit* cache = cache_get_block(break_block);
     break_pc = get_hp() - cache->hp;
-
     uint32_t* instr = (get_host() + get_hp() - 1);
-    prev_instr = *instr;
-    prev_instrp = instr;
-    *instr = 0xD4200000;
-    __builtin___clear_cache(instr, instr+4);
+    bp(instr);
 }
 void help(void) {
     printf("Commands:\n");
@@ -108,7 +107,7 @@ void handle_print(char* arg) {
             print_flags();
         } else if (strcmp(arg, "usage") == 0) {
             printf("cache usage: %i bytes\n", cache_usage());
-            printf("host usage: %li bytes (%li guest)\n", get_hp(), get_gp());
+            printf("host usage: %li bytes (%li guest)\n", get_hp()*4, get_gp());
         } else {
             printf("\033[34m%s\033[0m: %lX\n", arg, get_reg(arg));
         }
