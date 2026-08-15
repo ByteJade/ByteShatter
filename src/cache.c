@@ -72,7 +72,7 @@ void cache_block_point(void) {
         hogg = get_hp() - last_block->hp;
     }
     local_offsets[loffp].goff = goff;
-    local_offsets[loffp].hoff = hogg/4;
+    local_offsets[loffp].hoff = hogg;
     offset_usage += sizeof(OffsetUnit);
     loffp++;
     if (loffp >= MAX_OFFSETS) {
@@ -110,7 +110,7 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
     while (left <= right) {
         int mid = (left + right) / 2;
         uint8_t goff = offsets[mid].goff;
-        if (goff == gp) return cache->hp + offsets[mid].hoff*4;
+        if (goff == gp) return cache->hp + offsets[mid].hoff;
         if (goff < gp) left = mid + 1; 
         else right = mid - 1;
     }
@@ -121,7 +121,7 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
        which will cause this exception */
     return 0;
 }
-uint8_t* cache_search(uint32_t gp) {
+uint32_t* cache_search(uint32_t gp) {
     // TODO: better cache search
     for (int i = 0; i < bp; i++) {
         CacheUnit* cache = blocks_cache + i;
@@ -158,8 +158,8 @@ void cache_back() {
 }
 void cache_flush(uint16_t block_id) {
     CacheUnit* unit = blocks_cache + block_id;
-    uint8_t* code = get_host() + unit->hp;
-    uint32_t size = unit->offsets[unit->offsetssz-1].hoff*4+32;
+    uint32_t* code = get_host() + unit->hp;
+    uint32_t size = unit->offsets[unit->offsetssz-1].hoff+8;
     print("flush cache %x-%x; block %i", unit->hp, unit->hp+size, block_id);
     __builtin___clear_cache(code, code + size);
 }
@@ -169,7 +169,7 @@ uint32_t cache_usage(void) {
 void cache_print(int block) {
     CacheUnit* unit = blocks_cache + block;
     printf("%X Block: %i\n", unit->hp, block);
-    uint32_t* host = (uint32_t*)(&get_host()[unit->hp]);
+    uint32_t* host = get_host() + unit->hp;
     for (int x = 0; x < unit->offsetssz; x++) {
         Instruction buf;
         set_gp(unit->gp + unit->offsets[x].goff);

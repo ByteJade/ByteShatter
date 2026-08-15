@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 
 static uint8_t* guest = NULL;
-static uint8_t* host = NULL;
+static uint32_t* host = NULL;
 /*
 TODO: for multithreading,
 local hp and gp for each thread
@@ -48,23 +48,11 @@ void memory_clear_host(void) {
     hp = 0;
 }
 // TODO: check host overflow
-void emit8(uint8_t data) {
-    uint8_t* dst = (uint8_t*)(host + hp);
-    *dst = data;
-    hp += 1;
-}
-void emit16(uint16_t data) {
-    uint16_t* dst = (uint16_t*)(host + hp);
-    *dst = data;
-    hp += 2;
-}
 void emit32(uint32_t data) {
-    uint32_t* dst = (uint32_t*)(host + hp);
-    *dst = data;
-    hp += 4;
+    host[hp++] = data;
 }
 void patch32() {
-    hp -= 4;
+    hp--;
 }
 
 uint8_t fetch8(void) {
@@ -91,5 +79,5 @@ void set_hp(uint32_t new_hp) { hp = new_hp; }
 uint64_t get_hp(void) { return hp; }
 uint64_t get_gp(void) { return gp; }
 
-uint8_t* get_host(void) { return host; }
+uint32_t* get_host(void) { return host; }
 uint8_t* get_guest(void) { return guest; }

@@ -68,7 +68,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     print("ret: %x", ret);
     PatchUnit* patch = cache_get_patch(ret);
     print("patch: %i", patch->guest_off);
-    const uint8_t* block = cache_search(patch->guest_off);
+    const uint32_t* block = cache_search(patch->guest_off);
     if (block == NULL) {
         warning("PATCHER::NOT_FOUND %lx", patch->guest_off);
         block = get_host() + get_hp();
@@ -133,7 +133,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     }
     if (info->si_code == SEGV_ACCERR || sc->pc%4 != 0) {
         success("found unhandled jump");
-        const uint8_t* block = cache_search(sc->pc);
+        const uint32_t* block = cache_search(sc->pc);
         if (block == NULL) {
             warning("PATCHER::NOT_FOUND %lx", sc->pc);
             block = get_host() + get_hp();
