@@ -158,7 +158,7 @@ void debug_wait(void) {
                         decode_instr(&buf);
                     }
                 }
-                set_break_point(break_pc + 4);
+                set_break_point(break_pc + 1);
                 break;
             } else if (strcmp(com, "sb") == 0) {
                 break_block++;
