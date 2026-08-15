@@ -1,16 +1,11 @@
 #include <iostream>
 
 extern "C" {
-    extern std::ostream _ZSt4cout(std::cout.rdbuf());
-    extern std::ostream _ZSt4cerr(std::cerr.rdbuf());
-
-    extern const std::type_info& _ZTISt13runtime_error = typeid(std::runtime_error);
-
     void my__ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(std::ostream& os, const char* str) {
         os << str;
     }
     void my__ZNSt13runtime_errorD1Ev(std::runtime_error* this_ptr) {
-        
+        // C++ will do the cleanup itself
     }
     std::ostream& my__ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(std::ostream& os) {
         os << '\n';
