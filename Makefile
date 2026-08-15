@@ -14,6 +14,7 @@ TARGET = shatter
 
 all: $(BUILD_DIR) $(LIB_BUILD_DIR) \
     $(LIB_BUILD_DIR)/my_libc.so.6 \
+    $(LIB_BUILD_DIR)/my_libgcc_s.so.1 \
     $(LIB_BUILD_DIR)/my_libm.so.6 \
     $(LIB_BUILD_DIR)/my_libX11.so.6 \
     $(LIB_BUILD_DIR)/my_libGL.so.1 \
@@ -35,6 +36,9 @@ $(TARGET): $(OBJS)
 	$(CC) -o $(BUILD_DIR)/$@ $^
 
 $(LIB_BUILD_DIR)/my_libc.so.6: $(LIB_DIR)/my_libc.c | $(LIB_BUILD_DIR)
+	$(CC) -fPIC -shared $< -o $@
+
+$(LIB_BUILD_DIR)/my_libgcc_s.so.1: $(LIB_DIR)/my_libgcc_s.c | $(LIB_BUILD_DIR)
 	$(CC) -fPIC -shared $< -o $@
 
 $(LIB_BUILD_DIR)/my_libm.so.6: $(LIB_DIR)/my_libm.c | $(LIB_BUILD_DIR)
