@@ -32,7 +32,7 @@ uint64_t debug_breakp(void) {
 void set_break_point(uint32_t pc) {
     break_pc = pc;
     CacheUnit* cache = cache_get_block(break_block);
-    uint32_t* instr = get_host() + cache->hp + pc;
+    uint32_t* instr = (uint32_t*)(get_host() + cache->hp + pc);
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
@@ -43,7 +43,7 @@ void set_break() {
     CacheUnit* cache = cache_get_block(break_block);
     break_pc = get_hp() - cache->hp;
 
-    uint32_t* instr = get_host() + get_hp() - 1;
+    uint32_t* instr = (uint32_t*)(get_host() + get_hp() - 4);
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
@@ -134,13 +134,6 @@ void debug_wait(void) {
             } else if (strcmp(com, "brk") == 0) {
                 breakp = strtol(arg, NULL, 16);
                 printf("Set break point in pc %lX\n", breakp);
-                uint32_t* instr = cache_search((uint64_t)get_guest() + breakp);
-                if (instr) {
-                    prev_instr = *instr;
-                    prev_instrp = instr;
-                    *instr = 0xD4200000;
-                    __builtin___clear_cache(instr, instr+4);
-                }
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
@@ -152,13 +145,13 @@ void debug_wait(void) {
             if (strcmp(com, "si") == 0) {
                 CacheUnit* unit = cache_get_block(break_block);
                 for (int x = 0; x < unit->offsetssz; x++) {
-                    if (break_pc == unit->offsets[x].hoff) {
+                    if (break_pc == unit->offsets[x].hoff*4) {
                         Instruction buf;
                         set_gp(unit->gp + unit->offsets[x].goff);
                         decode_instr(&buf);
                     }
                 }
-                set_break_point(break_pc + 1);
+                set_break_point(break_pc + 4);
                 break;
             } else if (strcmp(com, "sb") == 0) {
                 break_block++;

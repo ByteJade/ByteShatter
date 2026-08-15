@@ -37,7 +37,7 @@ void cache_block_end(void);
 uint16_t cache_patch_point(uint8_t type, int offset);
 
 /* get pointer to host instruction at guest pointer */
-uint32_t* cache_search(uint32_t gp);
+uint8_t* cache_search(uint32_t gp);
 /* get pointer to host instruction at guest pointer */
 uint32_t cache_search_block(uint32_t hp);
 /* get pointer to patch data */

@@ -341,7 +341,6 @@ void decode(uint32_t gp) {
     uint16_t block = cache_block_start();
     uint8_t jump_type = 0;
     if (block == debug_break()) {
-        print("debug point found");
         jump_type = decode_step();
         set_break();
     }
@@ -352,9 +351,9 @@ void decode(uint32_t gp) {
         TODO: Static analysis of block jumps. 
         Cache lookups are resource-intensive.
         */
-        const uint32_t* blockp = cache_search(get_gp());
+        const uint8_t* blockp = cache_search(get_gp());
         if (blockp) {
-            int32_t offset = blockp - get_host() - get_hp();
+            int32_t offset = (uint64_t)blockp - (uint64_t)(get_host()+get_hp());
             warning("DECODER::DUPLICATION %i", offset);
             cache_block_point();
             emit32(0x14000000 | ((offset/4) & 0x3FFFFFF));

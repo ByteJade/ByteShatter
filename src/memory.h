@@ -9,6 +9,10 @@ void memory_fini(void);
 void* mmap_guest(uint32_t guest_size);
 void memory_clear_host(void);
 
+/* emit byte to host memory */
+void emit8(uint8_t data);
+/* emit 2 bytes to host memory */
+void emit16(uint16_t data);
 /* emit 4 bytes to host memory */
 void emit32(uint32_t data);
 /* replace 32 bytes */
@@ -34,7 +38,7 @@ uint64_t get_hp(void);
 uint64_t get_gp(void);
 
 /* get pointer to host memory */
-uint32_t* get_host(void);
+uint8_t* get_host(void);
 /* get pointer to guest memory */
 uint8_t* get_guest(void);
 
