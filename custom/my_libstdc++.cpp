@@ -1,4 +1,6 @@
+#include "wrapper.h"
 #include <iostream>
+
 namespace std {
     namespace __detail {
         struct _List_node_base {
@@ -40,6 +42,9 @@ extern "C" {
     void _ZdlPvm(void* ptr, size_t size) {
         free(ptr);
     }
+    void _ZdaPvm(void* ptr, size_t size) {
+        free(ptr);
+    }
     std::ostream& my__ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(std::ostream& os, const char* str) {
         return os << str;
     }
@@ -52,19 +57,26 @@ extern "C" {
     std::ostream& my__ZNSolsEf(std::ostream& os, float n) {
         return os << n;
     }
-    std::ostream& my__ZNSolsEn(std::ostream& os, unsigned long n) {
+    std::ostream& my__ZNSolsEd(std::ostream& os, double n) {
+        return os << n;
+    }
+    std::ostream& my__ZNSolsEm(std::ostream& os, unsigned long n) {
         return os << n;
     }
     std::ostream& my__ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(std::ostream& os) {
         return os << std::endl;
     }
-    std::istream& my__ZNSirsERj(std::istream* self, unsigned int& value) {
-        return self->operator>>(value);
+    std::istream& my__ZNSirsERj(std::istream* self, unsigned int& n) {
+        return self->operator>>(n);
     }
-    std::istream& my__ZNSirsERt(std::istream* self, unsigned short& value) {
-        return self->operator>>(value);
+    std::istream& my__ZNSirsERt(std::istream* self, unsigned short& n) {
+        return self->operator>>(n);
+    }
+    std::istream& my__ZNSirsERf(std::istream* self, float& f) {
+        return self->operator>>(f);
     }
     void _ZNSo5flushEv(std::ostream& os) {
         os.flush();
     }
+    WRAP_FUNC_VOID(__cxa_finalize)
 }

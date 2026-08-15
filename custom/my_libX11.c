@@ -6,6 +6,7 @@ WRAP_BIG_FUNC(XSetWMProperties)
 WRAP_MED_FUNC(XSetStandardProperties)
 WRAP_MED_FUNC(XChangeProperty)
 
+WRAP_FUNC(XScreenNumberOfScreen)
 WRAP_FUNC(XSetWMProtocols)
 WRAP_FUNC(XInternAtom)
 WRAP_FUNC(XOpenDisplay)

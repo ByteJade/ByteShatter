@@ -2,6 +2,7 @@
 
 WRAP_FUNC(png_malloc)
 WRAP_FUNC_VOID(png_free)
+WRAP_FUNC_VOID(png_read_png)
 WRAP_FUNC_VOID(png_read_image)
 WRAP_FUNC_VOID(png_read_info)
 WRAP_FUNC_VOID(png_read_end)
