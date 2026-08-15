@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MAX_BLOCKS 255
+#define MAX_BLOCKS 512
 #define MAX_JUMPS 255
 #define MAX_OFFSETS 255
 
