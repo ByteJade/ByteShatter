@@ -341,7 +341,7 @@ void decode(uint32_t gp) {
     uint16_t block = cache_block_start();
     uint8_t jump_type = 0;
     if (block == debug_break()) {
-        print("debug poit found\n");
+        print("debug point found");
         jump_type = decode_step();
         set_break();
     }

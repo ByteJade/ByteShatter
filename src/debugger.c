@@ -32,7 +32,7 @@ uint64_t debug_breakp(void) {
 void set_break_point(uint32_t pc) {
     break_pc = pc;
     CacheUnit* cache = cache_get_block(break_block);
-    uint32_t* instr = (uint32_t*)(get_host() + cache->hp + pc);
+    uint32_t* instr = get_host() + cache->hp + (pc/4);
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
@@ -43,7 +43,7 @@ void set_break() {
     CacheUnit* cache = cache_get_block(break_block);
     break_pc = get_hp() - cache->hp;
 
-    uint32_t* instr = (uint32_t*)(get_host() + get_hp() - 4);
+    uint32_t* instr = get_host() + get_hp() - 1;
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
