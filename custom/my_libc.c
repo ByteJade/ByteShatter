@@ -32,13 +32,11 @@ void my___isoc23_sscanf() {
 void my___errno_location() {
     asm volatile(
         "mov x27, x30\n"
-        "bl __errno\n"
+        "bl __errno_location\n"
         "mov x30, x27\n"
         "mov x9, x0\n"
     );
 }
-extern char __libc_single_threaded = 1;
-
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(vsnprintf)
 WRAP_BIG_FUNC(fprintf)
