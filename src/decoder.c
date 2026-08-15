@@ -12,6 +12,9 @@ int64_t fetch_imm8(void) {
 int64_t fetch_imm32(void) {
     return (int64_t)(int32_t)fetch32();
 }
+int64_t fetch_imm64(void) {
+    return (int64_t)fetch64();
+}
 void decode_sib(Operand* op, uint8_t mod) {
     uint8_t sib = fetch8();
     op->reg = sib&7;
@@ -236,7 +239,10 @@ int decode_instr(Instruction* buf) {
             if (byte < 0xB8) {
                 buf->size = 8;
                 buf->b.imm = fetch_imm8();
-            }else buf->b.imm = fetch_imm32();
+            }else {
+                if (rex & 8) buf->b.imm = fetch_imm64();
+                else buf->b.imm = fetch_imm32();
+            }
             break;
         case 0xC0: case 0xC1:
         case 0xD0: case 0xD1:

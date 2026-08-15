@@ -20,6 +20,8 @@ uint8_t fetch8(void);
 uint16_t fetch16(void);
 /* fetch 4 bytes from guest memory */
 uint32_t fetch32(void);
+/* fetch 8 bytes from guest memory */
+uint32_t fetch64(void);
 
 /* set guest */
 void set_guest(uint64_t new_guest);

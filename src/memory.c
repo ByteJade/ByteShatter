@@ -69,6 +69,11 @@ uint32_t fetch32(void) {
     gp += 4;
     return *src;
 }
+uint32_t fetch64(void) {
+    uint64_t* src = (uint64_t*)(guest + gp);
+    gp += 8;
+    return *src;
+}
 
 void set_guest(uint64_t new_guest) { guest = (uint8_t*)new_guest; }
 
