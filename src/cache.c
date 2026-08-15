@@ -110,7 +110,7 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
     while (left <= right) {
         int mid = (left + right) / 2;
         uint8_t goff = offsets[mid].goff;
-        if (goff == gp) return cache->hp + offsets[mid].hoff*4;
+        if (goff == gp) return cache->hp + offsets[mid].hoff;
         if (goff < gp) left = mid + 1; 
         else right = mid - 1;
     }
