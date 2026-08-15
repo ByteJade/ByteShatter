@@ -119,7 +119,3 @@ WRAP_FUNC(getrusage)
 WRAP_FUNC(setrlimit)
 
 WRAP_FUNC_VOID(__cxa_finalize)
-WRAP_FUNC_VOID(__cxa_end_catch)
-WRAP_FUNC_VOID(__cxa_rethrow)
-WRAP_FUNC_VOID(__cxa_throw)
-WRAP_FUNC(__cxa_guard_acquire)
