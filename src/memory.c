@@ -16,8 +16,7 @@ uint32_t gp = 0;
 uint32_t hp = 0;
 
 void memory_init(uint32_t guest_size) {
-    hostsz = guest_size * 2;
-    // host code ~2 times larger, than guest
+    hostsz = guest_size;
     host = mmap(
         NULL, hostsz,
         PROT_READ | PROT_WRITE | PROT_EXEC,
