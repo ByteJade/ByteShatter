@@ -14,7 +14,7 @@ typedef struct {
 } PatchUnit;
 
 typedef struct {
-    OffsetUnit* offsets;
+    uint32_t offsets;
     uint32_t hp;
     uint32_t gp;
     uint8_t end;
@@ -55,6 +55,8 @@ uint32_t cache_usage(void);
 void cache_print(int block);
 /* get current block pointer */
 int cache_bp(void);
+/* get current block pointer */
+OffsetUnit* cache_offsets(void);
 /* was there a block overflow */
 int cache_overflow(void);
 

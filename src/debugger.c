@@ -143,10 +143,11 @@ void debug_wait(void) {
         } else {
             if (strcmp(com, "si") == 0) {
                 CacheUnit* unit = cache_get_block(break_block);
+                OffsetUnit* offsets = unit->offsets + cache_offsets();
                 for (int x = 0; x < unit->offsetssz; x++) {
-                    if (break_pc == unit->offsets[x].hoff) {
+                    if (break_pc == offsets[x].hoff) {
                         Instruction buf;
-                        set_gp(unit->gp + unit->offsets[x].goff);
+                        set_gp(unit->gp + offsets[x].goff);
                         decode_instr(&buf);
                     }
                 }

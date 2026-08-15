@@ -10,7 +10,7 @@
 
 #define MAX_BLOCKS 512
 #define MAX_JUMPS 255
-#define MAX_OFFSETS 255
+#define MAX_OFFSETS 24576
 
 CacheUnit* blocks_cache = NULL;
 PatchUnit* jumps_cache = NULL;
@@ -18,7 +18,8 @@ uint16_t bp = 0;
 uint16_t pp = 0;
 
 CacheUnit* last_block = NULL;
-OffsetUnit local_offsets[MAX_OFFSETS];
+OffsetUnit* offsets_pool = NULL;
+uint32_t offp = 1;
 uint8_t loffp = 0;
 uint32_t offset_usage = 0;
 
@@ -31,27 +32,23 @@ void cahce_init(void) {
     jumps_cache = (PatchUnit*) malloc(
         MAX_JUMPS * sizeof(PatchUnit)
     );
+    offsets_pool = (OffsetUnit*) malloc(
+        MAX_BLOCKS * sizeof(CacheUnit)
+    );
 }
 void cahce_fini(void) {
-    for (int i = 0; i < bp; i++) {
-        CacheUnit* unit = blocks_cache + i;
-        if (unit->offsets) free(unit->offsets);
-    }
     if (blocks_cache) free(blocks_cache);
     if (jumps_cache) free(jumps_cache);
+    if (offsets_pool) free(offsets_pool);
 }
 
 void cache_clear(void) {
-    for (int i = 0; i < bp; i++) {
-        CacheUnit* unit = blocks_cache + i;
-        if (unit->offsets) free(unit->offsets);
-    }
     bp = 0;
     pp = 0;
 }
 uint16_t cache_block_start(void) {
     last_block = blocks_cache + bp;
-    last_block->offsets = NULL;
+    last_block->offsets = 0;
     last_block->gp = get_gp();
     last_block->hp = get_hp();
     bp++;
@@ -72,11 +69,11 @@ void cache_block_point(void) {
         goff = get_gp() - last_block->gp;
         hogg = get_hp() - last_block->hp;
     }
-    local_offsets[loffp].goff = goff;
-    local_offsets[loffp].hoff = hogg;
+    offsets_pool[offp+loffp].goff = goff;
+    offsets_pool[offp+loffp].hoff = hogg;
     offset_usage += sizeof(OffsetUnit);
     loffp++;
-    if (loffp >= MAX_OFFSETS) {
+    if (loffp == UINT8_MAX) {
         warning("CACHE::OFFSET::OVERFLOW");
         cache_block_end();
         cache_block_start();
@@ -85,9 +82,9 @@ void cache_block_point(void) {
 void cache_block_end(void) {
     last_block->end = get_gp() - last_block->gp;
     uint32_t size = loffp * sizeof(OffsetUnit);
-    last_block->offsets = (OffsetUnit*)malloc(size);
-    memcpy(last_block->offsets, local_offsets, size);
+    last_block->offsets = offp;
     last_block->offsetssz = loffp;
+    offp += loffp;
     loffp = 0;
     cache_flush(bp-1);
 }
@@ -105,7 +102,7 @@ uint16_t cache_patch_point(uint8_t type, int offset) {
 }
 uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
     gp -= cache->gp;
-    OffsetUnit* offsets = cache->offsets;
+    OffsetUnit* offsets = offsets_pool + cache->offsets;
     // binary search
     int left = 0, right = cache->offsetssz - 1;
     while (left <= right) {
@@ -126,7 +123,7 @@ uint32_t* cache_search(uint32_t gp) {
     // TODO: better cache search
     for (int i = 0; i < bp; i++) {
         CacheUnit* cache = blocks_cache + i;
-        if (cache->offsets == NULL) continue;
+        if (cache->offsets == 0) continue;
         if (gp == cache->gp) return get_host() + cache->hp;
         if (gp > cache->gp && gp <  cache->gp + cache->end) {
             return get_host() + block_cache_search(gp, cache);
@@ -155,12 +152,12 @@ CacheUnit* cache_get_block(uint16_t block_id) {
 }
 
 void cache_back() {
-    local_offsets[loffp-1].hoff--;
+    //(local_offsets)[loffp-1].hoff--;
 }
 void cache_flush(uint16_t block_id) {
     CacheUnit* unit = blocks_cache + block_id;
     uint32_t* code = get_host() + unit->hp;
-    uint32_t size = unit->offsets[unit->offsetssz-1].hoff+8;
+    uint32_t size = (offsets_pool + unit->offsets)[unit->offsetssz-1].hoff+8;
     print("flush cache %x-%x; block %i", unit->hp, unit->hp+size, block_id);
     __builtin___clear_cache(code, code + size);
 }
@@ -172,14 +169,15 @@ void cache_print(int block) {
     printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = get_host() + unit->hp;
     for (int x = 0; x < unit->offsetssz; x++) {
+        OffsetUnit* offsets = (offsets_pool + unit->offsets);
         Instruction buf;
-        set_gp(unit->gp + unit->offsets[x].goff);
+        set_gp(unit->gp + offsets[x].goff);
         decode_instr(&buf);
         char out[64];
         int end;
-        int start = unit->offsets[x].hoff;
+        int start = offsets[x].hoff;
         if (x+1 == unit->offsetssz) end = start+4;
-        else end = unit->offsets[x+1].hoff;
+        else end = offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
             sprint_arm(out, host[y]);
             printf("%x %s\n", host[y], out);
@@ -188,6 +186,9 @@ void cache_print(int block) {
 }
 int cache_bp(void) {
     return bp;
+}
+OffsetUnit* cache_offsets(void) {
+    return offsets_pool;
 }
 int cache_overflow(void) {
     int out = overflow;
