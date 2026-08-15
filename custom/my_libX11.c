@@ -20,6 +20,7 @@ WRAP_FUNC(XLookupKeysym)
 WRAP_FUNC(XPending)
 WRAP_FUNC(XGetVisualInfo)
 WRAP_FUNC(XGetErrorText)
+WRAP_FUNC(XGetWindowAttributes)
 
 WRAP_FUNC_VOID(XStoreName)
 WRAP_FUNC_VOID(XMapWindow)

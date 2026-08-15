@@ -1,5 +1,6 @@
 #include "wrapper.h"
 #include <iostream>
+#include <new>
 
 namespace std {
     namespace __detail {
@@ -27,23 +28,23 @@ extern "C" {
         position->_M_prev->_M_next = self;
         position->_M_prev = self;
     }
-    void* _Znwm(size_t size) {
-        return malloc(size);
+    void* my__Znwm(size_t size) {
+        return new char[size];
     }
-    void* _Znam(size_t size) {
-        return malloc(size);
+    void* my__Znam(size_t size) {
+        return new char[size];
     }
-    void _ZdaPv(void* ptr) {
-        free(ptr);
+    void my__ZdaPv(void* ptr) {
+        ::operator delete (ptr);
     }
-    void _ZdlPv(void* ptr) noexcept {
-        free(ptr);
+    void my__ZdlPv(void* ptr) noexcept {
+        ::operator delete (ptr);
     }
-    void _ZdlPvm(void* ptr, size_t size) {
-        free(ptr);
+    void my__ZdlPvm(void* ptr, size_t size) {
+        ::operator delete (ptr);
     }
-    void _ZdaPvm(void* ptr, size_t size) {
-        free(ptr);
+    void my__ZdaPvm(void* ptr, size_t size) {
+        ::operator delete (ptr);
     }
     std::ostream& my__ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(std::ostream& os, const char* str) {
         return os << str;
@@ -66,17 +67,27 @@ extern "C" {
     std::ostream& my__ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(std::ostream& os) {
         return os << std::endl;
     }
+    std::ostream& my__ZNSolsEPFRSoS_E(std::ostream& os, std::ostream& (*pf)(std::ostream&)) {
+        return pf(os);
+    }
     std::istream& my__ZNSirsERj(std::istream* self, unsigned int& n) {
         return self->operator>>(n);
     }
     std::istream& my__ZNSirsERt(std::istream* self, unsigned short& n) {
         return self->operator>>(n);
     }
+    std::istream& my__ZNSirsERi(std::istream* self, int& n) {
+        return self->operator>>(n);
+    }
     std::istream& my__ZNSirsERf(std::istream* self, float& f) {
         return self->operator>>(f);
     }
-    void _ZNSo5flushEv(std::ostream& os) {
+    void my__ZNSo5flushEv(std::ostream& os) {
         os.flush();
     }
     WRAP_FUNC_VOID(__cxa_finalize)
+    WRAP_FUNC_VOID(__cxa_end_catch)
+    WRAP_FUNC_VOID(__cxa_rethrow)
+    WRAP_FUNC_VOID(__cxa_throw)
+    WRAP_FUNC(__cxa_guard_acquire)
 }
