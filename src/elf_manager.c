@@ -21,7 +21,7 @@ const char* ld_paths[] = {
     ".",
     "/lib",
     "/lib64",
-    "/system/lib64",
+    "/system/lib",
     "/data/data/com.termux/files/usr/lib",
     NULL
 };
@@ -54,7 +54,10 @@ char* get_symbol(const char* symbol) {
     void* sym = dlsym(RTLD_DEFAULT, symbol);
     return sym;
 }
+static void* handle = NULL;
 char* get_cpp_symbol(const char* symbol) {
+    if (!handle)
+        handle = dlopen("/system/lib/libc++.so", RTLD_LAZY);
     static const char* symbols[] = {
         "_ZSt4cout",
         NULL
@@ -65,7 +68,7 @@ char* get_cpp_symbol(const char* symbol) {
     };
     for (int position = 0; symbols[position]; position++) {
         if (strcmp(symbol, symbols[position]) == 0) {
-            return get_symbol(targets[position]);
+            return dlsym(handle, targets[position]);
         }
     }
     return NULL;
