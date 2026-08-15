@@ -37,6 +37,8 @@ void my___errno_location() {
         "mov x9, x0\n"
     );
 }
+extern char __libc_single_threaded = 1;
+
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(vsnprintf)
 WRAP_BIG_FUNC(fprintf)
