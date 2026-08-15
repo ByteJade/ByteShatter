@@ -140,6 +140,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
             decode(sc->pc - (uint64_t)get_guest());
         }
         sc->pc = (uint64_t)block;
+        if (sc->regs[28] < 0x4000000000) sc->regs[28] = get_sp();
         return;
     }
     print_cpu();

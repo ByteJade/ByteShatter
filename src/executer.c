@@ -18,8 +18,8 @@ void execute(uint64_t address) {
         : : "r" (guest), "r" (sp)
         : "x21", "x28"
     );
-    exec();
     #endif
+    exec();
     print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
     memory_clear_host();
     cache_clear();
