@@ -41,7 +41,7 @@ void open_library(const char* filename) {
         fullpath, sizeof(fullpath),
         "./lib/my_%s", filename
     );
-    lib->wrapper = dlopen(fullpath, RTLD_NOW);
+    lib->wrapper = dlopen(fullpath, RTLD_NOW|RTLD_GLOBAL);
     if (!lib->wrapper) {
         print("%s", dlerror());
         panic("WRAPPER_NOT_FOUND %s", fullpath);
@@ -54,10 +54,7 @@ char* get_symbol(const char* symbol) {
     void* sym = dlsym(RTLD_DEFAULT, symbol);
     return sym;
 }
-static void* handle = NULL;
 char* get_cpp_symbol(const char* symbol) {
-    if (!handle)
-        handle = dlopen("/system/lib/libc++.so", RTLD_LAZY);
     static const char* symbols[] = {
         "_ZSt4cout",
         NULL
@@ -68,7 +65,7 @@ char* get_cpp_symbol(const char* symbol) {
     };
     for (int position = 0; symbols[position]; position++) {
         if (strcmp(symbol, symbols[position]) == 0) {
-            return dlsym(handle, targets[position]);
+            return get_symbol(targets[position]);
         }
     }
     return NULL;
