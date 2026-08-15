@@ -134,6 +134,13 @@ void debug_wait(void) {
             } else if (strcmp(com, "brk") == 0) {
                 breakp = strtol(arg, NULL, 16);
                 printf("Set break point in pc %lX\n", breakp);
+                uint32_t* instr = cache_search((uint64_t)get_guest() + breakp);
+                if (instr) {
+                    prev_instr = *instr;
+                    prev_instrp = instr;
+                    *instr = 0xD4200000;
+                    __builtin___clear_cache(instr, instr+4);
+                }
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
