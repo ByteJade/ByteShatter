@@ -155,9 +155,14 @@ void encode8bit(Instruction* buf) {
         } break;
         case TEST:{
             if (t0 == REG && t1 == REG) {
-                emit32(0x12001c00 | (x64_regs[r0]<<5) | (SC1R)); 
-                emit32(0x12001c00 | (x64_regs[r1]<<5) | (SC2R)); 
-                emit32(_construct_r_r_r(ANDS_REG, XZR, SC1, SC2));
+                if (r0 == r1) {
+                    emit32(0x12001c00 | (x64_regs[r0]<<5) | (SC1R)); 
+                    emit32(_construct_r_r_r(ANDS_REG, XZR, SC1, SC1));
+                } else {
+                    emit32(0x12001c00 | (x64_regs[r0]<<5) | (SC1R)); 
+                    emit32(0x12001c00 | (x64_regs[r1]<<5) | (SC2R)); 
+                    emit32(_construct_r_r_r(ANDS_REG, XZR, SC1, SC2));
+                }
             } else if (t0 == REG && t1 == IMM) {
                 emit32(0x12001c00 | (x64_regs[r0]<<5) | (SC1R)); 
                 emit_movz(SC2, buf->b.imm, 0);
