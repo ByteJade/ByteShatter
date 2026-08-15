@@ -85,9 +85,4 @@ extern "C" {
     void my__ZNSo5flushEv(std::ostream& os) {
         os.flush();
     }
-    WRAP_FUNC_VOID(__cxa_finalize)
-    WRAP_FUNC_VOID(__cxa_end_catch)
-    WRAP_FUNC_VOID(__cxa_rethrow)
-    WRAP_FUNC_VOID(__cxa_throw)
-    WRAP_FUNC(__cxa_guard_acquire)
 }
