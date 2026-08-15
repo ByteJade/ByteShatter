@@ -178,6 +178,16 @@ void encode8bit(Instruction* buf) {
                 emit32(_construct_r_r_imm(SUB_IMM|S, XZR, SC1, buf->b.imm));
             } else panic("ENCODER::UNHANDLED_CMP");
         } break;
+        case SETNE: {
+            if (t0 == REG) {
+                emit32(CSETNE | x64_regs[r0]);
+            }  else panic("ENCODER::UNHANDLED_SETNE");
+        } break;
+        case SETB: {
+            if (t0 == REG) {
+                emit32(CSETLO | x64_regs[r0]);
+            }  else panic("ENCODER::UNHANDLED_SETNE");
+        } break;
         default:
             panic("ENCODER::UNKNOWN_8BIT_INSTRUCTION: %x", buf->type);
     }
@@ -408,11 +418,6 @@ void encode(Instruction* buf) {
             if (t0 == REG && t1 == REG) {
                 emit32(_construct_r_r_r(CSELHI, r0, r1, r0));
             }  else panic("ENCODER::UNHANDLED_CMOVA");
-        } break;
-        case SETNE: {
-            if (t0 == REG) {
-                emit32(CSETNE | x64_regs[r0]);
-            }  else panic("ENCODER::UNHANDLED_SETNE");
         } break;
         case MULS:
             emit_neon(buf, MUL_NEON);
