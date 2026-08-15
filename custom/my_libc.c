@@ -29,6 +29,14 @@ void my___isoc23_sscanf() {
         "mov x9, x0\n"
     );
 }
+void my___errno_location() {
+    asm volatile(
+        "mov x27, x30\n"
+        "bl __errno\n"
+        "mov x30, x27\n"
+        "mov x9, x0\n"
+    );
+}
 extern char __libc_single_threaded = 1;
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(vsnprintf)
@@ -41,6 +49,7 @@ WRAP_FUNC(malloc)
 WRAP_FUNC(memcpy)
 WRAP_FUNC(memset)
 WRAP_FUNC(memcmp)
+WRAP_FUNC(memchr)
 WRAP_FUNC(realloc)
 WRAP_FUNC(calloc)
 WRAP_FUNC_VOID(free)
@@ -94,3 +103,14 @@ WRAP_FUNC(getenv)
 WRAP_FUNC(unsetenv)
 WRAP_FUNC(longjmp)
 WRAP_FUNC(setjmp)
+
+
+WRAP_FUNC(dlopen)
+WRAP_FUNC(dlclose)
+WRAP_FUNC(dlsym)
+WRAP_FUNC(dlerror)
+WRAP_FUNC(sysconf)
+
+WRAP_FUNC(getrlimit)
+WRAP_FUNC(getrusage)
+WRAP_FUNC(setrlimit)
