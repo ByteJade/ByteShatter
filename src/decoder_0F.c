@@ -89,6 +89,7 @@ void decode_0F(Instruction* buf) {
         case 0x90 ... 0x9F:
             buf->type = byte - 0x90 + SETO;
             decode_rm(&buf->a, fetch8());
+            buf->b.type = NONE;
             break;
         case 0xB6:
             buf->type = MOVZX;
