@@ -94,6 +94,6 @@ void decode_0F(Instruction* buf) {
             buf->type = MOVZX;
             decode_r_rm(buf);
             break;
-        default: panic("DECODER::UNKNOWN_F0_SYMBOL: %X", byte);
+        default: panic("DECODER::UNKNOWN_F0_SYMBOL: 0x%X", byte);
     }
 }

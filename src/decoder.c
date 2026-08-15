@@ -315,7 +315,7 @@ int decode_instr(Instruction* buf) {
             decode_GRP3(buf, code);
             if (buf->type == JMP) ret = 1;
         } break;
-        default: panic("DECODER::UNKNOWN_SYMBOL: %X", byte);
+        default: panic("DECODER::UNKNOWN_SYMBOL: 0x%X", byte);
     }
     if (rex) decode_rex(buf, rex);
     if (get_log_level() >= LOG_PRINT) {

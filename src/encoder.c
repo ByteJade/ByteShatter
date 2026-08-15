@@ -404,6 +404,11 @@ void encode(Instruction* buf) {
                 emit32(_construct_r_r_r(CSELHI, r0, r1, r0));
             }  else panic("ENCODER::UNHANDLED_CMOVA");
         } break;
+        case SETNE: {
+            if (t0 == REG) {
+                emit32(CSETNE | r0);
+            }  else panic("ENCODER::UNHANDLED_SETNE");
+        } break;
         case MULS:
             emit_neon(buf, MUL_NEON);
             break;
@@ -463,6 +468,6 @@ void encode(Instruction* buf) {
             emit32(sf|MOV_NEON | (r0) | (r1 << 5) | (r1 << 16));
             break;
         default:
-            panic("ENCODER::UNKNOWN_INSTRUCTION: %x", buf->type);
+            panic("ENCODER::UNKNOWN_INSTRUCTION: %i", buf->type);
     }
 }

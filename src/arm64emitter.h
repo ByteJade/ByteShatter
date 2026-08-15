@@ -40,6 +40,7 @@ static uint8_t x64_regs[] = {
 #define LDUR 0xB8400000
 #define GET_FS 0xD53BD040
 #define CSELHI 0x9A808000
+#define CSETNE 0x1a9f07e0
 
 #define FT 1<<22
 #define MFT 1<<30
