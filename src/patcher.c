@@ -16,7 +16,6 @@ static struct sigcontext* sc;
 static int memory_check = 0;
 
 uint64_t get_reg(const char* name) {
-    name++;
     for (int i = 0; i < 16; i++) {
         if (strcmp(name, regs64[i]) == 0)
             return sc->regs[x64_regs[i]];
