@@ -11,9 +11,9 @@
 #include <sys/mman.h>
 
 static int enabled = 0;
-uint64_t breakp = 0;
-uint64_t break_pc = 0;
-uint64_t break_block = 0;
+uint64_t breakp = UINT64_MAX;
+uint64_t break_pc = UINT64_MAX;
+uint64_t break_block = UINT64_MAX;
 static uint32_t prev_instr = 0;
 static uint32_t* prev_instrp = NULL;
 
@@ -29,7 +29,7 @@ int debug_break(void) {
 uint64_t debug_breakp(void) {
     return breakp;
 }
-inline void bp(uint32_t* instr) {
+void set_bp(uint32_t* instr) {
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
@@ -39,14 +39,14 @@ void set_break_point(uint32_t pc) {
     break_pc = pc;
     CacheUnit* cache = cache_get_block(break_block);
     uint32_t* instr = (get_host() + cache->hp + pc);
-    bp(instr);
+    set_bp(instr);
 }
 void set_break() {
     break_block = cache_search_block(get_hp());
     CacheUnit* cache = cache_get_block(break_block);
     break_pc = get_hp() - cache->hp;
     uint32_t* instr = (get_host() + get_hp() - 1);
-    bp(instr);
+    set_bp(instr);
 }
 void help(void) {
     printf("Commands:\n");
