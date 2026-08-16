@@ -149,6 +149,10 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     const char* name;
     if (sig == SIGBUS) name = "SIGBUS";
     else name = "segfault";
+    if (debug_enabled()) {
+        warning("%s", name);
+        debug_wait();
+    }
     if (code) {
         panic("%s: %x", name, *code);
     } else panic("%s", name);
