@@ -6,7 +6,6 @@
 
 void execute(uint64_t address) {
     decode(address);
-    void* guest = get_guest();
     uint32_t offset = cache_get_block(0)->hp;
     void(*exec)(void) = (void(*)(void))(get_host() + offset);
     uint64_t* sp = get_sp();
@@ -14,7 +13,7 @@ void execute(uint64_t address) {
     __asm__ volatile(
         "mov sp, %0\n"
         : : "r" (sp)
-        : "sp"
+        :
     );
     #endif
     exec();
