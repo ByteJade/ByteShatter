@@ -138,11 +138,11 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
     }
     if (info->si_code == SEGV_ACCERR || sc->pc%4 != 0) {
         success("found unhandled jump");
-        uint32_t block = cache_search_block(sc->pc);
-        if (block == 0) {
+        uint32_t block = cache_search_block((uint32_t*)sc->pc - get_host());
+        if (block == UINT32_MAX) {
             warning("PATCHER::NOT_FOUND %lx", sc->pc);
             decode(sc->pc - (uint64_t)get_guest());
-            block = cache_search_block(sc->pc);
+            block = cache_search_block((uint32_t*)sc->pc - get_host());
         }
         sc->pc = (uint64_t)(get_host() + cache_get_block(block)->hp);
         return;

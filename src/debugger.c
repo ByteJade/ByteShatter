@@ -112,7 +112,7 @@ void debug_wait(void) {
         __builtin___clear_cache(prev_instrp, prev_instrp+4);
         prev_instrp = NULL;
     }
-    current_block = cache_search_block(get_pc());
+    current_block = cache_search_block((uint32_t*)get_pc() - get_host());
     while (1) {
         printf(" <- ");
         fgets(line, sizeof(line), stdin);
