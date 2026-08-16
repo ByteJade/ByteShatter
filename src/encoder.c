@@ -259,8 +259,7 @@ void encode(Instruction* buf) {
             if (t0 == REG && t1 == IMM)
                 emit_lsr_imm(r0, r1, buf->b.imm);
             else panic("ENCODER::UNHANDLED_SHR");
-            break;
-        }
+        } break;
         case SAR:{
             if (t0 == REG && t1 == IMM)
                 emit_asr_imm(r0, r1, buf->b.imm);
@@ -319,6 +318,11 @@ void encode(Instruction* buf) {
             } else panic("ENCODER::UNHANDLED_CMP");
         } break;
         case XOR:{
+            if (t1 == IMM) {
+                emit_imm(buf->b.imm, SC2R);
+                r1 = SC2;
+                t1 = REG;
+            }
             if (t0 == REG && t1 == REG) {
                 emit32(sf|_construct_r_r_r(EOR_REG, r0, r0, r1));
             } else panic("ENCODER::UNHANDLED_XOR");
