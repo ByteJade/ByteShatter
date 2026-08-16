@@ -34,7 +34,7 @@ void push_argc(void) {
     if ((uint64_t)sp%16 == 0) {
         uint64_t size = (uint64_t)stack + STACK_SIZE;
         size -= (uint64_t)sp;
-        memmove(sp - 8, sp, size);
+        memmove(sp - 1, sp, size);
         sp--;
     }
     *(--sp) = argc;
