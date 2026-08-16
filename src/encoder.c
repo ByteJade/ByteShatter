@@ -207,8 +207,9 @@ void encode(Instruction* buf) {
     uint32_t sf = (buf->size == 64) * SF;
     if (buf->type != PUSH && buf->type != POP) {
         if (prev_instruction == PUSH) {
-            emit_sub_signed(31, 31, 8);
-            emit32(MFT|STR32_REG|(31<<5)|x64_regs[r0]);
+            emit_sub_signed(SC1R, 31, 8);
+            emit32(MFT|STR32_REG|(SC1R<<5)|x64_regs[r0]);
+            emit32(sf|ADD_IMM | 31 | (SC1R << 5));
         }
         prev_instruction = NOP;
     }
@@ -273,7 +274,7 @@ void encode(Instruction* buf) {
         case MOVZX:
         case MOV:{
             if (t0 == REG && t1 == REG) {
-                emit32(sf|_construct_r_r_imm(ADD_IMM, r0, r1, 0));
+                emit32(sf|ADD_IMM | x64_regs[r0] | (x64_regs[r1] << 5));
             }else if (t0 == REG && t1 == IMM){
                 emit_imm(buf->b.imm, x64_regs[r0]);
             } else if (t1&MEM) {
