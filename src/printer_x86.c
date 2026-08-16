@@ -93,8 +93,11 @@ char* sprint_op(Instruction* buf, char* out, Operand* op) {
             out += sprintf(out, "%s", scale[op->scale]);
         }
         if (op->type&IMM) {
-            if (op->type == (MEM|IMM))
-                out += sprintf(out, "rip ");
+            if (op->type == (MEM|IMM)) {
+                if (buf->prefix == FS)
+                    out += sprintf(out, "fs ");
+                else out += sprintf(out, "rip ");
+            }
             if (op->imm < 0)
                 out += sprintf(out, "- %lx ", -op->imm);
             if (op->imm > 0)

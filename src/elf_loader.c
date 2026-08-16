@@ -144,11 +144,11 @@ void elf_read_dynamic(Elf* elf) {
     }
     if (dyn_phdr == NULL) panic("LOADER::NO_DYNAMIC_SECTION");
     Elf64_Dyn* dyn = (Elf64_Dyn*)(elf->base + dyn_phdr->p_vaddr);
-    size_t relrsz;
+    size_t relrsz = 0;
     Elf64_Relr* relr = NULL;
-    size_t relasz;
+    size_t relasz = 0;
     Elf64_Rela* rela = NULL;
-    size_t jmprelsz;
+    size_t jmprelsz = 0;
     Elf64_Rela* jmprel = NULL;
     for (; dyn->d_tag != DT_NULL; dyn++) {
         switch (dyn->d_tag) {
