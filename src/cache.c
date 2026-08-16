@@ -146,7 +146,7 @@ PatchUnit* cache_get_patch(uint16_t patch_id) {
 }
 CacheUnit* cache_get_block(uint16_t block_id) {
     if (block_id >= bp) {
-        panic("CACHE::BLOCKS::BAD_ID");
+        return NULL;
     }
     return blocks_cache + block_id;
 }
