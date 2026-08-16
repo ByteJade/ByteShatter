@@ -23,12 +23,6 @@ void debug_enable(void) {
 int debug_enabled(void) {
     return enabled;
 }
-uint32_t debug_block() {
-    return break_block;
-}
-uint64_t debug_pc() {
-    return break_pc;
-}
 void set_bp(uint32_t* instr) {
     prev_instr = *instr;
     prev_instrp = instr;
@@ -36,6 +30,12 @@ void set_bp(uint32_t* instr) {
     __builtin___clear_cache(instr, instr+4);
     break_block = UINT32_MAX;
     break_pc = UINT64_MAX;
+}
+void debug_check_break() {
+    CacheUnit* cache = cache_get_block(break_block);
+    if (cache) set_bp(get_host() + cache->hp);
+    uint32_t* instr = cache_search(break_pc);
+    if (instr) set_bp(instr);
 }
 void help(void) {
     printf("Commands:\n");
@@ -157,4 +157,5 @@ void debug_wait(void) {
             }
         }
     }
+    debug_check_break();
 }

@@ -360,10 +360,5 @@ void decode(uint32_t gp) {
         }
     }
     cache_block_end();
-    if (debug_enabled()) {
-        CacheUnit* cache = cache_get_block(debug_block());
-        if (cache) set_bp(get_host() + cache->hp);
-        uint32_t* instr = cache_search(debug_pc());
-        if (instr) set_bp(instr);
-    }
+    if (debug_enabled()) debug_check_break();
 }
