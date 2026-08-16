@@ -31,6 +31,7 @@ void stack_fini(void) {
 }
 
 void push_argc(void) {
+    if ((uint64_t)sp%16 == 0) sp--;
     *(--sp) = argc;
 }
 void push_arg(const char* arg) {
