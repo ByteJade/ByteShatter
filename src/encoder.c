@@ -206,6 +206,12 @@ void encode(Instruction* buf) {
     uint8_t t1 = buf->b.type;
     uint32_t sf = (buf->size == 64) * SF;
     if (buf->type != PUSH && buf->type != POP) {
+        if (prev_instruction == PUSH) {
+            emit_sub_signed(31, 31, 8);
+            emit32(PUSHR | x64_regs[r0]);
+            prev_instruction = PUSH;
+            prev_register = r0;
+        }
         prev_instruction = NOP;
     }
     switch (buf->type) {
@@ -351,10 +357,6 @@ void encode(Instruction* buf) {
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
-            if (prev_instruction == PUSH) {
-                patch32();
-                cache_back();
-            }
             if (t0 == IMM) {
                 emit_imm(buf->a.imm, SC1R);
                 r0 = SC1;
@@ -368,10 +370,6 @@ void encode(Instruction* buf) {
             if (prev_instruction == PUSH) {
                 emit32(PUSHP | (x64_regs[prev_register]<<10) | (x64_regs[r0]));
                 prev_instruction = NOP;
-            } else {
-                emit32(PUSHR | x64_regs[r0]);
-                prev_instruction = PUSH;
-                prev_register = r0;
             }
         } break;
         case LEAVE: {
