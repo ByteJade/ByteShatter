@@ -2,6 +2,7 @@
 #include "memory.h"
 #include "core.h"
 #include "decoder.h"
+#include "patcher.h"
 #include "printer_arm.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -179,7 +180,10 @@ void cache_print(int block) {
         else end = offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
             sprint_arm(out, host[y]);
-            printf("%x %s\n", host[y], out);
+            printf("%x %s", host[y], out);
+            if ((uint64_t)&host[y] == get_pc()) {
+                printf(" <-\n");
+            } else printf("\n");
         }
     }
 }
