@@ -104,6 +104,8 @@ WRAP_FUNC(unsetenv)
 WRAP_FUNC(longjmp)
 WRAP_FUNC(setjmp)
 
+WRAP_FUNC(getopt)
+WRAP_FUNC(getopt_long)
 
 WRAP_FUNC(dlopen)
 WRAP_FUNC(dlclose)
