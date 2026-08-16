@@ -35,7 +35,7 @@ const char* instr_types[] = {
     "comis", "movs",
     "movq", "movapd",
     "cvtsd2si", "cvtsi2s",
-    "movzx", "idiv",
+    "movzx", "idiv", "imul",
     "cltq", "cltd"
 };
 const char* regs64[] = {

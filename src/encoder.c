@@ -406,6 +406,9 @@ void encode(Instruction* buf) {
             emit32(0x9ac00d89 | (x64_regs[r0]<<16)); // sdiv	x9, x12, r0
             emit32(0x9b00b122 | (x64_regs[r0]<<16)); // msub	x2, x9, r0, x12
         } break;
+        case IMUL: {
+            emit32(SMUL_REG | (x64_regs[r0]<<16) | (x64_regs[r0]<<5) | (x64_regs[r1]));
+        } break;
         case JG:
         case JGE:
         case JL:

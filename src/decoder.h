@@ -61,7 +61,7 @@ enum InstrTypes {
     COMIS, MOVS,
     MOVQ, MOVAPD,
     CVTSD2SI, CVTSI2S,
-    MOVZX, IDIV,
+    MOVZX, IDIV, IMUL,
     CLTQ, CLTD
 };
 typedef struct {

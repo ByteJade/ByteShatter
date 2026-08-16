@@ -92,6 +92,10 @@ void decode_0F(Instruction* buf) {
             decode_rm(&buf->a, fetch8());
             buf->b.type = NONE;
             break;
+        case 0xAF:
+            buf->type = IMUL;
+            decode_r_rm(buf);
+            break;
         case 0xB6:
             buf->type = MOVZX;
             decode_r_rm(buf);
