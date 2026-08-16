@@ -71,7 +71,6 @@ void cache_block_point(void) {
     }
     offsets_pool[offp+loffp].goff = goff;
     offsets_pool[offp+loffp].hoff = hogg;
-    offset_usage += sizeof(OffsetUnit);
     loffp++;
     if (loffp == UINT8_MAX) {
         warning("CACHE::OFFSET::OVERFLOW");
@@ -81,7 +80,7 @@ void cache_block_point(void) {
 }
 void cache_block_end(void) {
     last_block->end = get_gp() - last_block->gp;
-    uint32_t size = loffp * sizeof(OffsetUnit);
+    offset_usage += loffp * sizeof(OffsetUnit);
     last_block->offsets = offp;
     last_block->offsetssz = loffp;
     offp += loffp;
