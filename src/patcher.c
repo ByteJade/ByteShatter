@@ -52,7 +52,7 @@ void print_cpu(void) {
 }
 void print_native_cpu(void) {
     uint32_t* pc = (uint32_t*)get_pc();
-    printf("PC:  %p (%p)\n", pc, (void*)(pc - get_host()));
+    printf("PC:  %p (%p)\n", pc, (void*)((uint64_t)pc - (uint64_t)get_host()));
     for (int i = 0; i < 31; i++) {
         printf("X%i: %llX\n", i, sc->regs[i]);
     }
@@ -79,7 +79,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
         block = get_host() + get_hp();
         decode(patch->guest_off);
     }
-    int32_t offset = (block - pc)/4;
+    int32_t offset = (block - pc);
     print("offset: %i", offset);
     switch (patch->type) {
         case JL:
