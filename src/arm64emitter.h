@@ -42,6 +42,7 @@ static uint8_t x64_regs[] = {
 #define CSELHI 0x9A808000
 #define CSETNE 0x1a9f07e0
 #define CSETLO 0x1a9f27e0
+#define CSETEQ 0x1a9f17e0
 
 #define FT 1<<22
 #define MFT 1<<30
