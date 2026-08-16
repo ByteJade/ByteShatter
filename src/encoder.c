@@ -208,9 +208,7 @@ void encode(Instruction* buf) {
     if (buf->type != PUSH && buf->type != POP) {
         if (prev_instruction == PUSH) {
             emit_sub_signed(31, 31, 8);
-            emit32(PUSHR | x64_regs[r0]);
-            prev_instruction = PUSH;
-            prev_register = r0;
+            emit32(MFT|STR32_REG|(31<<5)|x64_regs[r0]);
         }
         prev_instruction = NOP;
     }
@@ -370,6 +368,9 @@ void encode(Instruction* buf) {
             if (prev_instruction == PUSH) {
                 emit32(PUSHP | (x64_regs[prev_register]<<10) | (x64_regs[r0]));
                 prev_instruction = NOP;
+            } else {
+                prev_instruction = PUSH;
+                prev_register = r0;
             }
         } break;
         case LEAVE: {
