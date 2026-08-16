@@ -343,13 +343,13 @@ void encode(Instruction* buf) {
                 }
                 if (prev_instruction == POP) {
                     patch32();
-                    emit32(POPP | (x64_regs[r0]<<10) | (x64_regs[prev_register]));
+                    emit32(POPP | (x64_regs[r0]<<10) | (prev_register));
                     cache_back();
                     prev_instruction = NOP;
                 } else {
                     emit32(POPR | x64_regs[r0]);
                     prev_instruction = POP;
-                    prev_register = r0;
+                    prev_register = x64_regs[r0];
                 }
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
@@ -365,11 +365,11 @@ void encode(Instruction* buf) {
                 break;
             }
             if (prev_instruction == PUSH) {
-                emit32(PUSHP | (x64_regs[prev_register]<<10) | (x64_regs[r0]));
+                emit32(PUSHP | (prev_register<<10) | (x64_regs[r0]));
                 prev_instruction = NOP;
             } else {
                 prev_instruction = PUSH;
-                prev_register = r0;
+                prev_register = x64_regs[r0];
             }
         } break;
         case LEAVE: {
@@ -485,7 +485,7 @@ void encode(Instruction* buf) {
     if (push_needed) {
         push_needed = 0;
         emit_sub_signed(SC1R, 31, 8);
-        emit32(MFT|STR32_REG|(SC1R<<5)|x64_regs[r0]);
+        emit32(MFT|STR32_REG|(SC1R<<5)|prev_register);
         emit32(sf|ADD_IMM | 31 | (SC1R << 5));
     }
 }
