@@ -169,10 +169,11 @@ void cache_print(int block) {
     printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = get_host() + unit->hp;
     int start = 0;
-    for (int x = 0; x <= unit->offsetssz; x++) {
+    int g_start = 0;
+    for (int x = 0; x < unit->offsetssz; x++) {
         OffsetUnit* offsets = (offsets_pool + unit->offsets);
         Instruction buf;
-        set_gp(unit->gp + offsets[x].goff);
+        set_gp(unit->gp + g_start);
         decode_instr(&buf);
         char out[64];
         int end;
@@ -186,6 +187,7 @@ void cache_print(int block) {
             } else printf("\n");
         }
         start = end;
+        g_start = offsets[x].goff;
     }
 }
 int cache_bp(void) {
