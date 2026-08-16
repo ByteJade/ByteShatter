@@ -3,7 +3,6 @@
 #include "cache.h"
 #include "decoder.h"
 #include "stack.h"
-#include "core.h"
 
 void execute(uint64_t address) {
     decode(address);
@@ -13,15 +12,11 @@ void execute(uint64_t address) {
     uint64_t* sp = get_sp();
     #if defined(__aarch64__) || defined(_M_ARM64)
     __asm__ volatile(
-        "mov x22, %0\n"
-        "mov x28, %1\n"
-        : : "r" (guest), "r" (sp)
-        : "x21", "x28"
+        "mov sp, %0\n"
+        : : "r" (sp)
+        : "sp"
     );
     #endif
     exec();
-    print("STAT: memory: %i, cache: %i", get_hp(), cache_usage());
-    memory_clear_host();
-    cache_clear();
-    success("execution");
+    __builtin_unreachable();
 }
