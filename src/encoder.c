@@ -219,7 +219,7 @@ void encode(Instruction* buf) {
                 r0 = SC2;
             }
             if (t1 == REG) {
-                emit32(sf|_construct_r_r_r(SUB_REG, r0, r0, r1));
+                emit32(sf|_construct_r_r_r(SUB_REG|S, r0, r0, r1));
             } else {
                 emit_sub_signed(x64_regs[r0], x64_regs[r0], buf->b.imm);
             }
@@ -237,7 +237,7 @@ void encode(Instruction* buf) {
                 r0 = SC2;
             }
             if (t1 == REG) {
-                emit32(sf|_construct_r_r_r(ADD_REG, r0, r0, r1));
+                emit32(sf|_construct_r_r_r(ADD_REG|S, r0, r0, r1));
             } else {
                 emit_add_signed(x64_regs[r0], x64_regs[r0], buf->b.imm);
             }
