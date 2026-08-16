@@ -148,7 +148,6 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         if (sc->regs[28] < 0x4000000000) sc->regs[28] = (uint64_t)get_sp();
         return;
     }
-    print_cpu();
     uint32_t* code = (uint32_t*)sc->pc;
     const char* name;
     if (sig == SIGBUS) name = "SIGBUS";
@@ -157,6 +156,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         warning("%s", name);
         debug_wait();
     }
+    print_cpu();
     if (code) {
         panic("%s: %x", name, *code);
     } else panic("%s", name);
