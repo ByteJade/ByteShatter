@@ -15,25 +15,25 @@ void my___libc_start_main(
 }
 void my___isoc23_strtol() {
     asm volatile(
-        "mov x27, x30\n"
+        "mov x20, x30\n"
         "bl strtol\n"
-        "mov x30, x27\n"
+        "mov x30, x20\n"
         "mov x9, x0\n"
     );
 }
 void my___isoc23_sscanf() {
     asm volatile(
-        "mov x27, x30\n"
+        "mov x20, x30\n"
         "bl sscanf\n"
-        "mov x30, x27\n"
+        "mov x30, x20\n"
         "mov x9, x0\n"
     );
 }
 void my___errno_location() {
     asm volatile(
-        "mov x27, x30\n"
+        "mov x20, x30\n"
         "bl __errno_location\n"
-        "mov x30, x27\n"
+        "mov x30, x20\n"
         "mov x9, x0\n"
     );
 }
