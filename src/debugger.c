@@ -135,7 +135,7 @@ void debug_wait(void) {
                 CacheUnit* unit = cache_get_block(current_block);
                 OffsetUnit* offsets = unit->offsets + cache_offsets();
                 for (int x = 0; x < unit->offsetssz; x++) {
-                    if (get_pc() == offsets[x].hoff) {
+                    if ((uint32_t*)get_pc() - get_host() == unit->hp + offsets[x].hoff) {
                         Instruction buf;
                         set_gp(unit->gp + offsets[x].goff);
                         decode_instr(&buf);
