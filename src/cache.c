@@ -168,17 +168,16 @@ void cache_print(int block) {
     CacheUnit* unit = blocks_cache + block;
     printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = get_host() + unit->hp;
-    int start = 0;
-    int g_start = 0;
     for (int x = 0; x < unit->offsetssz; x++) {
         OffsetUnit* offsets = (offsets_pool + unit->offsets);
         Instruction buf;
-        set_gp(unit->gp + g_start);
+        set_gp(unit->gp + offsets[x].goff);
         decode_instr(&buf);
         char out[64];
         int end;
-        if (x == unit->offsetssz) end = start+4;
-        else end = offsets[x].hoff;
+        int start = offsets[x].hoff;
+        if (x+1 == unit->offsetssz) end = start+4;
+        else end = offsets[x+1].hoff;
         for (int y = start; y < end; y++) {
             sprint_arm(out, host[y]);
             printf("%x %s", host[y], out);
@@ -186,8 +185,6 @@ void cache_print(int block) {
                 printf(" <-\n");
             } else printf("\n");
         }
-        start = end;
-        g_start = offsets[x].goff;
     }
 }
 int cache_bp(void) {
