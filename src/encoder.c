@@ -183,6 +183,11 @@ void encode8bit(Instruction* buf) {
                 emit32(CSETNE | x64_regs[r0]);
             }  else panic("ENCODER::UNHANDLED_SETNE");
         } break;
+        case SETAE: {
+            if (t0 == REG) {
+                emit32(CSETHS | x64_regs[r0]);
+            }  else panic("ENCODER::UNHANDLED_SETE");
+        } break;
         case SETE: {
             if (t0 == REG) {
                 emit32(CSETEQ | x64_regs[r0]);
