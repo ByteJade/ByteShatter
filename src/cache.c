@@ -175,10 +175,9 @@ void cache_print(int block) {
         decode_instr(&buf);
         char out[64];
         int end;
-        int start = offsets[x].hoff;
-        if (x+1 == unit->offsetssz) end = start+4;
+        if (x+1 == unit->offsetssz) end = 4;
         else end = offsets[x+1].hoff;
-        for (int y = start; y < end; y++) {
+        for (int y = 0; y < end; y++) {
             sprint_arm(out, host[y]);
             printf("%x %s", host[y], out);
             if ((uint64_t)&host[y] == get_pc()) {
