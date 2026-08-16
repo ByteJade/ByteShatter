@@ -17,25 +17,6 @@ Lib* libs = NULL;
 int lib_count = 0;
 int lib_capacity = 0;
 
-static const char* cpp_symbols[] = {
-    "_ZSt4cout",
-    "_ZSt4cerr",
-    NULL
-};
-#if defined (__TERMUX__)
-static const char* cpp_targets[] = {
-    "_ZNSt6__ndk14coutE",
-    "_ZNSt6__ndk14cerrE",
-    NULL
-};
-#else
-static const char* cpp_targets[] = {
-    "_ZNSt3__14coutE",
-    "_ZNSt3__14cerrE",
-    NULL
-};
-#endif
-
 void open_library(const char* filename) {
     for (int i = 0; i < lib_count; i++) {
         Lib* lib = libs + i;
@@ -61,17 +42,7 @@ void open_library(const char* filename) {
     lib_count++;
 }
 char* get_symbol(const char* symbol) {
-    void* sym = dlsym(RTLD_DEFAULT, symbol);
-    if (!sym) sym = get_cpp_symbol(symbol);
-    return sym;
-}
-char* get_cpp_symbol(const char* symbol) {
-    for (int position = 0; cpp_symbols[position]; position++) {
-        if (strcmp(symbol, cpp_symbols[position]) == 0) {
-            return get_symbol(cpp_targets[position]);
-        }
-    }
-    return NULL;
+    return dlsym(RTLD_DEFAULT, symbol);
 }
 char* get_symbol_wrapped(const char* symbol) {
     char my_symbol[512];
