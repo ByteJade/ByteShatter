@@ -3,7 +3,6 @@
 #include "cache.h"
 #include "memory.h"
 #include "decoder.h"
-#include "stack.h"
 #include "arm64emitter.h"
 #include "printer_x86.h"
 #include "debugger.h"
@@ -17,6 +16,7 @@ static struct sigcontext* sc;
 static int memory_check = 0;
 
 uint64_t get_reg(const char* name) {
+    if (strcmp(name, "rsp") == 0) return sc->sp;
     for (int i = 0; i < 16; i++) {
         if (strcmp(name, regs64[i]) == 0)
             return sc->regs[x64_regs[i]];
@@ -145,7 +145,6 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
             decode(sc->pc - (uint64_t)get_guest());
         }
         sc->pc = (uint64_t)block;
-        if (sc->regs[28] < 0x4000000000) sc->regs[28] = (uint64_t)get_sp();
         return;
     }
     uint32_t* code = (uint32_t*)sc->pc;
