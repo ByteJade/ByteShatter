@@ -50,8 +50,8 @@ void memory_clear_host(void) {
 void emit32(uint32_t data) {
     host[hp++] = data;
 }
-void patch32() {
-    hp--;
+void patch(uint32_t n) {
+    hp -= n;
 }
 
 uint8_t fetch8(void) {

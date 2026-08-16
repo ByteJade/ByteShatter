@@ -194,7 +194,6 @@ void encode8bit(Instruction* buf) {
 }
 static int prev_instruction = NOP;
 static int prev_register = NOP;
-static int push_needed = 0;
 
 void encode(Instruction* buf) {
     if (buf->size == 8) {
@@ -207,8 +206,6 @@ void encode(Instruction* buf) {
     uint8_t t1 = buf->b.type;
     uint32_t sf = (buf->size == 64) * SF;
     if (buf->type != PUSH && buf->type != POP) {
-        if (prev_instruction == PUSH)
-            push_needed = 1;
         prev_instruction = NOP;
     }
     switch (buf->type) {
@@ -342,7 +339,7 @@ void encode(Instruction* buf) {
                     break;
                 }
                 if (prev_instruction == POP) {
-                    patch32();
+                    patch(1);
                     emit32(POPP | (x64_regs[r0]<<10) | (prev_register));
                     cache_back();
                     prev_instruction = NOP;
@@ -354,6 +351,10 @@ void encode(Instruction* buf) {
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
+            if (prev_instruction == PUSH) {
+                patch(3);
+                cache_back();
+            }
             if (t0 == IMM) {
                 emit_imm(buf->a.imm, SC1R);
                 r0 = SC1;
@@ -370,6 +371,9 @@ void encode(Instruction* buf) {
             } else {
                 prev_instruction = PUSH;
                 prev_register = x64_regs[r0];
+                emit_sub_signed(SC1R, 31, 8);
+                emit32(MFT|STR32_REG|(SC1R<<5)|prev_register);
+                emit32(sf|ADD_IMM | 31 | (SC1R << 5));
             }
         } break;
         case LEAVE: {
@@ -481,11 +485,5 @@ void encode(Instruction* buf) {
             break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %i", buf->type);
-    }
-    if (push_needed) {
-        push_needed = 0;
-        emit_sub_signed(SC1R, 31, 8);
-        emit32(MFT|STR32_REG|(SC1R<<5)|prev_register);
-        emit32(sf|ADD_IMM | 31 | (SC1R << 5));
     }
 }

@@ -12,7 +12,7 @@ void memory_clear_host(void);
 /* emit 4 bytes to host memory */
 void emit32(uint32_t data);
 /* replace 32 bytes */
-void patch32();
+void patch(uint32_t n);
 
 /* fetch byte from guest memory */
 uint8_t fetch8(void);
