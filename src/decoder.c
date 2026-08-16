@@ -5,6 +5,7 @@
 #include "encoder.h"
 #include "cache.h"
 #include "core.h"
+#include <stdint.h>
 
 int64_t fetch_imm8(void) {
     return (int64_t)(int8_t)fetch8();
@@ -332,26 +333,18 @@ int decode_instr(Instruction* buf) {
     return ret;
 }
 int decode_step() {
-    uint8_t brk = 0;
-    if (get_gp() == debug_breakp()) brk = 1;
     cache_block_point();
     Instruction buf;
     int type = decode_instr(&buf);
     encode(&buf);
-    if (brk) set_break();
     return type;
 }
 void decode(uint32_t gp) {
     print("Start decode %lx", gp);
     set_gp(gp);
-    uint16_t block = cache_block_start();
-    uint8_t jump_type = 0;
-    if (block == debug_break()) {
-        jump_type = decode_step();
-        set_break();
-    }
+    cache_block_start();
     while (1) {
-        jump_type = decode_step();
+        uint8_t jump_type = decode_step();
         if (jump_type) break;
         /*
         TODO: Static analysis of block jumps. 
@@ -365,13 +358,12 @@ void decode(uint32_t gp) {
             emit32(0x14000000 | ((offset/4) & 0x3FFFFFF));
             break;
         }
-        if (cache_overflow()) {
-            block++;
-            if (block == debug_break()) {
-                jump_type = decode_step();
-                set_break();
-            }
-        }
     }
     cache_block_end();
+    if (debug_enabled()) {
+        CacheUnit* cache = cache_get_block(debug_block());
+        if (cache) set_bp(get_host() + cache->hp);
+        uint32_t* instr = cache_search(debug_pc());
+        if (instr) set_bp(instr);
+    }
 }

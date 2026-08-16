@@ -11,11 +11,11 @@
 #include <sys/mman.h>
 
 static int enabled = 0;
-uint64_t breakp = UINT64_MAX;
-uint64_t break_pc = UINT64_MAX;
-uint64_t break_block = UINT64_MAX;
 static uint32_t prev_instr = 0;
 static uint32_t* prev_instrp = NULL;
+static uint32_t current_block = UINT32_MAX;
+static uint32_t break_block = UINT32_MAX;
+static uint64_t break_pc = UINT64_MAX;
 
 void debug_enable(void) {
     enabled = 1;
@@ -23,30 +23,19 @@ void debug_enable(void) {
 int debug_enabled(void) {
     return enabled;
 }
-int debug_break(void) {
+uint32_t debug_block() {
     return break_block;
 }
-uint64_t debug_breakp(void) {
-    return breakp;
+uint64_t debug_pc() {
+    return break_pc;
 }
 void set_bp(uint32_t* instr) {
     prev_instr = *instr;
     prev_instrp = instr;
     *instr = 0xD4200000;
     __builtin___clear_cache(instr, instr+4);
-}
-void set_break_point(uint32_t pc) {
-    break_pc = pc;
-    CacheUnit* cache = cache_get_block(break_block);
-    uint32_t* instr = (get_host() + cache->hp + pc);
-    set_bp(instr);
-}
-void set_break() {
-    break_block = cache_search_block(get_hp());
-    CacheUnit* cache = cache_get_block(break_block);
-    break_pc = get_hp() - cache->hp;
-    uint32_t* instr = (get_host() + get_hp() - 1);
-    set_bp(instr);
+    break_block = UINT32_MAX;
+    break_pc = UINT64_MAX;
 }
 void help(void) {
     printf("Commands:\n");
@@ -102,7 +91,7 @@ void handle_print(char* arg) {
         } else if (strcmp(arg, "regs") == 0) {
             print_native_cpu();
         } else if (strcmp(arg, "cache") == 0) {
-            cache_print(break_block);
+            cache_print(current_block);
         } else if (strcmp(arg, "flags") == 0) {
             print_flags();
         } else if (strcmp(arg, "usage") == 0) {
@@ -123,16 +112,17 @@ void debug_wait(void) {
         __builtin___clear_cache(prev_instrp, prev_instrp+4);
         prev_instrp = NULL;
     }
+    current_block = cache_search_block(get_pc());
     while (1) {
         printf(" <- ");
         fgets(line, sizeof(line), stdin);
         if (sscanf(line, "%s %s", com, arg) == 2) {
             if (strcmp(com, "brb") == 0) {
                 break_block = strtol(arg, NULL, 10);
-                printf("Set break point in block %li\n", break_block);
+                printf("Set break point in block %X\n", break_block);
             } else if (strcmp(com, "brk") == 0) {
-                breakp = strtol(arg, NULL, 16);
-                printf("Set break point in pc %lX\n", breakp);
+                break_pc = strtol(arg, NULL, 16);
+                printf("Set break point in pc %lX\n", break_pc);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);
             }  else if (strcmp(com, "log") == 0) {
@@ -142,22 +132,22 @@ void debug_wait(void) {
             }
         } else {
             if (strcmp(com, "si") == 0) {
-                CacheUnit* unit = cache_get_block(break_block);
+                CacheUnit* unit = cache_get_block(current_block);
                 OffsetUnit* offsets = unit->offsets + cache_offsets();
                 for (int x = 0; x < unit->offsetssz; x++) {
-                    if (break_pc == offsets[x].hoff) {
+                    if (get_pc() == offsets[x].hoff) {
                         Instruction buf;
                         set_gp(unit->gp + offsets[x].goff);
                         decode_instr(&buf);
                     }
                 }
-                set_break_point(break_pc + 1);
+                set_bp((uint32_t*)(get_pc() + 4));
                 break;
             } else if (strcmp(com, "sb") == 0) {
-                break_block++;
+                break_block = current_block+1;
                 break;
             } else if (strcmp(com, "run") == 0) {
-                if (break_block) 
+                if (break_block || break_pc) 
                     printf("Stop at break point\n");
                 break;
             } else if (strcmp(com, "exit") == 0) {

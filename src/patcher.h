@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 uint64_t get_reg(const char* name);
+uint64_t get_pc();
 void memory_check_mode();
 int memory_fail();
 void print_flags(void);

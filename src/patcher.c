@@ -23,6 +23,9 @@ uint64_t get_reg(const char* name) {
     }
     return 0;
 }
+uint64_t get_pc() {
+    return sc->pc;
+}
 void memory_check_mode() {
     memory_check = 1;
 }
@@ -48,7 +51,8 @@ void print_cpu(void) {
     print_flags();
 }
 void print_native_cpu(void) {
-    printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
+    uint32_t* pc = (uint32_t*)get_pc();
+    printf("PC:  %p (%p)\n", pc, (void*)(pc - get_host()));
     for (int i = 0; i < 31; i++) {
         printf("X%i: %llX\n", i, sc->regs[i]);
     }
@@ -59,8 +63,8 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     sc = (struct sigcontext*)&ctx->uc_mcontext;
     
-    uint32_t* code = (uint32_t*)sc->pc;
-    uint32_t instruction = *code;
+    uint32_t* pc = (uint32_t*)get_pc();
+    uint32_t instruction = *pc;
     uint16_t ret = (instruction >> 5) & 0xFFFF;
     if (ret == 0) {
         debug_wait();
@@ -75,53 +79,53 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
         block = get_host() + get_hp();
         decode(patch->guest_off);
     }
-    int32_t offset = ((uint64_t)block - sc->pc)/4;
+    int32_t offset = (block - pc)/4;
     print("offset: %i", offset);
     switch (patch->type) {
         case JL:
             print("patch JL");
-            *code = BLT_IMM | ((offset & 0x7FFFF) << 5);
+            *pc = BLT_IMM | ((offset & 0x7FFFF) << 5);
             break;
         case JLE:
             print("patch JL");
-            *code = 0x5400000D | ((offset & 0x7FFFF) << 5);
+            *pc = 0x5400000D | ((offset & 0x7FFFF) << 5);
             break;
         case JE:
             print("patch JE");
-            *code = 0x54000000 | ((offset & 0x7FFFF) << 5);
+            *pc = 0x54000000 | ((offset & 0x7FFFF) << 5);
             break;
         case JAE:
             print("patch JAE");
-            *code = 0x54000002 | ((offset & 0x7FFFF) << 5);
+            *pc = 0x54000002 | ((offset & 0x7FFFF) << 5);
             break;
         case JNE:
             print("patch JNE");
-            *code = 0x54000001 | ((offset & 0x7FFFF) << 5);
+            *pc = 0x54000001 | ((offset & 0x7FFFF) << 5);
             break;
         case JG:
             print("patch JG");
-            *code = 0x5400000C | ((offset & 0x7FFFF) << 5);
+            *pc = 0x5400000C | ((offset & 0x7FFFF) << 5);
             break;
         case JGE:
             print("patch JGE");
-            *code = 0x5400000A | ((offset & 0x7FFFF) << 5);
+            *pc = 0x5400000A | ((offset & 0x7FFFF) << 5);
             break;
         case JBE:
             print("patch JBE");
-            *code = 0x54000009 | ((offset & 0x7FFFF) << 5);
+            *pc = 0x54000009 | ((offset & 0x7FFFF) << 5);
             break;
         case JMP:
             print("patch JMP");
-            *code = BR_IMM | (offset & 0x3FFFFFF);
+            *pc = BR_IMM | (offset & 0x3FFFFFF);
             break;
         case CALL:
             print("patch CALL");
-            *code = BLR_IMM | (offset & 0x3FFFFFF);
+            *pc = BLR_IMM | (offset & 0x3FFFFFF);
             break;
         default:
             panic("PATCHER::UNKNOWN_PATCH");
     }
-    void* clear = (void*)sc->pc;
+    void* clear = (void*)pc;
     __builtin___clear_cache(clear, clear + 4);
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {
