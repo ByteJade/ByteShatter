@@ -6,6 +6,7 @@
 #include "stack.h"
 #include "executer.h"
 #include "debugger.h"
+#include <cstdint>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -53,7 +54,7 @@ int main(int argc, char** argv, const char** envp) {
     push_argc();
     
     debug_wait();
-    execute(elf->head.e_entry);
+    execute((uint64_t)elf->base + elf->head.e_entry);
 
     elf_close(elf);
     cahce_fini();
