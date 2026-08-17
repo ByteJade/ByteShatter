@@ -335,7 +335,7 @@ void decode(uint64_t gp) {
         TODO: Static analysis of block jumps. 
         Cache lookups are resource-intensive.
         */
-        const uint32_t* blockp = cache_search(gp);
+        const uint32_t* blockp = cache_search((uint64_t)context.guest + context.gp);
         if (blockp) {
             int32_t offset = (uint64_t)blockp - (uint64_t)(context.host+context.hp);
             warning("DECODER::DUPLICATION %i", offset);
