@@ -320,7 +320,7 @@ int decode_instr(Context* context, Instruction* buf) {
     }
     return ret;
 }
-void decode(uint32_t gp) {
+void decode(uint64_t gp) {
     print("Start decode %lx", gp);
     Context context;
     setup_context(&context, gp);

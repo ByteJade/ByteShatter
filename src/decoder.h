@@ -90,6 +90,6 @@ void decode_rm_r(Context* context, Instruction* buf);
 void decode_rm(Context* context, Operand* op, uint8_t modrm);
 void decode_0F(Context* context, Instruction* buf);
 int decode_instr(Context* context, Instruction* buf);
-void decode(uint32_t gp);
+void decode(uint64_t gp);
 
 #endif
