@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "cache.h"
 
-typedef struct {
+typedef struct Context {
    CacheUnit* block;
    OffsetUnit* offsets;
    uint8_t* guest;

@@ -332,20 +332,18 @@ int decode_instr(Instruction* buf) {
     }
     return ret;
 }
-int decode_step() {
-    cache_block_point();
-    Instruction buf;
-    int type = decode_instr(&buf);
-    encode(&buf);
-    return type;
-}
 void decode(uint32_t gp) {
     print("Start decode %lx", gp);
     set_gp(gp);
-    cache_block_start();
+    Context context;
+    setup_context(&context, gp);
+    cache_block_start(&context);
     while (1) {
-        uint8_t jump_type = decode_step();
-        if (jump_type) break;
+        cache_block_point(&context);
+        Instruction buf;
+        uint8_t jump = decode_instr(&buf);
+        encode(&buf);
+        if (jump) break;
         /*
         TODO: Static analysis of block jumps. 
         Cache lookups are resource-intensive.
@@ -354,11 +352,11 @@ void decode(uint32_t gp) {
         if (blockp) {
             int32_t offset = (uint64_t)blockp - (uint64_t)(get_host()+get_hp());
             warning("DECODER::DUPLICATION %i", offset);
-            cache_block_point();
+            cache_block_point(&context);
             emit32(0x14000000 | ((offset/4) & 0x3FFFFFF));
             break;
         }
     }
-    cache_block_end();
+    cache_block_end(&context);
     if (debug_enabled()) debug_check_break();
 }

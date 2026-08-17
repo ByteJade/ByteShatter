@@ -40,15 +40,16 @@ typedef struct {
 void cahce_init(void);
 void cahce_fini(void);
 
+typedef struct Context Context;
 /* clear all data */
 void cache_clear(void);
 /* set start point of code block cache */
-uint16_t cache_block_start(void);
+uint16_t cache_block_start(Context* context);
 /* set instruction point in block  
    needed for jumping inside */
-void cache_block_point(void);
+void cache_block_point(Context* context);
 /* set end point of code block cache */
-void cache_block_end(void);
+void cache_block_end(Context* context);
 /* save patch in cache for patching */
 uint16_t cache_patch_point(uint8_t type, int offset);
 

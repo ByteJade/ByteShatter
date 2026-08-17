@@ -13,8 +13,6 @@
 #define MAX_JUMPS 255
 #define MAX_OFFSETS 24576
 
-uint8_t loffp = 0;
-
 CacheUnit* last_block;
 Anchor* anchor;
 
@@ -44,7 +42,7 @@ void cache_clear(void) {
     anchor->blocks_p = 0;
     anchor->jumps_p = 0;
 }
-uint16_t cache_block_start(void) {
+uint16_t cache_block_start(Context* context) {
     last_block = anchor->blocks + anchor->blocks_p;
     last_block->offsets = 0;
     last_block->gp_lo = get_gp();
@@ -55,37 +53,38 @@ uint16_t cache_block_start(void) {
     }
     return anchor->blocks_p-1;
 }
-void cache_block_point(void) {
+void cache_block_point(struct Context* context) {
     uint16_t goff = get_gp() - last_block->gp_lo;
     if (goff == 0) return;
     uint16_t hogg = get_hp() - last_block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
         overflow = 1;
-        cache_block_end();
-        cache_block_start();
+        cache_block_end(context);
+        cache_block_start(context);
         goff = get_gp() - last_block->gp_lo;
         hogg = get_hp() - last_block->hp;
     }
-    anchor->offsets[anchor->offsets_p+loffp].goff = goff;
-    anchor->offsets[anchor->offsets_p+loffp].hoff = hogg;
-    loffp++;
-    if (loffp == UINT8_MAX) {
+    OffsetUnit* offset = &anchor->offsets[anchor->offsets_p+context->loffp];
+    offset->goff = goff;
+    offset->hoff = hogg;
+    context->loffp++;
+    if (context->loffp == UINT8_MAX) {
         warning("CACHE::OFFSET::OVERFLOW");
-        cache_block_end();
-        cache_block_start();
+        cache_block_end(context);
+        cache_block_start(context);
     }
 }
-void cache_block_end(void) {
+void cache_block_end(struct Context* context) {
     last_block->end = get_gp() - last_block->gp_lo;
     last_block->offsets = anchor->offsets_p;
-    last_block->offsetssz = loffp;
-    anchor->offsets_p += loffp;
-    loffp = 0;
+    last_block->offsetssz = context->loffp;
+    anchor->offsets_p += context->loffp;
+    context->loffp = 0;
 
     uint32_t* start = get_host() + last_block->hp;
     uint32_t* end = get_host() + get_hp();
-    print("flush cache %x-%x;", last_block->hp, (start - end)*4);
+    print("flush cache %x-%x;", last_block->hp, (end - start)*4);
     __builtin___clear_cache(start, end);
 }
 uint16_t cache_patch_point(uint8_t type, int offset) {
