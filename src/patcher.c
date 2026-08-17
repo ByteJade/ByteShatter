@@ -74,11 +74,10 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     Anchor* anchor = cache_get_anchor(sc->pc);
     PatchUnit* patch = cache_get_patch(ret);
     uint64_t addr = ((uint64_t)anchor->gp_hi<<32)+patch->guest_off;
-    print("patch: %i", patch->guest_off);
+    print("patch: %lx", addr);
     const uint32_t* block = cache_search(addr);
     if (block == NULL) {
         warning("PATCHER::NOT_FOUND %lx", addr);
-        Anchor* anchor = cache_get_anchor(sc->pc);
         block = anchor->host + anchor->host_p;
         decode(addr);
     }
