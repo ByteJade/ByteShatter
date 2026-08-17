@@ -97,7 +97,7 @@ uint16_t cache_patch_point(Context* context, uint8_t type, int offset) {
     }
     PatchUnit* jump = anchor->jumps + anchor->jumps_p;
     jump->type = type;
-    // where to jump (relative to the start of the block)
+    // where to jump (relative to the start of the anchor)
     jump->guest_off = context->gp + offset;
     return ++anchor->jumps_p;
 }
