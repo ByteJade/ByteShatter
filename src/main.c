@@ -6,7 +6,6 @@
 #include "stack.h"
 #include "executer.h"
 #include "debugger.h"
-#include <cstdint>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
