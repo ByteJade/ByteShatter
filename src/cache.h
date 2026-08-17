@@ -14,12 +14,28 @@ typedef struct {
 } PatchUnit;
 
 typedef struct {
-    uint32_t offsets;
+    uint32_t gp_lo;
     uint32_t hp;
-    uint32_t gp;
+    uint32_t offsets;
     uint8_t end;
     uint8_t offsetssz;
 } CacheUnit;
+
+typedef struct {
+    uint32_t gp_hi;
+    OffsetUnit* offsets;
+    uint32_t offsets_p;
+    uint32_t offsets_c;
+    CacheUnit* blocks;
+    uint32_t blocks_p;
+    uint32_t blocks_c;
+    uint32_t* host;
+    uint32_t host_p;
+    uint32_t host_c;
+    PatchUnit* jumps;
+    uint32_t jumps_p;
+    uint32_t jumps_c;
+} Anchor;
 
 void cahce_init(void);
 void cahce_fini(void);

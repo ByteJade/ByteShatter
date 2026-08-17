@@ -13,53 +13,50 @@
 #define MAX_JUMPS 255
 #define MAX_OFFSETS 24576
 
-CacheUnit* blocks_cache = NULL;
-PatchUnit* jumps_cache = NULL;
-uint16_t bp = 0;
-uint16_t pp = 0;
-
-CacheUnit* last_block = NULL;
-OffsetUnit* offsets_pool = NULL;
-uint32_t offp = 1;
 uint8_t loffp = 0;
-uint32_t offset_usage = 0;
+
+CacheUnit* last_block;
+Anchor* anchor;
 
 int overflow = 0;
 
 void cahce_init(void) {
-    blocks_cache = (CacheUnit*) malloc(
-        MAX_BLOCKS * sizeof(CacheUnit)
-    );
-    jumps_cache = (PatchUnit*) malloc(
-        MAX_JUMPS * sizeof(PatchUnit)
-    );
-    offsets_pool = (OffsetUnit*) malloc(
-        MAX_BLOCKS * sizeof(CacheUnit)
-    );
+    anchor = malloc(sizeof(Anchor));
+    anchor->blocks_p = 0;
+    anchor->blocks_c = MAX_BLOCKS * sizeof(CacheUnit);
+    anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c);
+    anchor->jumps_p = 0;
+    anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
+    anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);
+    anchor->offsets_p = 0;
+    anchor->offsets_c = MAX_OFFSETS * sizeof(OffsetUnit);
+    anchor->offsets = (OffsetUnit*) malloc(anchor->offsets_c);
 }
 void cahce_fini(void) {
-    if (blocks_cache) free(blocks_cache);
-    if (jumps_cache) free(jumps_cache);
-    if (offsets_pool) free(offsets_pool);
+    if (anchor->blocks) free(anchor->blocks);
+    if (anchor->jumps) free(anchor->jumps);
+    if (anchor->offsets) free(anchor->offsets);
+    if (anchor) free(anchor);
 }
 
 void cache_clear(void) {
-    bp = 0;
-    pp = 0;
+    anchor->offsets_p = 0;
+    anchor->blocks_p = 0;
+    anchor->jumps_p = 0;
 }
 uint16_t cache_block_start(void) {
-    last_block = blocks_cache + bp;
+    last_block = anchor->blocks + anchor->blocks_p;
     last_block->offsets = 0;
-    last_block->gp = get_gp();
+    last_block->gp_lo = get_gp();
     last_block->hp = get_hp();
-    bp++;
-    if (bp >= MAX_BLOCKS) {
+    anchor->blocks_p++;
+    if (anchor->blocks_p >= MAX_BLOCKS) {
         panic("CACHE::BLOCKS::OVERFLOW");
     }
-    return bp-1;
+    return anchor->blocks_p-1;
 }
 void cache_block_point(void) {
-    uint16_t goff = get_gp() - last_block->gp;
+    uint16_t goff = get_gp() - last_block->gp_lo;
     if (goff == 0) return;
     uint16_t hogg = get_hp() - last_block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
@@ -67,11 +64,11 @@ void cache_block_point(void) {
         overflow = 1;
         cache_block_end();
         cache_block_start();
-        goff = get_gp() - last_block->gp;
+        goff = get_gp() - last_block->gp_lo;
         hogg = get_hp() - last_block->hp;
     }
-    offsets_pool[offp+loffp].goff = goff;
-    offsets_pool[offp+loffp].hoff = hogg;
+    anchor->offsets[anchor->offsets_p+loffp].goff = goff;
+    anchor->offsets[anchor->offsets_p+loffp].hoff = hogg;
     loffp++;
     if (loffp == UINT8_MAX) {
         warning("CACHE::OFFSET::OVERFLOW");
@@ -80,13 +77,12 @@ void cache_block_point(void) {
     }
 }
 void cache_block_end(void) {
-    last_block->end = get_gp() - last_block->gp;
-    offset_usage += loffp * sizeof(OffsetUnit);
-    last_block->offsets = offp;
+    last_block->end = get_gp() - last_block->gp_lo;
+    last_block->offsets = anchor->offsets_p;
     last_block->offsetssz = loffp;
-    offp += loffp;
+    anchor->offsets_p += loffp;
     loffp = 0;
-    cache_flush(bp-1);
+    cache_flush(anchor->blocks_p-1);
 }
 uint16_t cache_patch_point(uint8_t type, int offset) {
     if (offset < INT32_MIN || offset > INT32_MAX) {
@@ -94,15 +90,15 @@ uint16_t cache_patch_point(uint8_t type, int offset) {
            work with such jumps */
         panic("CACHE::JUMPS::BAD_OFFSET");
     }
-    PatchUnit* jump = jumps_cache + pp;
+    PatchUnit* jump = anchor->jumps + anchor->jumps_p;
     jump->type = type;
     // where to jump (relative to the start of the block)
     jump->guest_off = get_gp() + offset;
-    return ++pp;
+    return ++anchor->jumps_p;
 }
 uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
-    gp -= cache->gp;
-    OffsetUnit* offsets = offsets_pool + cache->offsets;
+    gp -= cache->gp_lo;
+    OffsetUnit* offsets = anchor->offsets + cache->offsets;
     // binary search
     int left = 0, right = cache->offsetssz - 1;
     while (left <= right) {
@@ -121,57 +117,59 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
 }
 uint32_t* cache_search(uint32_t gp) {
     // TODO: better cache search
-    for (int i = 0; i < bp; i++) {
-        CacheUnit* cache = blocks_cache + i;
+    for (int i = 0; i < anchor->blocks_p; i++) {
+        CacheUnit* cache = anchor->blocks + i;
         if (cache->offsets == 0) continue;
-        if (gp == cache->gp) return get_host() + cache->hp;
-        if (gp > cache->gp && gp <  cache->gp + cache->end) {
+        if (gp == cache->gp_lo) return get_host() + cache->hp;
+        if (gp > cache->gp_lo && gp <  cache->gp_lo + cache->end) {
             return get_host() + block_cache_search(gp, cache);
         }
     }
     return NULL;
 }
 uint32_t cache_search_block(uint32_t hp) {
-    for (int i = bp-1; i >= 0; i--) {
-        if (hp >= blocks_cache[i].hp) return i;
+    for (int i = anchor->blocks_p-1; i >= 0; i--) {
+        if (hp >= anchor->blocks[i].hp) return i;
     }
     return UINT32_MAX;
 }
 PatchUnit* cache_get_patch(uint16_t patch_id) {
     patch_id--;
-    if (patch_id >= pp) {
+    if (patch_id >= anchor->jumps_p) {
         panic("CACHE::PATCH::BAD_ID %x", patch_id);
     }
-    return jumps_cache + patch_id;
+    return anchor->jumps + patch_id;
 }
 CacheUnit* cache_get_block(uint16_t block_id) {
-    if (block_id >= bp) {
+    if (block_id >= anchor->blocks_p) {
         return NULL;
     }
-    return blocks_cache + block_id;
+    return anchor->blocks + block_id;
 }
 
 void cache_back() {
     //(local_offsets)[loffp-1].hoff--;
 }
 void cache_flush(uint16_t block_id) {
-    CacheUnit* unit = blocks_cache + block_id;
+    CacheUnit* unit = anchor->blocks + block_id;
     uint32_t* code = get_host() + unit->hp;
-    uint32_t size = (offsets_pool + unit->offsets)[unit->offsetssz-1].hoff+8;
+    uint32_t size = (anchor->offsets + unit->offsets)[unit->offsetssz-1].hoff+8;
     print("flush cache %x-%x; block %i", unit->hp, unit->hp+size, block_id);
     __builtin___clear_cache(code, code + size);
 }
 uint32_t cache_usage(void) {
-    return bp * sizeof(CacheUnit) + pp * sizeof(PatchUnit) + offset_usage;
+    return anchor->blocks_p * sizeof(CacheUnit) +
+        anchor->jumps_p * sizeof(PatchUnit) + 
+        anchor->offsets_p * sizeof(OffsetUnit);
 }
 void cache_print(int block) {
-    CacheUnit* unit = blocks_cache + block;
+    CacheUnit* unit = anchor->blocks + block;
     printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = get_host() + unit->hp;
     for (int x = 0; x < unit->offsetssz; x++) {
-        OffsetUnit* offsets = (offsets_pool + unit->offsets);
+        OffsetUnit* offsets = (anchor->offsets + unit->offsets);
         Instruction buf;
-        set_gp(unit->gp + offsets[x].goff);
+        set_gp(unit->gp_lo + offsets[x].goff);
         decode_instr(&buf);
         char out[64];
         int end;
@@ -188,10 +186,10 @@ void cache_print(int block) {
     }
 }
 int cache_bp(void) {
-    return bp;
+    return anchor->blocks_p;
 }
 OffsetUnit* cache_offsets(void) {
-    return offsets_pool;
+    return anchor->offsets;
 }
 int cache_overflow(void) {
     int out = overflow;

@@ -65,20 +65,15 @@ void elf_close(Elf* elf) {
 void reloc_relr(Elf* elf, Elf64_Relr* relr, int relrsz) {
     size_t count = relrsz / sizeof(Elf64_Addr);
     Elf64_Addr *where = NULL;
-    
     for (size_t i = 0; i < count; i++) {
         Elf64_Addr entry = relr[i];
-        
-        if ((entry & 1) == 0) {
+        if (!(entry & 1)) {
             where = (Elf64_Addr *)(elf->base + entry);
             *where++ += (Elf64_Addr)elf->base;
         } else {
             for (long i = 0; (entry >>= 1) != 0; i++) {
-                if (entry & 1) {
-                    where[i] += (Elf64_Addr)elf->base;
-                }
-            }
-            where += 63;
+                if (entry&1) where[i] += (Elf64_Addr)elf->base;
+            } where += 63;
         }
     }
 }
@@ -167,23 +162,23 @@ void elf_read_dynamic(Elf* elf) {
             case DT_RELASZ:
                 relasz = dyn->d_un.d_val;
                 break;
-            case DT_JMPREL:
-                jmprel = (Elf64_Rela*)(elf->base + dyn->d_un.d_ptr);
-                break;
-            case DT_RELRSZ:
-                relrsz = dyn->d_un.d_val;
-                break;
-            case DT_RELR:
-                relr = (Elf64_Relr*)(elf->base + dyn->d_un.d_ptr);
-                break;
             case DT_INIT:
                 elf->init = elf->base + dyn->d_un.d_ptr;
+                break;
+            case DT_JMPREL:
+                jmprel = (Elf64_Rela*)(elf->base + dyn->d_un.d_ptr);
                 break;
             case DT_INIT_ARRAY:
                 elf->init_array = (uint8_t**)(elf->base + dyn->d_un.d_ptr);
                 break;
             case DT_INIT_ARRAYSZ:
                 elf->init_arraysz = dyn->d_un.d_val;
+                break;
+            case DT_RELRSZ:
+                relrsz = dyn->d_un.d_val;
+                break;
+            case DT_RELR:
+                relr = (Elf64_Relr*)(elf->base + dyn->d_un.d_ptr);
                 break;
         }
     }
