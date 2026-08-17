@@ -2,7 +2,8 @@
 #define ENCODER_H
 
 #include "decoder.h"
+#include "memory.h"
 
-void encode(Instruction* buf);
+void encode(Context* context, Instruction* buf);
 
 #endif

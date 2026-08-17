@@ -24,7 +24,7 @@ void cahce_init(void) {
     anchor->blocks_c = MAX_BLOCKS * sizeof(CacheUnit);
     anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c);
     anchor->host_p = 0;
-    //anchor->host_c = MAX_OFFSETS * sizeof(OffsetUnit);
+    //anchor->host_c = 0;
     anchor->host = get_host();
     anchor->jumps_p = 0;
     anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
@@ -47,7 +47,7 @@ uint16_t cache_block_start(Context* context) {
     context->block = anchor->blocks + anchor->blocks_p;
     context->block->offsets = 0;
     context->block->gp_lo = get_gp();
-    context->block->hp = get_hp();
+    context->block->hp = context->hp;
     anchor->blocks_p++;
     if (anchor->blocks_p >= anchor->blocks_c) {
         panic("CACHE::BLOCKS::OVERFLOW");
@@ -57,13 +57,13 @@ uint16_t cache_block_start(Context* context) {
 void cache_block_point(struct Context* context) {
     uint16_t goff = get_gp() - context->block->gp_lo;
     if (goff == 0) return;
-    uint16_t hogg = get_hp() - context->block->hp;
+    uint16_t hogg = context->hp - context->block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
         cache_block_end(context);
         cache_block_start(context);
         goff = get_gp() - context->block->gp_lo;
-        hogg = get_hp() - context->block->hp;
+        hogg = context->hp - context->block->hp;
     }
     OffsetUnit* offset = &anchor->offsets[anchor->offsets_p+context->loffp];
     offset->goff = goff;
@@ -83,9 +83,10 @@ void cache_block_end(struct Context* context) {
     context->loffp = 0;
 
     uint32_t* start = anchor->host + context->block->hp;
-    uint32_t* end = anchor->host + get_hp();
+    uint32_t* end = anchor->host + context->hp;
     print("flush cache %x-%x;", context->block->hp, (end - start)*4);
     __builtin___clear_cache(start, end);
+    anchor->host_p = context->hp;
 }
 uint16_t cache_patch_point(uint8_t type, int offset) {
     if (offset < INT32_MIN || offset > INT32_MAX) {

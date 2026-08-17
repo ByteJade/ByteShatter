@@ -78,43 +78,43 @@ static uint8_t x64_regs[] = {
     ((op) | (x64_regs[rm] << 16) | (x64_regs[rn] << 5) | x64_regs[rd])
 
 #define emit_lsl_imm(rd, rn, shift) \
-    emit32(0xD3400000 | ((-(shift) & 0x3F) << 16) | (((63 - shift) & 0x3F) << 10) |  (x64_regs[rn] << 5) | x64_regs[rd])
+    emit32(context, 0xD3400000 | ((-(shift) & 0x3F) << 16) | (((63 - shift) & 0x3F) << 10) |  (x64_regs[rn] << 5) | x64_regs[rd])
 #define emit_lsr_imm(rd, rn, shift) \
-    emit32(0xD3600000 | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
+    emit32(context, 0xD3600000 | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
 #define emit_asr_imm(rd, rn, shift) \
-    emit32(0x93600000 | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
+    emit32(context, 0x93600000 | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
 
 #define emit_adrp(rd, delta) \
-    emit32(0x90000000 | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | x64_regs[rd])
+    emit32(context, 0x90000000 | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | x64_regs[rd])
 #define emit_movz(rd, imm, shift) \
-    emit32(0xD2800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
+    emit32(context, 0xD2800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
 #define emit_movn(rd, imm, shift) \
-    emit32(0x92800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
+    emit32(context, 0x92800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
 #define emit_mov32(rd, imm) \
-    emit32(0xD2800000 | ((imm&0xFFFF) << 5) | x64_regs[rd]); \
-    emit32(0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | x64_regs[rd])
+    emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | x64_regs[rd]); \
+    emit32(context, 0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | x64_regs[rd])
 #define emit_sub_imm(rd, rn, imm) \
-    emit32(_construct_r_r_imm(0xD1000000, rd, rn, imm))
+    emit32(context, _construct_r_r_imm(0xD1000000, rd, rn, imm))
 #define emit_sub_reg(rd, rn, rm) \
-    emit32(_construct_r_r_r(0xCB000000, rd, rn, rm))
+    emit32(context, _construct_r_r_r(0xCB000000, rd, rn, rm))
 #define emit_add_imm(rd, rn, imm) \
-    emit32(_construct_r_r_imm(0x91000000, rd, rn, imm))
+    emit32(context, _construct_r_r_imm(0x91000000, rd, rn, imm))
 #define emit_add_reg(rd, rn, rm) \
-    emit32(_construct_r_r_r(0x8B000000, rd, rn, rm))
+    emit32(context, _construct_r_r_r(0x8B000000, rd, rn, rm))
 #define emit_eor_reg(rd, rn, rm) \
-    emit32(_construct_r_r_r(0xCA000000, rd, rn, rm))
+    emit32(context, _construct_r_r_r(0xCA000000, rd, rn, rm))
 #define emit_and_imm(rd, rn, imm) \
-    emit32(_construct_r_r_imm(0x92000000, rd, rn, imm))
+    emit32(context, _construct_r_r_imm(0x92000000, rd, rn, imm))
 #define emit_ldr_reg(rd, rn, imm) \
-    emit32(_construct_r_r_imm(LDR64_REG, rd, rn, imm))
+    emit32(context, _construct_r_r_imm(LDR64_REG, rd, rn, imm))
 #define emit_blr_reg(rn) \
-    emit32(0xD63F0000 | (x64_regs[rn] << 5))
+    emit32(context, 0xD63F0000 | (x64_regs[rn] << 5))
 #define emit_br_reg(rn) \
-    emit32(0xD61F0000 | (x64_regs[rn] << 5))
+    emit32(context, 0xD61F0000 | (x64_regs[rn] << 5))
 #define emit_brk(imm16) \
-    emit32(0xD4200000 | (imm16 << 5))
+    emit32(context, 0xD4200000 | (imm16 << 5))
 #define emit_ret() \
-    emit32(0xD65F03C0)
+    emit32(context, 0xD65F03C0)
 #define emit_bti() \
-    emit32(0xD503245F)
+    emit32(context, 0xD503245F)
 #endif

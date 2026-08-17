@@ -330,7 +330,7 @@ void decode(uint32_t gp) {
         cache_block_point(&context);
         Instruction buf;
         uint8_t jump = decode_instr(&context, &buf);
-        encode(&buf);
+        encode(&context, &buf);
         if (jump) break;
         /*
         TODO: Static analysis of block jumps. 
@@ -338,10 +338,10 @@ void decode(uint32_t gp) {
         */
         const uint32_t* blockp = cache_search(get_gp());
         if (blockp) {
-            int32_t offset = (uint64_t)blockp - (uint64_t)(get_host()+get_hp());
+            int32_t offset = (uint64_t)blockp - (uint64_t)(context.host+context.hp);
             warning("DECODER::DUPLICATION %i", offset);
             cache_block_point(&context);
-            emit32(0x14000000 | ((offset/4) & 0x3FFFFFF));
+            emit32(&context, 0x14000000 | ((offset/4) & 0x3FFFFFF));
             break;
         }
     }

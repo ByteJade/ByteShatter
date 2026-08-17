@@ -14,7 +14,6 @@ and host mutex
 */
 uint32_t hostsz = 0;
 uint32_t gp = 0;
-uint32_t hp = 0;
 
 void setup_context(Context* context, uint64_t gp) {
     Anchor* current = cache_get_anchor(gp);
@@ -55,16 +54,6 @@ void* mmap_guest(uint32_t guest_size) {
     }
     return guest;
 }
-void memory_clear_host(void) {
-    hp = 0;
-}
-// TODO: check host overflow
-void emit32(uint32_t data) {
-    host[hp++] = data;
-}
-void patch(uint32_t n) {
-    hp -= n;
-}
 
 uint8_t fetch8(void) {
     uint8_t* src = (uint8_t*)(guest + gp);
@@ -90,9 +79,7 @@ uint32_t fetch64(void) {
 void set_guest(uint64_t new_guest) { guest = (uint8_t*)new_guest; }
 
 void set_gp(uint32_t new_gp) { gp = new_gp; }
-void set_hp(uint32_t new_hp) { hp = new_hp; }
 
-uint64_t get_hp(void) { return hp; }
 uint64_t get_gp(void) { return gp; }
 
 uint32_t* get_host(void) { return host; }

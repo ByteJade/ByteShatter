@@ -23,9 +23,13 @@ void* mmap_guest(uint32_t guest_size);
 void memory_clear_host(void);
 
 /* emit 4 bytes to host memory */
-void emit32(uint32_t data);
+inline void emit32(Context* cotnext, uint32_t data) {
+    cotnext->host[cotnext->hp++] = data;
+}
 /* replace 32 bytes */
-void patch(uint32_t n);
+inline void patch(Context* cotnext, uint32_t n) {
+    cotnext->hp -= n;
+}
 
 /* fetch byte from guest memory */
 uint8_t fetch8(void);
@@ -39,12 +43,7 @@ uint32_t fetch64(void);
 /* set guest */
 void set_guest(uint64_t new_guest);
 void set_gp(uint32_t new_gp);
-/* set host pointer  
-   only for code patching! */
-void set_hp(uint32_t new_hp);
 
-/* get host pointer */
-uint64_t get_hp(void);
 /* get guest pointer */
 uint64_t get_gp(void);
 
