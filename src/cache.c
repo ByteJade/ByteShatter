@@ -172,7 +172,7 @@ void cache_print(int block) {
     Context context;
     setup_context(&context,((uint64_t)anchor->gp_hi<<32) + unit->gp_lo);
     int start = 0;
-    for (int x = 0; x < unit->offsetssz; x++) {
+    for (int x = 0; x <= unit->offsetssz; x++) {
         OffsetUnit* offsets = (anchor->offsets + unit->offsets);
         Instruction buf;
         decode_instr(&context, &buf);
