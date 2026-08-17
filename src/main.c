@@ -40,7 +40,6 @@ int main(int argc, char** argv, const char** envp) {
     int end = read_argv(argc, argv);
     Elf* elf = elf_load(argv[end]);
 
-    set_guest((uint64_t)elf->base);
     elf_read_dynamic(elf);
     patcher_init();
     cahce_init();
