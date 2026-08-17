@@ -178,7 +178,7 @@ void cache_print(int block) {
         decode_instr(&context, &buf);
         char out[64];
         int end;
-        if (x+1 == unit->offsetssz) end = start+4;
+        if (x == unit->offsetssz) end = start+4;
         else end = offsets[x].hoff;
         for (int y = start; y < end; y++) {
             sprint_arm(out, host[y]);
