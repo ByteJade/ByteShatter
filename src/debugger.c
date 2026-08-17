@@ -136,10 +136,12 @@ void debug_wait(void) {
                 Anchor* anchor = cache_get_anchor(get_pc());
                 CacheUnit* unit = cache_get_block(current_block);
                 OffsetUnit* offsets = unit->offsets + cache_offsets();
-                Context context;
-                setup_context(&context, ((uint64_t)anchor->gp_hi<<32) + unit->gp_lo);
                 for (int x = 0; x < unit->offsetssz; x++) {
                     if ((uint32_t*)get_pc() - get_host() == unit->hp + offsets[x].hoff) {
+                        Context context;
+                        setup_context(&context, 
+                            ((uint64_t)anchor->gp_hi<<32) +
+                            unit->gp_lo + offsets[x].goff);
                         Instruction buf;
                         decode_instr(&context, &buf);
                     }
