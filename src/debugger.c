@@ -133,13 +133,14 @@ void debug_wait(void) {
             }
         } else {
             if (strcmp(com, "si") == 0) {
+                Anchor* anchor = cache_get_anchor(get_pc());
                 CacheUnit* unit = cache_get_block(current_block);
                 OffsetUnit* offsets = unit->offsets + cache_offsets();
+                Context context;
+                setup_context(&context, ((uint64_t)anchor->gp_hi<<32) + unit->gp_lo);
                 for (int x = 0; x < unit->offsetssz; x++) {
                     if ((uint32_t*)get_pc() - get_host() == unit->hp + offsets[x].hoff) {
                         Instruction buf;
-                        Context context;
-                        setup_context(&context, unit->gp_lo + offsets[x].goff);
                         decode_instr(&context, &buf);
                     }
                 }
