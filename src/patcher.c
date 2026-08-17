@@ -76,7 +76,8 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     const uint32_t* block = cache_search(patch->guest_off);
     if (block == NULL) {
         warning("PATCHER::NOT_FOUND %lx", patch->guest_off);
-        block = get_host() + get_hp();
+        Anchor* anchor = cache_get_anchor(sc->pc);
+        block = anchor->host + anchor->host_p;
         decode(patch->guest_off);
     }
     int32_t offset = (block - pc);
