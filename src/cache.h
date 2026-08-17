@@ -74,7 +74,5 @@ void cache_print(int block);
 int cache_bp(void);
 /* get current block pointer */
 OffsetUnit* cache_offsets(void);
-/* was there a block overflow */
-int cache_overflow(void);
 
 #endif

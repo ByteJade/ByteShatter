@@ -28,25 +28,23 @@ int read_argv(int argc, char** argv) {
                 case 'h':
                 default: usage();
             }
-        } else {
-            return i;
-        }
-        if (i == (argc - 1)) usage();
+        } else return i;
     }
     usage();
     return 0;
 }
 
 int main(int argc, char** argv, const char** envp) {
-    patcher_init();
-    cahce_init();
     stack_init();
     set_envp(envp);
-    
     int end = read_argv(argc, argv);
     Elf* elf = elf_load(argv[end]);
+
     set_guest((uint64_t)elf->base);
     elf_read_dynamic(elf);
+    patcher_init();
+    cahce_init();
+
     elf_init(elf);
     finish_stack(elf);
     push_arg(0);
@@ -54,7 +52,6 @@ int main(int argc, char** argv, const char** envp) {
         push_arg(argv[n]);
     }
     push_argc();
-    
     
     debug_wait();
     execute(elf->head.e_entry);

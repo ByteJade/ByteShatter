@@ -13,22 +13,22 @@
 #define MAX_JUMPS 255
 #define MAX_OFFSETS 24576
 
-CacheUnit* last_block;
 Anchor* anchor;
-
-int overflow = 0;
 
 void cahce_init(void) {
     anchor = malloc(sizeof(Anchor));
-    anchor->blocks_p = 0;
-    anchor->blocks_c = MAX_BLOCKS * sizeof(CacheUnit);
-    anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c);
-    anchor->jumps_p = 0;
-    anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
-    anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);
     anchor->offsets_p = 0;
     anchor->offsets_c = MAX_OFFSETS * sizeof(OffsetUnit);
     anchor->offsets = (OffsetUnit*) malloc(anchor->offsets_c);
+    anchor->blocks_p = 0;
+    anchor->blocks_c = MAX_BLOCKS * sizeof(CacheUnit);
+    anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c);
+    anchor->host_p = 0;
+    //anchor->host_c = MAX_OFFSETS * sizeof(OffsetUnit);
+    anchor->host = get_host();
+    anchor->jumps_p = 0;
+    anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
+    anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);
 }
 void cahce_fini(void) {
     if (anchor->blocks) free(anchor->blocks);
@@ -41,29 +41,29 @@ void cache_clear(void) {
     anchor->offsets_p = 0;
     anchor->blocks_p = 0;
     anchor->jumps_p = 0;
+    anchor->host_p = 0;
 }
 uint16_t cache_block_start(Context* context) {
-    last_block = anchor->blocks + anchor->blocks_p;
-    last_block->offsets = 0;
-    last_block->gp_lo = get_gp();
-    last_block->hp = get_hp();
+    context->block = anchor->blocks + anchor->blocks_p;
+    context->block->offsets = 0;
+    context->block->gp_lo = get_gp();
+    context->block->hp = get_hp();
     anchor->blocks_p++;
-    if (anchor->blocks_p >= MAX_BLOCKS) {
+    if (anchor->blocks_p >= anchor->blocks_c) {
         panic("CACHE::BLOCKS::OVERFLOW");
     }
     return anchor->blocks_p-1;
 }
 void cache_block_point(struct Context* context) {
-    uint16_t goff = get_gp() - last_block->gp_lo;
+    uint16_t goff = get_gp() - context->block->gp_lo;
     if (goff == 0) return;
-    uint16_t hogg = get_hp() - last_block->hp;
+    uint16_t hogg = get_hp() - context->block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
-        overflow = 1;
         cache_block_end(context);
         cache_block_start(context);
-        goff = get_gp() - last_block->gp_lo;
-        hogg = get_hp() - last_block->hp;
+        goff = get_gp() - context->block->gp_lo;
+        hogg = get_hp() - context->block->hp;
     }
     OffsetUnit* offset = &anchor->offsets[anchor->offsets_p+context->loffp];
     offset->goff = goff;
@@ -76,15 +76,15 @@ void cache_block_point(struct Context* context) {
     }
 }
 void cache_block_end(struct Context* context) {
-    last_block->end = get_gp() - last_block->gp_lo;
-    last_block->offsets = anchor->offsets_p;
-    last_block->offsetssz = context->loffp;
+    context->block->end = get_gp() - context->block->gp_lo;
+    context->block->offsets = anchor->offsets_p;
+    context->block->offsetssz = context->loffp;
     anchor->offsets_p += context->loffp;
     context->loffp = 0;
 
-    uint32_t* start = get_host() + last_block->hp;
-    uint32_t* end = get_host() + get_hp();
-    print("flush cache %x-%x;", last_block->hp, (end - start)*4);
+    uint32_t* start = anchor->host + context->block->hp;
+    uint32_t* end = anchor->host + get_hp();
+    print("flush cache %x-%x;", context->block->hp, (end - start)*4);
     __builtin___clear_cache(start, end);
 }
 uint16_t cache_patch_point(uint8_t type, int offset) {
@@ -123,9 +123,9 @@ uint32_t* cache_search(uint32_t gp) {
     for (int i = 0; i < anchor->blocks_p; i++) {
         CacheUnit* cache = anchor->blocks + i;
         if (cache->offsets == 0) continue;
-        if (gp == cache->gp_lo) return get_host() + cache->hp;
+        if (gp == cache->gp_lo) return anchor->host + cache->hp;
         if (gp > cache->gp_lo && gp <  cache->gp_lo + cache->end) {
-            return get_host() + block_cache_search(gp, cache);
+            return anchor->host + block_cache_search(gp, cache);
         }
     }
     return NULL;
@@ -165,7 +165,7 @@ uint32_t cache_usage(void) {
 void cache_print(int block) {
     CacheUnit* unit = anchor->blocks + block;
     printf("%X Block: %i\n", unit->hp, block);
-    uint32_t* host = get_host() + unit->hp;
+    uint32_t* host = anchor->host + unit->hp;
     Context context;
     setup_context(&context, unit->gp_lo);
     set_gp(unit->gp_lo);
@@ -193,9 +193,4 @@ int cache_bp(void) {
 }
 OffsetUnit* cache_offsets(void) {
     return anchor->offsets;
-}
-int cache_overflow(void) {
-    int out = overflow;
-    overflow = 0;
-    return out;
 }
