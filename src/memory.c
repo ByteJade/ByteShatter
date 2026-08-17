@@ -17,7 +17,7 @@ void setup_context(Context* context, uint64_t gp) {
     Anchor* current = cache_get_anchor(gp);
     context->block = NULL;
     context->offsets = current->offsets + current->offsets_p;
-    context->guest = (uint8_t*)(gp & (~UINT32_MAX));
+    context->guest = (uint8_t*)(gp & (~(uint64_t)UINT32_MAX));
     context->host = current->host;
     context->gp = gp & UINT32_MAX;
     context->hp = current->host_p;
