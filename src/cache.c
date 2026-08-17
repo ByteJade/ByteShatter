@@ -124,9 +124,9 @@ uint32_t* cache_search(uint32_t gp) {
     // TODO: better cache search
     for (int i = 0; i < anchor->blocks_p; i++) {
         CacheUnit* cache = anchor->blocks + i;
-        if (cache->offsets == 0) continue;
         if (gp == cache->gp_lo) return anchor->host + cache->hp;
-        if (gp > cache->gp_lo && gp <  cache->gp_lo + cache->end) {
+        if (cache->offsets == 0) continue;
+        if (gp > cache->gp_lo && gp < cache->gp_lo + cache->end) {
             return anchor->host + block_cache_search(gp, cache);
         }
     }
