@@ -1,6 +1,6 @@
 #include "core.h"
 #include <stdio.h>
-#include <stdlib.h>
+#include <unistd.h>
 
 static const char* const prefixes[] = {
     "\033[1;31mPANIC::",
@@ -33,7 +33,5 @@ void log_message(LogLevel level, const char* format, ...) {
     
     printf("\033[0m\n");
     
-    if (level == LOG_PANIC) {
-        exit(0);
-    }
+    if (level == LOG_PANIC) _exit(0);
 }

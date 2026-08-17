@@ -6,8 +6,9 @@
 #include "decoder.h"
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/unistd.h>
 #include <sys/mman.h>
 
 static int enabled = 0;
@@ -152,7 +153,7 @@ void debug_wait(void) {
                     printf("Stop at break point\n");
                 break;
             } else if (strcmp(com, "exit") == 0) {
-                exit(0);
+                _exit(0);
             } else {
                 help();
             }
