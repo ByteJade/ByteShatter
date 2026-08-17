@@ -20,7 +20,6 @@ void memory_init(uint32_t guest_size);
 void memory_fini(void);
 
 void* mmap_guest(uint32_t guest_size);
-void memory_clear_host(void);
 
 /* emit 4 bytes to host memory */
 inline void emit32(Context* cotnext, uint32_t data) {
