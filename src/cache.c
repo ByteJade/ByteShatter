@@ -122,7 +122,6 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
 }
 uint32_t* cache_search(uint32_t gp) {
     // TODO: better cache search
-    gp -= (uint64_t)anchor->gp_hi<<32;
     for (int i = 0; i < anchor->blocks_p; i++) {
         CacheUnit* cache = anchor->blocks + i;
         if (cache->offsets == 0) continue;
