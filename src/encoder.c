@@ -245,9 +245,9 @@ void encode(Context* context, Instruction* buf) {
                 emit_load(context, SC2R, &buf->a, sf, buf->prefix);
                 r0 = SC2;
             }
-            uint8_t r0 = x64_regs[r0];
+            r0 = x64_regs[r0];
             if (t1 == REG) {
-                emit32(context, sf|ADD_REG|S | (r0) | (r0<<5) | (r1<<16));
+                emit32(context, sf|ADD_REG|S | (r0) | (r0<<5) | (x64_regs[r1]<<16));
             } else {
                 emit_add_signed(context, r0, r0, buf->b.imm);
             }

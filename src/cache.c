@@ -84,7 +84,7 @@ void cache_block_end(struct Context* context) {
 
     uint32_t* start = anchor->host + context->block->hp;
     uint32_t* end = anchor->host + context->hp;
-    print("flush cache %x-%x;", context->block->hp, (end - anchor->host)*4);
+    print("flush cache %x-%x;", context->block->hp, end - anchor->host);
     __builtin___clear_cache(start, end);
     anchor->host_p = context->hp;
 }
