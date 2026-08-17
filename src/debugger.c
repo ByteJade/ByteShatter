@@ -96,7 +96,7 @@ void handle_print(char* arg) {
             print_flags();
         } else if (strcmp(arg, "usage") == 0) {
             printf("cache usage: %i bytes\n", cache_usage());
-            printf("host usage: %li bytes (%li guest)\n", get_hp()*4, get_gp());
+            //printf("host usage: %li bytes (%li guest)\n", get_hp()*4, get_gp());
         } else {
             printf("\033[34m%s\033[0m: %lX\n", arg, get_reg(arg));
         }
@@ -137,8 +137,10 @@ void debug_wait(void) {
                 for (int x = 0; x < unit->offsetssz; x++) {
                     if ((uint32_t*)get_pc() - get_host() == unit->hp + offsets[x].hoff) {
                         Instruction buf;
-                        set_gp(unit->gp + offsets[x].goff);
-                        decode_instr(&buf);
+                        set_gp(unit->gp_lo + offsets[x].goff);
+                        Context context;
+                        setup_context(&context, unit->gp_lo + offsets[x].goff);
+                        decode_instr(&context, &buf);
                     }
                 }
                 set_bp((uint32_t*)(get_pc() + 4));
