@@ -1,8 +1,9 @@
+#include "cache.h"
 #include "decoder.h"
 #include "memory.h"
 #include "core.h"
 
-void decode_0F(Instruction* buf) {
+void decode_0F(Context* context, Instruction* buf) {
     uint8_t byte = fetch8();
     switch (byte) {
         case 0x1E:
@@ -13,7 +14,7 @@ void decode_0F(Instruction* buf) {
             break;
         case 0x11:
             buf->type = MOVS;
-            decode_rm_r(buf);
+            decode_rm_r(context, buf);
             if (buf->a.type == REG)
                 buf->a.type |= XMM;
             buf->b.type |= XMM;
@@ -26,12 +27,12 @@ void decode_0F(Instruction* buf) {
             goto set;
         case 0x2A:
             buf->type = CVTSI2S;
-            decode_r_rm(buf);
+            decode_r_rm(context, buf);
             buf->a.type |= XMM;
             break;
         case 0x2C:
             buf->type = CVTSD2SI;
-            decode_rm_r(buf);
+            decode_rm_r(context, buf);
             buf->b.type |= XMM;
             break;
         case 0x2f:
@@ -41,7 +42,7 @@ void decode_0F(Instruction* buf) {
             goto set;
         case 0x40 ... 0x4F:
             buf->type = byte - 0x40 + CMOVO;
-            decode_r_rm(buf);
+            decode_r_rm(context, buf);
             break;
         case 0x57:
             buf->type = PXOR;
@@ -64,18 +65,18 @@ void decode_0F(Instruction* buf) {
             goto set;
         case 0x7e:
             buf->type = MOVQ;
-            decode_rm_r(buf);
+            decode_rm_r(context, buf);
             buf->b.type |= XMM;
             break;
         case 0x6e:
             buf->type = MOVQ;
-            decode_r_rm(buf);
+            decode_r_rm(context, buf);
             buf->a.type |= XMM;
             break;
         case 0xEF:
             buf->type = PXOR;
         set:
-            decode_r_rm(buf);
+            decode_r_rm(context, buf);
             buf->a.type |= XMM;
             if (buf->b.type == REG)
                 buf->b.type |= XMM;
@@ -83,22 +84,22 @@ void decode_0F(Instruction* buf) {
         case 0x80 ... 0x8F:
             buf->type = byte - 0x80 + JO;
             buf->a.type = IMM;
-            buf->a.imm = fetch_imm32();
+            buf->a.imm = fetch_imm32;
             buf->b.type = NONE;
             break;
         case 0x90 ... 0x9F:
             buf->size = 8;
             buf->type = byte - 0x90 + SETO;
-            decode_rm(&buf->a, fetch8());
+            decode_rm(context, &buf->a, fetch8());
             buf->b.type = NONE;
             break;
         case 0xAF:
             buf->type = IMUL;
-            decode_r_rm(buf);
+            decode_r_rm(context, buf);
             break;
         case 0xB6:
             buf->type = MOVZX;
-            decode_r_rm(buf);
+            decode_r_rm(context, buf);
             break;
         default: panic("DECODER::UNKNOWN_0F_SYMBOL: 0x%X", byte);
     }
