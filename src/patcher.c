@@ -142,7 +142,8 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         uint32_t* target = cache_search(guest);
         if (target == NULL) {
             warning("PATCHER::NOT_FOUND %lx", sc->pc);
-            target = get_host() + get_hp();
+            Anchor* anchor = cache_get_anchor(sc->pc);
+            target = anchor->host + anchor->host_p;
             decode(guest);
         }
         sc->pc = (uint64_t)target;
