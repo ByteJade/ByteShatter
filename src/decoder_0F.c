@@ -4,13 +4,13 @@
 #include "core.h"
 
 void decode_0F(Context* context, Instruction* buf) {
-    uint8_t byte = fetch8();
+    uint8_t byte = fetch8(context);
     switch (byte) {
         case 0x1E:
             buf->prefix = 0;
             buf->type = EBR;
             buf->a.type = NONE;
-            fetch8();
+            fetch8(context);
             break;
         case 0x11:
             buf->type = MOVS;
@@ -90,7 +90,7 @@ void decode_0F(Context* context, Instruction* buf) {
         case 0x90 ... 0x9F:
             buf->size = 8;
             buf->type = byte - 0x90 + SETO;
-            decode_rm(context, &buf->a, fetch8());
+            decode_rm(context, &buf->a, fetch8(context));
             buf->b.type = NONE;
             break;
         case 0xAF:

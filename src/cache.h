@@ -51,7 +51,7 @@ void cache_block_point(Context* context);
 /* set end point of code block cache */
 void cache_block_end(Context* context);
 /* save patch in cache for patching */
-uint16_t cache_patch_point(uint8_t type, int offset);
+uint16_t cache_patch_point(Context* context, uint8_t type, int offset);
 
 /* get pointer to host instruction at guest pointer */
 uint32_t* cache_search(uint32_t gp);

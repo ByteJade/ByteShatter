@@ -31,24 +31,31 @@ inline void patch(Context* cotnext, uint32_t n) {
 }
 
 /* fetch byte from guest memory */
-uint8_t fetch8(void);
+inline uint8_t fetch8(Context* cotnext) {
+    uint8_t* src = cotnext->guest + cotnext->gp;
+    cotnext->gp += 1;
+    return *src;
+}
 /* fetch 2 bytes from guest memory */
-uint16_t fetch16(void);
+inline uint16_t fetch16(Context* cotnext) {
+    uint16_t* src = (uint16_t*)(cotnext->guest + cotnext->gp);
+    cotnext->gp += 2;
+    return *src;
+}
 /* fetch 4 bytes from guest memory */
-uint32_t fetch32(void);
+inline uint32_t fetch32(Context* cotnext) {
+    uint16_t* src = (uint16_t*)(cotnext->guest + cotnext->gp);
+    cotnext->gp += 2;
+    return *src;
+}
 /* fetch 8 bytes from guest memory */
-uint32_t fetch64(void);
-
-/* set guest */
-void set_guest(uint64_t new_guest);
-void set_gp(uint32_t new_gp);
-
-/* get guest pointer */
-uint64_t get_gp(void);
+inline uint32_t fetch64(Context* cotnext) {
+    uint16_t* src = (uint16_t*)(cotnext->guest + cotnext->gp);
+    cotnext->gp += 2;
+    return *src;
+}
 
 /* get pointer to host memory */
 uint32_t* get_host(void);
-/* get pointer to guest memory */
-uint8_t* get_guest(void);
 
 #endif

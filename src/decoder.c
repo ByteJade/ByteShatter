@@ -13,7 +13,7 @@ void decode_rm(Context* context, Operand* op, uint8_t modrm) {
     if (mod < 3) {
         op->type = MEM;
         if (rm == 4) {
-            uint8_t sib = fetch8();
+            uint8_t sib = fetch8(context);
             op->reg = sib&7;
             op->idx = (sib>>3)&7;
             op->scale = sib>>6;
@@ -45,14 +45,14 @@ void decode_rm(Context* context, Operand* op, uint8_t modrm) {
     }
 }
 void decode_r_rm(Context* context, Instruction* buf) {
-    uint8_t byte = fetch8();
+    uint8_t byte = fetch8(context);
     buf->reverse = 0;
     buf->a.type = REG;
     buf->a.reg = (byte >> 3) & 7;
     decode_rm(context, &buf->b, byte);
 }
 void decode_rm_r(Context* context, Instruction* buf) {
-    uint8_t byte = fetch8();
+    uint8_t byte = fetch8(context);
     buf->reverse = 1;
     buf->b.type = REG;
     buf->b.reg = (byte >> 3) & 7;
@@ -115,15 +115,15 @@ int decode_instr(Context* context, Instruction* buf) {
     buf->size = 32;
     uint8_t rex = 0;
     uint8_t ret = 0;
-    uint8_t byte = fetch8();
+    uint8_t byte = fetch8(context);
     if ((byte >= FS && byte <= OS) ||
     (byte >= REPN && byte <= REPE)) {
         buf->prefix = byte;
-        byte = fetch8();
+        byte = fetch8(context);
     }
     if ((byte&0xF0) == 0x40) {
         rex = byte & 0xF;
-        byte = fetch8();
+        byte = fetch8(context);
     }
     switch (byte) {
         case 0x00 ... 0x3F:
@@ -176,7 +176,7 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->size = 8;
             [[fallthrough]];
         case 0x81: case 0x83: {
-            uint8_t modrm = fetch8();
+            uint8_t modrm = fetch8(context);
             buf->reverse = 1;
             buf->type = ADD + ((modrm >> 3) & 7);
             decode_rm(context, &buf->a, modrm);
@@ -216,7 +216,7 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->size = 64;
             buf->reverse = 1;
             buf->type = POP;
-            decode_rm(context, &buf->a, fetch8());
+            decode_rm(context, &buf->a, fetch8(context));
             buf->b.type = NONE;
             break;
         case 0xB0 ... 0xBF:
@@ -229,7 +229,7 @@ int decode_instr(Context* context, Instruction* buf) {
                 buf->size = 8;
                 buf->b.imm = fetch_imm8;
             }else {
-                if (rex & 8) buf->b.imm = fetch64();
+                if (rex & 8) buf->b.imm = fetch64(context);
                 else buf->b.imm = fetch_imm32;
             }
             break;
@@ -237,7 +237,7 @@ int decode_instr(Context* context, Instruction* buf) {
         case 0xD0: case 0xD1:
         case 0xD2: case 0xD3:{
             if (!(byte&1)) buf->size = 8;
-            uint8_t modrm = fetch8();
+            uint8_t modrm = fetch8(context);
             buf->reverse = 1;
             buf->type = ROL + ((modrm >> 3) & 7);
             decode_rm(context, &buf->a, modrm);
@@ -260,14 +260,14 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->size = 8;
             buf->reverse = 1;
             buf->type = MOV;
-            decode_rm(context, &buf->a, fetch8());
+            decode_rm(context, &buf->a, fetch8(context));
             buf->b.type = IMM;
             buf->b.imm = fetch_imm8;
             break;
         case 0xC7:
             buf->reverse = 1;
             buf->type = MOV;
-            decode_rm(context, &buf->a, fetch8());
+            decode_rm(context, &buf->a, fetch8(context));
             buf->b.type = IMM;
             buf->b.imm = fetch_imm32;
             break;
@@ -291,7 +291,7 @@ int decode_instr(Context* context, Instruction* buf) {
             ret = 1;
             break;
         case 0xF7: {
-            uint8_t byte = fetch8();
+            uint8_t byte = fetch8(context);
             if ((byte&0b11111000) == 0xF8) {
                 buf->type = IDIV;
                 buf->a.type = REG;
@@ -304,7 +304,7 @@ int decode_instr(Context* context, Instruction* buf) {
             [[fallthrough]];
         case 0xFF: {
             buf->reverse = 1;
-            uint8_t modrm = fetch8();
+            uint8_t modrm = fetch8(context);
             uint8_t code = (modrm >> 3) & 7;
             decode_rm(context, &buf->a, modrm);
             decode_GRP3(buf, code);
@@ -322,7 +322,6 @@ int decode_instr(Context* context, Instruction* buf) {
 }
 void decode(uint32_t gp) {
     print("Start decode %lx", gp);
-    set_gp(gp);
     Context context;
     setup_context(&context, gp);
     cache_block_start(&context);
@@ -336,7 +335,7 @@ void decode(uint32_t gp) {
         TODO: Static analysis of block jumps. 
         Cache lookups are resource-intensive.
         */
-        const uint32_t* blockp = cache_search(get_gp());
+        const uint32_t* blockp = cache_search(gp);
         if (blockp) {
             int32_t offset = (uint64_t)blockp - (uint64_t)(context.host+context.hp);
             warning("DECODER::DUPLICATION %i", offset);

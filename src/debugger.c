@@ -137,7 +137,6 @@ void debug_wait(void) {
                 for (int x = 0; x < unit->offsetssz; x++) {
                     if ((uint32_t*)get_pc() - get_host() == unit->hp + offsets[x].hoff) {
                         Instruction buf;
-                        set_gp(unit->gp_lo + offsets[x].goff);
                         Context context;
                         setup_context(&context, unit->gp_lo + offsets[x].goff);
                         decode_instr(&context, &buf);

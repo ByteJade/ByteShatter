@@ -30,7 +30,7 @@ void emit_address_decode(Context* context, Operand* op, uint8_t reg, uint8_t pre
         return;
     }
     if (t == (MEM|IMM)) {
-        uint64_t full = (uint64_t)(get_guest() + get_gp() + op->imm);
+        uint64_t full = (uint64_t)(context->guest + context->gp + op->imm);
         int64_t target = full & ~0xFFF;
         int64_t current = (uint64_t)(context->host + context->hp) & ~0xFFF;
         int64_t delta = (target - current) >> 12;
@@ -64,7 +64,7 @@ void emit_branch(Context* context, Instruction* buf, uint32_t code, uint8_t type
     if (buf->a.type == REG) {
         emit32(context, code | (x64_regs[buf->a.reg] << 5));
     } else if (buf->a.type == IMM) {
-        emit32(context, 0xD4200000 | (cache_patch_point(type, buf->a.imm) << 5));
+        emit32(context, 0xD4200000 | (cache_patch_point(context, type, buf->a.imm) << 5));
     } else if (buf->a.type&MEM) {
         emit_address_decode(context, &buf->a, SC1R, 0);
         emit32(context, (LDR64_REG | (SC1R << 5) | SC1R));
@@ -417,7 +417,7 @@ void encode(Context* context, Instruction* buf) {
         case JBE:
         case JAE:
         case JE:{
-            emit_brk(cache_patch_point(buf->type, buf->a.imm));
+            emit_brk(cache_patch_point(context, buf->type, buf->a.imm));
         } break;
         case JMP:{
             emit_branch(context, buf, BR_REG, JMP);
