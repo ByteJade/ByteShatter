@@ -46,7 +46,7 @@ void cache_clear(void) {
 uint16_t cache_block_start(Context* context) {
     context->block = anchor->blocks + anchor->blocks_p;
     context->block->offsets = 0;
-    context->block->gp_lo = get_gp();
+    context->block->gp_lo = context->gp;
     context->block->hp = context->hp;
     anchor->blocks_p++;
     if (anchor->blocks_p >= anchor->blocks_c) {
@@ -55,14 +55,14 @@ uint16_t cache_block_start(Context* context) {
     return anchor->blocks_p-1;
 }
 void cache_block_point(struct Context* context) {
-    uint16_t goff = get_gp() - context->block->gp_lo;
+    uint16_t goff = context->gp - context->block->gp_lo;
     if (goff == 0) return;
     uint16_t hogg = context->hp - context->block->hp;
     if (goff > UINT8_MAX || hogg > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
         cache_block_end(context);
         cache_block_start(context);
-        goff = get_gp() - context->block->gp_lo;
+        goff = context->gp - context->block->gp_lo;
         hogg = context->hp - context->block->hp;
     }
     OffsetUnit* offset = &anchor->offsets[anchor->offsets_p+context->loffp];
@@ -76,7 +76,7 @@ void cache_block_point(struct Context* context) {
     }
 }
 void cache_block_end(struct Context* context) {
-    context->block->end = get_gp() - context->block->gp_lo;
+    context->block->end = context->gp - context->block->gp_lo;
     context->block->offsets = anchor->offsets_p;
     context->block->offsetssz = context->loffp;
     anchor->offsets_p += context->loffp;
@@ -88,7 +88,7 @@ void cache_block_end(struct Context* context) {
     __builtin___clear_cache(start, end);
     anchor->host_p = context->hp;
 }
-uint16_t cache_patch_point(uint8_t type, int offset) {
+uint16_t cache_patch_point(Context* context, uint8_t type, int offset) {
     if (offset < INT32_MIN || offset > INT32_MAX) {
         /* I don't know yet how to
            work with such jumps */
@@ -97,7 +97,7 @@ uint16_t cache_patch_point(uint8_t type, int offset) {
     PatchUnit* jump = anchor->jumps + anchor->jumps_p;
     jump->type = type;
     // where to jump (relative to the start of the block)
-    jump->guest_off = get_gp() + offset;
+    jump->guest_off = context->gp + offset;
     return ++anchor->jumps_p;
 }
 uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
@@ -168,8 +168,7 @@ void cache_print(int block) {
     printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = anchor->host + unit->hp;
     Context context;
-    setup_context(&context, unit->gp_lo);
-    set_gp(unit->gp_lo);
+    setup_context(&context,((uint64_t)anchor->gp_hi<<32) + unit->gp_lo);
     int start = 0;
     for (int x = 0; x < unit->offsetssz; x++) {
         OffsetUnit* offsets = (anchor->offsets + unit->offsets);
