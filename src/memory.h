@@ -44,14 +44,14 @@ inline uint16_t fetch16(Context* cotnext) {
 }
 /* fetch 4 bytes from guest memory */
 inline uint32_t fetch32(Context* cotnext) {
-    uint16_t* src = (uint16_t*)(cotnext->guest + cotnext->gp);
-    cotnext->gp += 2;
+    uint32_t* src = (uint32_t*)(cotnext->guest + cotnext->gp);
+    cotnext->gp += 4;
     return *src;
 }
 /* fetch 8 bytes from guest memory */
 inline uint32_t fetch64(Context* cotnext) {
-    uint16_t* src = (uint16_t*)(cotnext->guest + cotnext->gp);
-    cotnext->gp += 2;
+    uint64_t* src = (uint64_t*)(cotnext->guest + cotnext->gp);
+    cotnext->gp += 8;
     return *src;
 }
 
