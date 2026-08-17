@@ -1,6 +1,7 @@
 #ifndef DECODER_H
 #define DECODER_H
 
+#include "memory.h"
 #include <stdint.h>
 
 enum Prefixes {
@@ -81,13 +82,14 @@ typedef struct {
     Operand b;
 } Instruction;
 
-int64_t fetch_imm8(void);
-int64_t fetch_imm32(void);
-void decode_r_rm(Instruction* buf);
-void decode_rm_r(Instruction* buf);
-void decode_rm(Operand* op, uint8_t modrm);
-void decode_0F(Instruction* buf);
-int decode_instr(Instruction* buf);
+#define fetch_imm8 ((int64_t)(int8_t)fetch8())
+#define fetch_imm32 ((int64_t)(int32_t)fetch32())
+
+void decode_r_rm(Context* context, Instruction* buf);
+void decode_rm_r(Context* context, Instruction* buf);
+void decode_rm(Context* context, Operand* op, uint8_t modrm);
+void decode_0F(Context* context, Instruction* buf);
+int decode_instr(Context* context, Instruction* buf);
 void decode(uint32_t gp);
 
 #endif
