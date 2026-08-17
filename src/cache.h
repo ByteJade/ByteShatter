@@ -61,10 +61,10 @@ PatchUnit* cache_get_patch(uint16_t patch_id);
 /* get pointer to block data */
 CacheUnit* cache_get_block(uint16_t block_id);
 
+Anchor* cache_get_anchor(uint64_t guest);
+
 /* fix instruction pointer if patch */
 void cache_back();
-/* update code after patching */
-void cache_flush(uint16_t block_id);
 /* how much memory used */
 uint32_t cache_usage(void);
 /* show recompiled block */

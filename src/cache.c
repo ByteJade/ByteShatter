@@ -82,7 +82,11 @@ void cache_block_end(void) {
     last_block->offsetssz = loffp;
     anchor->offsets_p += loffp;
     loffp = 0;
-    cache_flush(anchor->blocks_p-1);
+
+    uint32_t* start = get_host() + last_block->hp;
+    uint32_t* end = get_host() + get_hp();
+    print("flush cache %x-%x;", last_block->hp, (start - end)*4);
+    __builtin___clear_cache(start, end);
 }
 uint16_t cache_patch_point(uint8_t type, int offset) {
     if (offset < INT32_MIN || offset > INT32_MAX) {
@@ -146,16 +150,13 @@ CacheUnit* cache_get_block(uint16_t block_id) {
     }
     return anchor->blocks + block_id;
 }
+Anchor* cache_get_anchor(uint64_t guest) {
+    ((void)guest);
+    return anchor;
+}
 
 void cache_back() {
     //(local_offsets)[loffp-1].hoff--;
-}
-void cache_flush(uint16_t block_id) {
-    CacheUnit* unit = anchor->blocks + block_id;
-    uint32_t* code = get_host() + unit->hp;
-    uint32_t size = (anchor->offsets + unit->offsets)[unit->offsetssz-1].hoff+8;
-    print("flush cache %x-%x; block %i", unit->hp, unit->hp+size, block_id);
-    __builtin___clear_cache(code, code + size);
 }
 uint32_t cache_usage(void) {
     return anchor->blocks_p * sizeof(CacheUnit) +

@@ -1,4 +1,5 @@
 #include "memory.h"
+#include "cache.h"
 #include "core.h"
 #include <stddef.h>
 #include <stdint.h>
@@ -14,6 +15,17 @@ and host mutex
 uint32_t hostsz = 0;
 uint32_t gp = 0;
 uint32_t hp = 0;
+
+void setup_context(Context* context, uint64_t gp) {
+    Anchor* current = cache_get_anchor(gp);
+    context->block = NULL;
+    context->offsets = current->offsets + current->offsets_p;
+    context->guest = (uint8_t*)(gp & (~UINT32_MAX));
+    context->host = current->host;
+    context->gp = gp;
+    context->hp = current->host_p;
+    context->loffp = 0;
+}
 
 void memory_init(uint32_t guest_size) {
     hostsz = guest_size;

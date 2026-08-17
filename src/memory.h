@@ -2,6 +2,19 @@
 #define MEMORY_H
 
 #include <stdint.h>
+#include "cache.h"
+
+typedef struct {
+   CacheUnit* block;
+   OffsetUnit* offsets;
+   uint8_t* guest;
+   uint32_t* host;
+   uint32_t gp;
+   uint32_t hp;
+   uint8_t loffp;
+} Context;
+
+void setup_context(Context* context, uint64_t gp);
 
 void memory_init(uint32_t guest_size);
 void memory_fini(void);
