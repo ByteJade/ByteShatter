@@ -1,7 +1,6 @@
 #include "patcher.h"
 #include "core.h"
 #include "cache.h"
-#include "memory.h"
 #include "decoder.h"
 #include "arm64emitter.h"
 #include "printer_x86.h"
@@ -9,7 +8,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <signal.h>
-#include <stdlib.h>
+#include <sys/unistd.h>
 #include <stdio.h>
 
 static struct sigcontext* sc;
