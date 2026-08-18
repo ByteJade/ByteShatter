@@ -15,9 +15,9 @@
 
 Anchor* anchor;
 
-void cahce_init(uint64_t gp) {
+void cahce_init(uint64_t guest, uint32_t* host, uint32_t size) {
     anchor = malloc(sizeof(Anchor));
-    anchor->gp_hi = gp >> 32;
+    anchor->gp_hi = guest >> 32;
     anchor->offsets_p = 0;
     anchor->offsets_c = MAX_OFFSETS * sizeof(OffsetUnit);
     anchor->offsets = (OffsetUnit*) malloc(anchor->offsets_c);
@@ -25,8 +25,8 @@ void cahce_init(uint64_t gp) {
     anchor->blocks_c = MAX_BLOCKS * sizeof(CacheUnit);
     anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c);
     anchor->host_p = 0;
-    //anchor->host_c = 0;
-    anchor->host = get_host();
+    anchor->host_c = size;
+    anchor->host = host;
     anchor->jumps_p = 0;
     anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
     anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);

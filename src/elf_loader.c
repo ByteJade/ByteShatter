@@ -24,9 +24,11 @@ void mmap_base(Elf* elf) {
     }
     min &= ~(PAGE_SIZE - 1);
     max = (max + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-    memory_init(max);
-    elf->base = (uint8_t*)mmap_guest(max - min);
+    uint32_t size = max - min;
+    memory_init(size);
+    elf->base = (uint8_t*)mmap_guest(size);
     elf->base -= min;
+    cahce_init((uint64_t)elf->base, get_host(), size);
 }
 
 Elf* elf_load(const char* filename) {
