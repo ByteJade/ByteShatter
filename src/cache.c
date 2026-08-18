@@ -30,6 +30,7 @@ void cahce_init(uint64_t guest, uint32_t* host) {
     anchor->jumps_p = 0;
     anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
     anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);
+    print("Anchor create %p", anchor->host);
 }
 void cahce_fini(void) {
     if (anchor->blocks) free(anchor->blocks);
