@@ -10,7 +10,7 @@
 #include <string.h>
 
 #define MAX_BLOCKS 512
-#define MAX_JUMPS 255
+#define MAX_JUMPS 512
 #define MAX_OFFSETS 24576
 
 Anchor* anchor;
