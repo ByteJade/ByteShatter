@@ -37,8 +37,8 @@ Elf* elf_load(const char* filename) {
     if (fp == NULL) return NULL;
     Elf* elf = (Elf*)calloc(1, sizeof(Elf));
     fread(&elf->head, sizeof(Elf64_Ehdr), 1, fp);
-    elf->pheads = malloc(sizeof(Elf64_Phdr) * elf->head.e_phnum);
-    elf->sheads = malloc(sizeof(Elf64_Shdr) * elf->head.e_shnum);
+    elf->pheads = (Elf64_Phdr*)malloc(sizeof(Elf64_Phdr) * elf->head.e_phnum);
+    elf->sheads = (Elf64_Shdr*)malloc(sizeof(Elf64_Shdr) * elf->head.e_shnum);
     fseek(fp, elf->head.e_phoff, SEEK_SET);
     fread(elf->pheads, sizeof(Elf64_Phdr), elf->head.e_phnum, fp);
     fseek(fp, elf->head.e_shoff, SEEK_SET);
