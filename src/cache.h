@@ -37,7 +37,7 @@ typedef struct {
     uint32_t jumps_c;
 } Anchor;
 
-void cahce_init(uint64_t gp);
+void cahce_init(uint64_t guest, uint32_t* host, uint32_t size);
 void cahce_fini(void);
 
 typedef struct Context Context;
