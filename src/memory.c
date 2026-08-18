@@ -22,6 +22,7 @@ void setup_context(Context* context, uint64_t gp) {
     context->gp = gp;
     context->hp = current->host_p;
     context->loffp = 0;
+    print("Setup context %p-%x", context->guest, context->gp);
 }
 
 void memory_init(uint32_t guest_size) {
