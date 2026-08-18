@@ -17,12 +17,14 @@ void usage(void) {
     exit(0);
 }
 
+int debug = 0;
+
 int read_argv(int argc, char** argv) {
     for (int i = 1; i < argc; i++) {
         char* arg = argv[i];
         if (arg[0] == '-') {
             switch (arg[1]) {
-                case 'd': debug_enable(); break;
+                case 'd': debug = 1; break;
                 case 'l': set_log_level(arg[2]); break;
                 case 'h':
                 default: usage();
@@ -50,7 +52,7 @@ int main(int argc, char** argv, const char** envp) {
     }
     push_argc();
     
-    debug_wait();
+    if (debug) debug_enable();
     execute((uint64_t)elf->base + elf->head.e_entry);
 
     elf_close(elf);

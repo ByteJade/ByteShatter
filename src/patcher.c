@@ -43,9 +43,9 @@ void print_flags(void) {
     printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
 }
 void print_cpu(void) {
-    printf("PC:  %llX\n", sc->pc);
+    printf("PC:  %lX\n", get_pc());
     for (int i = 0; i < 16; i++) {
-        printf("%s: %llX\n", regs64[i], sc->regs[x64_regs[i]]);
+        printf("%s: %lX\n", regs64[i], sc->regs[x64_regs[i]]);
     }
     print_flags();
 }
@@ -70,7 +70,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
         return;
     }
     print("ret: %x", ret);
-    Anchor* anchor = cache_get_anchor(sc->pc);
+    Anchor* anchor = cache_get_anchor((uint64_t)pc);
     PatchUnit* patch = cache_get_patch(ret);
     uint64_t addr = ((uint64_t)anchor->gp_hi<<32)+patch->guest_off;
     print("patch: %lx", addr);

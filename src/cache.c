@@ -45,14 +45,17 @@ void cache_clear(void) {
     anchor->host_p = 0;
 }
 uint16_t cache_block_start(Context* context) {
-    context->block = anchor->blocks + anchor->blocks_p;
-    context->block->offsets = 0;
-    context->block->gp_lo = context->gp;
-    context->block->hp = context->hp;
+    CacheUnit* block = anchor->blocks + anchor->blocks_p;
+    block->offsets = 0;
+    block->offsetssz = 0;
+    block->end = 0;
+    block->gp_lo = context->gp;
+    block->hp = context->hp;
     anchor->blocks_p++;
     if (anchor->blocks_p >= anchor->blocks_c) {
         panic("CACHE::BLOCKS::OVERFLOW");
     }
+    context->block = block;
     return anchor->blocks_p-1;
 }
 void cache_block_point(struct Context* context) {

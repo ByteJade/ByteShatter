@@ -20,6 +20,7 @@ static uint64_t break_pc = UINT64_MAX;
 
 void debug_enable(void) {
     enabled = 1;
+    break_block = 0;
 }
 int debug_enabled(void) {
     return enabled;
