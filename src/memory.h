@@ -16,9 +16,6 @@ typedef struct Context {
 
 void setup_context(Context* context, uint64_t gp);
 
-void memory_init(uint32_t guest_size);
-void memory_fini(void);
-
 void* mmap_guest(uint32_t guest_size);
 
 /* emit 4 bytes to host memory */
@@ -54,8 +51,5 @@ inline uint32_t fetch64(Context* cotnext) {
     cotnext->gp += 8;
     return *src;
 }
-
-/* get pointer to host memory */
-uint32_t* get_host(void);
 
 #endif

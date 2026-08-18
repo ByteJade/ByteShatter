@@ -33,8 +33,9 @@ void set_bp(uint32_t* instr) {
     break_pc = UINT64_MAX;
 }
 void debug_check_break() {
+    Anchor* anchor = cache_get_anchor(get_pc());
     CacheUnit* cache = cache_get_block(break_block);
-    if (cache) set_bp(get_host() + cache->hp);
+    if (cache) set_bp(anchor->host + cache->hp);
     uint32_t* instr = cache_search(break_pc);
     if (instr) set_bp(instr);
 }
@@ -113,7 +114,8 @@ void debug_wait(void) {
         __builtin___clear_cache(prev_instrp, prev_instrp+4);
         prev_instrp = NULL;
     }
-    current_block = cache_search_block((uint32_t*)get_pc() - get_host());
+    Anchor* anchor = cache_get_anchor(get_pc());
+    current_block = cache_search_block((uint32_t*)get_pc() - anchor->host);
     while (1) {
         printf(" <- ");
         fgets(line, sizeof(line), stdin);
@@ -133,15 +135,15 @@ void debug_wait(void) {
             }
         } else {
             if (strcmp(com, "si") == 0) {
-                Anchor* anchor = cache_get_anchor(get_pc());
                 CacheUnit* unit = cache_get_block(current_block);
                 OffsetUnit* offsets = unit->offsets + cache_offsets();
                 for (int x = 0; x < unit->offsetssz; x++) {
-                    if ((uint32_t*)get_pc() - get_host() == unit->hp + offsets[x].hoff) {
+                    if ((uint32_t*)get_pc() - anchor->host == unit->hp + offsets[x].hoff) {
                         Context context;
                         setup_context(&context, 
                             ((uint64_t)anchor->gp_hi<<32) +
-                            unit->gp_lo + offsets[x].goff);
+                            unit->gp_lo + offsets[x].goff
+                        );
                         Instruction buf;
                         decode_instr(&context, &buf);
                     }

@@ -44,7 +44,7 @@ void print_flags(void) {
     printf("Flags: N%x Z%x C%x V%x\n", N, Z, C, V);
 }
 void print_cpu(void) {
-    printf("PC:  %llX (%llX)\n", sc->pc, sc->pc - (uint64_t)get_host());
+    printf("PC:  %llX\n", sc->pc);
     for (int i = 0; i < 16; i++) {
         printf("%s: %llX\n", regs64[i], sc->regs[x64_regs[i]]);
     }
@@ -52,7 +52,7 @@ void print_cpu(void) {
 }
 void print_native_cpu(void) {
     uint32_t* pc = (uint32_t*)get_pc();
-    printf("PC:  %p (%p)\n", pc, (void*)((uint64_t)pc - (uint64_t)get_host()));
+    printf("PC:  %p\n", pc);
     for (int i = 0; i < 31; i++) {
         printf("X%i: %llX\n", i, sc->regs[i]);
     }

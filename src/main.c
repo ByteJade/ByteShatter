@@ -1,6 +1,4 @@
 #include "core.h"
-#include "memory.h"
-#include "cache.h"
 #include "elf_loader.h"
 #include "patcher.h"
 #include "stack.h"
@@ -39,7 +37,6 @@ int main(int argc, char** argv, const char** envp) {
     set_envp(envp);
     int end = read_argv(argc, argv);
     Elf* elf = elf_load(argv[end]);
-    cahce_init((uint64_t)elf->base);
 
     elf_read_dynamic(elf);
     patcher_init();
@@ -56,8 +53,6 @@ int main(int argc, char** argv, const char** envp) {
     execute((uint64_t)elf->base + elf->head.e_entry);
 
     elf_close(elf);
-    cahce_fini();
-    memory_fini();
     stack_fini();
     success("anythink");
 }

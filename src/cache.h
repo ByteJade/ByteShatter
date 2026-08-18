@@ -37,8 +37,7 @@ typedef struct {
     uint32_t jumps_c;
 } Anchor;
 
-void cahce_init(uint64_t gp);
-void cahce_fini(void);
+void cache_anchor_create(uint64_t guest, uint32_t* host, uint32_t size);
 
 typedef struct Context Context;
 /* clear all data */
