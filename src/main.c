@@ -1,5 +1,4 @@
 #include "core.h"
-#include "memory.h"
 #include "cache.h"
 #include "elf_loader.h"
 #include "patcher.h"
@@ -56,7 +55,6 @@ int main(int argc, char** argv, const char** envp) {
 
     elf_close(elf);
     cahce_fini();
-    memory_fini();
     stack_fini();
     success("anythink");
 }
