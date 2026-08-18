@@ -16,7 +16,7 @@
 Anchor* anchor;
 
 void cahce_init(uint64_t guest, uint32_t* host, uint32_t size) {
-    anchor = malloc(sizeof(Anchor));
+    anchor = (Anchor*) malloc(sizeof(Anchor));
     anchor->gp_hi = guest >> 32;
     anchor->offsets_p = 0;
     anchor->offsets_c = MAX_OFFSETS * sizeof(OffsetUnit);
@@ -127,7 +127,7 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
 }
 uint32_t* cache_search(uint32_t gp) {
     // TODO: better cache search
-    for (int i = 0; i < anchor->blocks_p; i++) {
+    for (uint32_t i = 0; i < anchor->blocks_p; i++) {
         CacheUnit* cache = anchor->blocks + i;
         if (gp == cache->gp_lo) return anchor->host + cache->hp;
         if (cache->offsets == 0) continue;
