@@ -25,9 +25,6 @@ void setup_context(Context* context, uint64_t gp) {
     print("Setup context %p-%x", context->guest, context->gp);
 }
 
-void memory_init(uint32_t guest_size) {
-    success("host mmap %li", hostsz);
-}
 void* mmap_guest(uint32_t guest_size) {
     void* guest = mmap(
         NULL, guest_size,
@@ -48,6 +45,7 @@ void* mmap_guest(uint32_t guest_size) {
     if (host == MAP_FAILED) {
         panic("MMAP::FAIL");
     }
+    success("host mmap %li", hostsz);
     return guest;
 }
 /* get pointer to host memory */
