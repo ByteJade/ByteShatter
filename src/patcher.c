@@ -45,7 +45,7 @@ void print_flags(void) {
 void print_cpu(void) {
     printf("PC:  %lX\n", get_pc());
     for (int i = 0; i < 16; i++) {
-        printf("%s: %lX\n", regs64[i], sc->regs[x64_regs[i]]);
+        printf("%s: %llX\n", regs64[i], sc->regs[x64_regs[i]]);
     }
     print_flags();
 }
@@ -126,7 +126,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
         default:
             panic("PATCHER::UNKNOWN_PATCH");
     }
-    void* clear = (void*)pc;
+    char* clear = (char*)pc;
     __builtin___clear_cache(clear, clear + 4);
 }
 void segv_handler(int sig, siginfo_t* info, void* ucontext) {
@@ -170,18 +170,15 @@ void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     } else _exit(0);
 }
 void patcher_init(void) {
-    struct sigaction sa_trap = {
-        .sa_sigaction = brk_handler,
-        .sa_flags = SA_SIGINFO,
-    };
-    struct sigaction sa_segv = {
-        .sa_sigaction = segv_handler,
-        .sa_flags = SA_SIGINFO,
-    };
-    struct sigaction sa_segi = {
-        .sa_sigaction = segi_handler,
-        .sa_flags = SA_SIGINFO,
-    };
+    struct sigaction sa_trap;
+    sa_trap.sa_sigaction = brk_handler;
+    sa_trap.sa_flags = SA_SIGINFO;
+    struct sigaction sa_segv;
+    sa_segv.sa_sigaction = segv_handler;
+    sa_segv.sa_flags = SA_SIGINFO;
+    struct sigaction sa_segi;
+    sa_segi.sa_sigaction = segi_handler;
+    sa_segi.sa_flags = SA_SIGINFO;
     sigaction(SIGTRAP, &sa_trap, NULL);
     sigaction(SIGSEGV, &sa_segv, NULL);
     sigaction(SIGILL, &sa_segv, NULL);
