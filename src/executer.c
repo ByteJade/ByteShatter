@@ -2,7 +2,7 @@
 #include "stack.h"
 
 void execute(uint64_t address) {
-    uint64_t* sp = get_sp();
+    void* sp = get_sp();
     #if defined(__aarch64__) || defined(_M_ARM64)
     asm volatile(
         "mov sp, %0\n"
