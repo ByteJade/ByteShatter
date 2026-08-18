@@ -26,7 +26,7 @@ void cahce_init(uint64_t guest, uint32_t* host) {
     anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c);
     anchor->host_p = 0;
     //anchor->host_c = 0;
-    anchor->host = host;
+    anchor->host = get_host();
     anchor->jumps_p = 0;
     anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
     anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);

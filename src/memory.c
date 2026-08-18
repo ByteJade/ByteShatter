@@ -5,6 +5,14 @@
 #include <stdint.h>
 #include <sys/mman.h>
 
+static uint32_t* host = NULL;
+/*
+TODO: for multithreading,
+local hp and gp for each thread
+and host mutex
+*/
+uint32_t hostsz = 0;
+
 void setup_context(Context* context, uint64_t gp) {
     Anchor* current = cache_get_anchor(gp);
     context->block = NULL;
@@ -17,6 +25,19 @@ void setup_context(Context* context, uint64_t gp) {
     print("Setup context %p-%x", context->guest, context->gp);
 }
 
+void memory_init(uint32_t guest_size) {
+    hostsz = guest_size;
+    host = mmap(
+        NULL, hostsz,
+        PROT_READ | PROT_WRITE | PROT_EXEC,
+        MAP_ANON | MAP_PRIVATE,
+        -1, 0
+    );
+    if (host == MAP_FAILED) {
+        panic("MMAP::FAIL");
+    }
+    success("host mmap %li", hostsz);
+}
 void* mmap_guest(uint32_t guest_size) {
     void* guest = mmap(
         NULL, guest_size,
@@ -29,3 +50,5 @@ void* mmap_guest(uint32_t guest_size) {
     }
     return guest;
 }
+/* get pointer to host memory */
+uint32_t* get_host(void) {return host;}
