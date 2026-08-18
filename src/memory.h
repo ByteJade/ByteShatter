@@ -46,7 +46,7 @@ inline uint32_t fetch32(Context* cotnext) {
     return *src;
 }
 /* fetch 8 bytes from guest memory */
-inline uint32_t fetch64(Context* cotnext) {
+inline uint64_t fetch64(Context* cotnext) {
     uint64_t* src = (uint64_t*)(cotnext->guest + cotnext->gp);
     cotnext->gp += 8;
     return *src;
