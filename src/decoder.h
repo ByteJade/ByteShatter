@@ -82,9 +82,6 @@ typedef struct {
     Operand b;
 } Instruction;
 
-#define fetch_imm8 ((int64_t)(int8_t)fetch8(context))
-#define fetch_imm32 ((int64_t)(int32_t)fetch32(context))
-
 void decode_r_rm(Context* context, Instruction* buf);
 void decode_rm_r(Context* context, Instruction* buf);
 void decode_rm(Context* context, Operand* op, uint8_t modrm);

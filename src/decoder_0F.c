@@ -84,7 +84,7 @@ void decode_0F(Context* context, Instruction* buf) {
         case 0x80 ... 0x8F:
             buf->type = byte - 0x80 + JO;
             buf->a.type = IMM;
-            buf->a.imm = fetch_imm32;
+            buf->a.imm = (int64_t)(int32_t)fetch32(context);
             buf->b.type = NONE;
             break;
         case 0x90 ... 0x9F:

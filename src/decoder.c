@@ -21,23 +21,23 @@ void decode_rm(Context* context, Operand* op, uint8_t modrm) {
 
             if (op->reg == 5 && mod == 0) {
                 op->type |= IMM;
-                op->imm = fetch_imm32;
+                op->imm = (int64_t)(int32_t)fetch32(context);
             } else {
                 op->type |= REG;
             }
         } else if (mod == 0 && rm == 5) {
             op->type |= IMM;
-            op->imm = fetch_imm32;
+            op->imm = (int64_t)(int32_t)fetch32(context);
         } else {
             op->type |= REG;
             op->reg = rm;
         }
         if (mod == 1) {
             op->type |= IMM;
-            op->imm = fetch_imm8;
+            op->imm = (int64_t)(int8_t)fetch8(context);
         } else if (mod == 2) {
             op->type |= IMM;
-            op->imm = fetch_imm32;
+            op->imm = (int64_t)(int32_t)fetch32(context);
         }
     } else {
         op->type = REG;
@@ -83,8 +83,8 @@ void decode_GRP0(Context* context, Instruction* buf, uint8_t byte) {
         buf->a.reg = RAX;
         buf->b.type = IMM;
         if (buf->size == 8)
-            buf->b.imm = fetch_imm8;
-        else buf->b.imm = fetch_imm32;
+            buf->b.imm = (int64_t)(int8_t)fetch8(context);
+        else buf->b.imm = (int64_t)(int32_t)fetch32(context);
     }
 }
 void decode_GRP3(Instruction* buf, uint8_t code) {
@@ -157,19 +157,19 @@ int decode_instr(Context* context, Instruction* buf) {
         case 0x68:
             buf->type = PUSH;
             buf->a.type = IMM;
-            buf->a.imm = fetch_imm32;
+            buf->a.imm = (int64_t)(int32_t)fetch32(context);
             buf->b.type = NONE;
             break;
         case 0x6A:
             buf->type = PUSH;
             buf->a.type = IMM;
-            buf->a.imm = fetch_imm8;
+            buf->a.imm = (int64_t)(int8_t)fetch8(context);
             buf->b.type = NONE;
             break;
         case 0x70 ... 0x7F:
             buf->type = JO + byte - 0x70;
             buf->a.type = IMM;
-            buf->a.imm = fetch_imm8;
+            buf->a.imm = (int64_t)(int8_t)fetch8(context);
             buf->b.type = NONE;
             break;
         case 0x80: 
@@ -182,8 +182,8 @@ int decode_instr(Context* context, Instruction* buf) {
             decode_rm(context, &buf->a, modrm);
             buf->b.type = IMM;
             if (byte == 0x81) {
-                buf->b.imm = fetch_imm32;
-            } else buf->b.imm = fetch_imm8;
+                buf->b.imm = (int64_t)(int32_t)fetch32(context);
+            } else buf->b.imm = (int64_t)(int8_t)fetch8(context);
         } break;
         case 0x84:
             buf->size = 8;
@@ -227,10 +227,10 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->b.type = IMM;
             if (byte < 0xB8) {
                 buf->size = 8;
-                buf->b.imm = fetch_imm8;
+                buf->b.imm = (int64_t)(int8_t)fetch8(context);
             }else {
                 if (rex & 8) buf->b.imm = fetch64(context);
-                else buf->b.imm = fetch_imm32;
+                else buf->b.imm = (int64_t)(int32_t)fetch32(context);
             }
             break;
         case 0xC0: case 0xC1:
@@ -244,7 +244,7 @@ int decode_instr(Context* context, Instruction* buf) {
             if (byte < 0xD2) {
                 buf->b.type = IMM;
                 if (byte > 0xC1) buf->b.imm = 1;
-                else buf->b.imm = fetch_imm8;
+                else buf->b.imm = (int64_t)(int8_t)fetch8(context);
             } else {
                 buf->b.type = REG;
                 buf->b.reg = RCX;
@@ -262,14 +262,14 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->type = MOV;
             decode_rm(context, &buf->a, fetch8(context));
             buf->b.type = IMM;
-            buf->b.imm = fetch_imm8;
+            buf->b.imm = (int64_t)(int8_t)fetch8(context);
             break;
         case 0xC7:
             buf->reverse = 1;
             buf->type = MOV;
             decode_rm(context, &buf->a, fetch8(context));
             buf->b.type = IMM;
-            buf->b.imm = fetch_imm32;
+            buf->b.imm = (int64_t)(int32_t)fetch32(context);
             break;
         case 0xC9:
             buf->type = LEAVE;
@@ -279,14 +279,14 @@ int decode_instr(Context* context, Instruction* buf) {
         case 0xE9:
             buf->type = CALL + (byte - 0xE8);
             buf->a.type = IMM;
-            buf->a.imm = fetch_imm32;
+            buf->a.imm = (int64_t)(int32_t)fetch32(context);
             buf->b.type = NONE;
             if (buf->type == JMP) ret = 1;
             break;
         case 0xEB:
             buf->type = JMP;
             buf->a.type = IMM;
-            buf->a.imm = fetch_imm8;
+            buf->a.imm = (int64_t)(int8_t)fetch8(context);
             buf->b.type = NONE;
             ret = 1;
             break;
