@@ -9,7 +9,7 @@ typedef struct {
 } OffsetUnit;
 
 typedef struct {
-    uint32_t guest_off;
+    int32_t guest_off;
     uint8_t type;
 } PatchUnit;
 
@@ -37,7 +37,7 @@ typedef struct {
     uint32_t jumps_c;
 } Anchor;
 
-void cahce_init(uint64_t guest, uint32_t* host);
+void cahce_init(uint64_t gp);
 void cahce_fini(void);
 
 typedef struct Context Context;
