@@ -26,16 +26,6 @@ void setup_context(Context* context, uint64_t gp) {
 }
 
 void memory_init(uint32_t guest_size) {
-    hostsz = guest_size;
-    host = mmap(
-        NULL, hostsz,
-        PROT_READ | PROT_WRITE | PROT_EXEC,
-        MAP_ANON | MAP_PRIVATE,
-        -1, 0
-    );
-    if (host == MAP_FAILED) {
-        panic("MMAP::FAIL");
-    }
     success("host mmap %li", hostsz);
 }
 void* mmap_guest(uint32_t guest_size) {
@@ -46,6 +36,16 @@ void* mmap_guest(uint32_t guest_size) {
         -1, 0
     );
     if (guest == MAP_FAILED) {
+        panic("MMAP::FAIL");
+    }
+    hostsz = guest_size;
+    host = mmap(
+        NULL, hostsz,
+        PROT_READ | PROT_WRITE | PROT_EXEC,
+        MAP_ANON | MAP_PRIVATE,
+        -1, 0
+    );
+    if (host == MAP_FAILED) {
         panic("MMAP::FAIL");
     }
     return guest;
