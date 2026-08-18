@@ -30,6 +30,7 @@ void mmap_base(Elf* elf) {
     mprotect(host, size, PROT_READ | PROT_WRITE | PROT_EXEC);
     cahce_init((uint64_t)elf->base, host);
     //cache_anchor_create((uint64_t)elf->base, host, size);
+    memory_init(size);
     elf->base -= min;
 }
 

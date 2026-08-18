@@ -1,4 +1,5 @@
 #include "core.h"
+#include "memory.h"
 #include "cache.h"
 #include "elf_loader.h"
 #include "patcher.h"
