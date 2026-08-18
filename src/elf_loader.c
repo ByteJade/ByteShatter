@@ -54,8 +54,8 @@ Elf* elf_load(const char* filename) {
             }
         }
     }
-    cahce_init((uint64_t)elf->base);
     fclose(fp);
+    cahce_init((uint64_t)elf->base);
     return elf;
 }
 void elf_close(Elf* elf) {
