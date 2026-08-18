@@ -24,7 +24,7 @@ void open_library(const char* filename) {
     }
     if (lib_count >= lib_capacity) {
         lib_capacity += 4;
-        libs = realloc(libs, lib_capacity * sizeof(Lib));
+        libs = (Lib*)realloc(libs, lib_capacity * sizeof(Lib));
     }
     char fullpath[512];
     Lib* lib = libs + lib_count;
@@ -41,10 +41,10 @@ void open_library(const char* filename) {
     lib->name = strdup(filename);
     lib_count++;
 }
-char* get_symbol(const char* symbol) {
+void* get_symbol(const char* symbol) {
     return dlsym(RTLD_DEFAULT, symbol);
 }
-char* get_symbol_wrapped(const char* symbol) {
+void* get_symbol_wrapped(const char* symbol) {
     char my_symbol[512];
     snprintf(
         my_symbol, sizeof(my_symbol),
