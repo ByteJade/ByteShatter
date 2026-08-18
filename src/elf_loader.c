@@ -24,8 +24,12 @@ void mmap_base(Elf* elf) {
     }
     min &= ~(PAGE_SIZE - 1);
     max = (max + PAGE_SIZE - 1) & ~(PAGE_SIZE - 1);
-    memory_init(max);
-    elf->base = (uint8_t*)mmap_guest(max - min);
+    size_t size = max - min;
+    elf->base = (uint8_t*)mmap_guest(size*2);
+    uint32_t* host = (uint32_t*)(elf->base + size);
+    mprotect(host, size, PROT_READ | PROT_WRITE | PROT_EXEC);
+    cahce_init((uint64_t)elf->base, host);
+    //cache_anchor_create((uint64_t)elf->base, host, size);
     elf->base -= min;
 }
 

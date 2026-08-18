@@ -55,7 +55,4 @@ inline uint32_t fetch64(Context* cotnext) {
     return *src;
 }
 
-/* get pointer to host memory */
-uint32_t* get_host(void);
-
 #endif
