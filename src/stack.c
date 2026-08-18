@@ -14,7 +14,7 @@ uint64_t* sp = NULL;
 int argc = 0;
 
 void stack_init(void) {
-    stack = mmap(
+    stack = (uint8_t*)mmap(
         NULL, STACK_SIZE,
         PROT_READ | PROT_WRITE,
         MAP_STACK | MAP_ANON | MAP_PRIVATE,
