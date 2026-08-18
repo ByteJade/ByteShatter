@@ -168,7 +168,7 @@ void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     sc = (struct sigcontext*)&ctx->uc_mcontext;
     if (debug_enabled()) {
         debug_wait();
-    } else exit(0);
+    } else _exit(0);
 }
 void patcher_init(void) {
     struct sigaction sa_trap = {
