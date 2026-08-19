@@ -257,17 +257,17 @@ void encode(Context* context, Instruction* buf) {
         } break;
         case SHL:{
             if (t0 == REG && t1 == IMM)
-                emit_lsl_imm(r0, r1, buf->b.imm);
+                emit_lsl_imm(r0, r0, buf->b.imm);
             else panic("ENCODER::UNHANDLED_SHL");  
         } break;
         case SHR:{
             if (t0 == REG && t1 == IMM)
-                emit_lsr_imm(r0, r1, buf->b.imm);
+                emit_lsr_imm(r0, r0, buf->b.imm);
             else panic("ENCODER::UNHANDLED_SHR");
         } break;
         case SAR:{
             if (t0 == REG && t1 == IMM)
-                emit_asr_imm(r0, r1, buf->b.imm);
+                emit_asr_imm(r0, r0, buf->b.imm);
             else panic("ENCODER::UNHANDLED_SAR");
         } break;
         case MOVSX: {
