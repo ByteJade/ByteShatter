@@ -99,9 +99,9 @@ char* sprint_op(Instruction* buf, char* out, Operand* op) {
                 else out += sprintf(out, "rip ");
             }
             if (op->imm < 0)
-                out += sprintf(out, "- %llx ", -op->imm);
+                out += sprintf(out, "- %lx ", -op->imm);
             if (op->imm > 0)
-                out += sprintf(out, "+ %llx ", op->imm);
+                out += sprintf(out, "+ %lx ", op->imm);
         }
         out += sprintf(out, "] ");
     }
