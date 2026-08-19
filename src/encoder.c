@@ -91,9 +91,9 @@ void emit_imm(Context* context, int64_t imm, uint8_t rd) {
     return;
 mov64:
     emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
-    emit32(context, 0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
-    emit32(context, 0x72800000 | (2<<21) | (((imm>>32)&0xFFFF) << 5) | rd);
-    emit32(context, 0x72800000 | (3<<21) | (((imm>>48)&0xFFFF) << 5) | rd);
+    emit32(context, 0x72A00000 | (((imm>>16)&0xFFFF) << 5) | rd);
+    emit32(context, 0x72C00000 | (((imm>>32)&0xFFFF) << 5) | rd);
+    emit32(context, 0x72E00000 | (((imm>>48)&0xFFFF) << 5) | rd);
 }
 void emit_neon(Context* context, Instruction* buf, int opcode) {
     uint8_t r0 = buf->a.reg;
