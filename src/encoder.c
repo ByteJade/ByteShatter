@@ -78,7 +78,7 @@ void emit_imm(Context* context, int64_t imm, uint8_t rd) {
         else if (imm <= INT32_MAX) {
             emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
             emit32(context, 0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
-        } else goto mov64;
+        } else panic("ENCODER::64 bit constant");
     } else {
         if (~imm <= INT16_MAX)
             emit32(context, 0x92800000 | (~imm << 5) | rd);
@@ -86,14 +86,8 @@ void emit_imm(Context* context, int64_t imm, uint8_t rd) {
             emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
             emit32(context, 0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
             emit32(context, SXTW_REG | (rd << 5) | rd);
-        } else goto mov64;
+        } else panic("ENCODER::64 bit constant");
     }
-    return;
-mov64:
-    emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
-    emit32(context, 0x72A00000 | (((imm>>16)&0xFFFF) << 5) | rd);
-    emit32(context, 0x72C00000 | (((imm>>32)&0xFFFF) << 5) | rd);
-    emit32(context, 0x72E00000 | (((imm>>48)&0xFFFF) << 5) | rd);
 }
 void emit_neon(Context* context, Instruction* buf, int opcode) {
     uint8_t r0 = buf->a.reg;
@@ -263,17 +257,17 @@ void encode(Context* context, Instruction* buf) {
         } break;
         case SHL:{
             if (t0 == REG && t1 == IMM)
-                emit_lsl_imm(r0, r0, buf->b.imm);
-            else panic("ENCODER::UNHANDLED_SHL");
+                emit_lsl_imm(r0, r1, buf->b.imm);
+            else panic("ENCODER::UNHANDLED_SHL");  
         } break;
         case SHR:{
             if (t0 == REG && t1 == IMM)
-                emit_lsr_imm(r0, r0, buf->b.imm);
+                emit_lsr_imm(r0, r1, buf->b.imm);
             else panic("ENCODER::UNHANDLED_SHR");
         } break;
         case SAR:{
             if (t0 == REG && t1 == IMM)
-                emit_asr_imm(r0, r0, buf->b.imm);
+                emit_asr_imm(r0, r1, buf->b.imm);
             else panic("ENCODER::UNHANDLED_SAR");
         } break;
         case MOVSX: {
