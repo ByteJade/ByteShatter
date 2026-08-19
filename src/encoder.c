@@ -78,7 +78,7 @@ void emit_imm(Context* context, int64_t imm, uint8_t rd) {
         else if (imm <= INT32_MAX) {
             emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
             emit32(context, 0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
-        } else panic("ENCODER::64 bit constant");
+        } else goto mov64;
     } else {
         if (~imm <= INT16_MAX)
             emit32(context, 0x92800000 | (~imm << 5) | rd);
@@ -86,8 +86,11 @@ void emit_imm(Context* context, int64_t imm, uint8_t rd) {
             emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
             emit32(context, 0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
             emit32(context, SXTW_REG | (rd << 5) | rd);
-        } else panic("ENCODER::64 bit constant");
+        } else goto mov64;
     }
+    return;
+mov64:
+    panic("ENCODER::64 bit constant");
 }
 void emit_neon(Context* context, Instruction* buf, int opcode) {
     uint8_t r0 = buf->a.reg;
