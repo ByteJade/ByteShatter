@@ -30,6 +30,9 @@ void cahce_init(uint64_t guest, uint32_t* host, uint32_t size) {
     anchor->jumps_p = 0;
     anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
     anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);
+    anchor->jumps_reuse_p = 0;
+    anchor->jumps_reuse_c = MAX_JUMPS * sizeof(uint32_t);
+    anchor->jumps_reuse = (uint32_t*) malloc(anchor->jumps_c);
 }
 void cahce_fini(void) {
     if (anchor->blocks) free(anchor->blocks);
@@ -44,7 +47,7 @@ void cache_clear(void) {
     anchor->jumps_p = 0;
     anchor->host_p = 0;
 }
-uint16_t cache_block_start(Context* context) {
+void cache_block_start(Context* context) {
     CacheUnit* block = anchor->blocks + anchor->blocks_p;
     block->offsets = 0;
     block->offsetssz = 0;
@@ -56,7 +59,6 @@ uint16_t cache_block_start(Context* context) {
         panic("CACHE::BLOCKS::OVERFLOW");
     }
     context->block = block;
-    return anchor->blocks_p-1;
 }
 void cache_block_point(struct Context* context) {
     uint16_t goff = context->gp - context->block->gp_lo;
@@ -92,19 +94,26 @@ void cache_block_end(struct Context* context) {
     __builtin___clear_cache(start, end);
     anchor->host_p = context->hp;
 }
-uint16_t cache_patch_point(Context* context, uint8_t type, int offset) {
+uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
     if (offset < INT32_MIN || offset > INT32_MAX) {
         /* I don't know yet how to
            work with such jumps */
         panic("CACHE::JUMPS::BAD_OFFSET");
     }
-    PatchUnit* jump = anchor->jumps + anchor->jumps_p;
+    uint32_t ret;
+    if (anchor->jumps_reuse_p) {
+        ret = anchor->jumps_reuse[--anchor->jumps_reuse_p];
+    } else {
+        ret = anchor->jumps_p++;
+        if (anchor->jumps_p == anchor->jumps_c)
+            panic("CACHE::JUMPS::OVERFLOW");
+    }
+    PatchUnit* jump = anchor->jumps + ret;
     jump->type = type;
     // where to jump (relative to the start of the anchor)
     jump->guest_off = context->gp + offset;
-    if (++anchor->jumps_p == MAX_JUMPS)
-        panic("CACHE::JUMPS::OVERFLOW");
-    return anchor->jumps_p;
+    
+    return ret+1;
 }
 uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
     gp -= cache->gp_lo;
@@ -143,14 +152,14 @@ uint32_t cache_search_block(uint32_t hp) {
     }
     return UINT32_MAX;
 }
-PatchUnit* cache_get_patch(uint16_t patch_id) {
+PatchUnit* cache_get_patch(uint32_t patch_id) {
     patch_id--;
-    if (patch_id >= anchor->jumps_p) {
-        panic("CACHE::PATCH::BAD_ID %x", patch_id);
-    }
+    anchor->jumps_reuse[anchor->jumps_reuse_p++] = patch_id;
+    if (anchor->jumps_reuse_p == anchor->jumps_reuse_c)
+        panic("CACHE::REUSE_OVERFLOW");
     return anchor->jumps + patch_id;
 }
-CacheUnit* cache_get_block(uint16_t block_id) {
+CacheUnit* cache_get_block(uint32_t block_id) {
     if (block_id >= anchor->blocks_p) {
         return NULL;
     }
@@ -161,13 +170,12 @@ Anchor* cache_get_anchor(uint64_t guest) {
     return anchor;
 }
 
-void cache_back() {
-    //(local_offsets)[loffp-1].hoff--;
-}
 uint32_t cache_usage(void) {
-    return anchor->blocks_p * sizeof(CacheUnit) +
+    return sizeof(Anchor) +
+        anchor->blocks_p * sizeof(CacheUnit) +
         anchor->jumps_p * sizeof(PatchUnit) + 
-        anchor->offsets_p * sizeof(OffsetUnit);
+        anchor->offsets_p * sizeof(OffsetUnit) + 
+        anchor->jumps_reuse_p * sizeof(uint32_t);
 }
 void cache_print(int block) {
     CacheUnit* unit = anchor->blocks + block;
