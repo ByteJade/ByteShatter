@@ -147,6 +147,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
             decode(sc->pc);
         }
         sc->pc = (uint64_t)target;
+        sc->regs[28] = sc->sp;
         return;
     }
     uint32_t* code = (uint32_t*)sc->pc;
