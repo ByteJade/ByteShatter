@@ -95,18 +95,16 @@ void cache_block_end(struct Context* context) {
     anchor->host_p = context->hp;
 }
 uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
-    if (offset < INT32_MIN || offset > INT32_MAX) {
-        /* I don't know yet how to
-           work with such jumps */
-        panic("CACHE::JUMPS::BAD_OFFSET");
-    }
     uint32_t ret;
     if (anchor->jumps_reuse_p) {
         ret = anchor->jumps_reuse[--anchor->jumps_reuse_p];
+        print("pop to reuse patch %x", ret);
     } else {
-        ret = anchor->jumps_p++;
+        ret = anchor->jumps_p;
+        anchor->jumps_p++;
         if (anchor->jumps_p == anchor->jumps_c)
             panic("CACHE::JUMPS::OVERFLOW");
+        print("create new patch %x", ret);
     }
     PatchUnit* jump = anchor->jumps + ret;
     jump->type = type;
@@ -155,6 +153,7 @@ uint32_t cache_search_block(uint32_t hp) {
 PatchUnit* cache_get_patch(uint32_t patch_id) {
     patch_id--;
     anchor->jumps_reuse[anchor->jumps_reuse_p++] = patch_id;
+    print("push to reuse patch %x", patch_id);
     if (anchor->jumps_reuse_p == anchor->jumps_reuse_c)
         panic("CACHE::REUSE_OVERFLOW");
     return anchor->jumps + patch_id;
