@@ -352,15 +352,8 @@ void encode(Context* context, Instruction* buf) {
                     emit32(context, POPP | (29<<10) | 30);
                     break;
                 }
-                if (prev_instruction == POP) {
-                    patch(context, 1);
-                    emit32(context, POPP | (x64_regs[r0]<<10) | (prev_register));
-                    prev_instruction = NOP;
-                } else {
-                    emit32(context, POPR | x64_regs[r0]);
-                    prev_instruction = POP;
-                    prev_register = x64_regs[r0];
-                }
+                prev_instruction = NOP;
+                emit32(context, POPR | x64_regs[r0]);
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
