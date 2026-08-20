@@ -1,42 +1,26 @@
 #include "wrapper.h"
-#include <stdlib.h>
+#include <sys/unistd.h>
 
 // just call main and return
-void my___libc_start_main(
+__attribute__((naked)) void my___libc_start_main(
     int (*main)(int, char **, char **),
     int argc, char** argv,
     void (*init)(void), void (*fini)(void),
     void (*rtld_fini)(void), void* stack_end)
 {
-    if (init) init();
-    int out = main(argc, argv, NULL);
-    if (fini) fini();
-    exit(0);
-}
-void my___isoc23_strtol() {
     asm volatile(
-        "mov x20, x30\n"
-        "bl strtol\n"
-        "mov x30, x20\n"
-        "mov x9, x0\n"
+        "mov sp, x28\n"
+        "mov x7, x0\n"
+        "mov x0, x1\n"
+        "mov x1, x2\n"
+        "bl x7\n"
+        "mov x0, #0\n"
+        "b _exit\n"
     );
 }
-void my___isoc23_sscanf() {
-    asm volatile(
-        "mov x20, x30\n"
-        "bl sscanf\n"
-        "mov x30, x20\n"
-        "mov x9, x0\n"
-    );
-}
-void my___errno_location() {
-    asm volatile(
-        "mov x20, x30\n"
-        "bl __errno_location\n"
-        "mov x30, x20\n"
-        "mov x9, x0\n"
-    );
-}
+WRAP_FUNC(__isoc23_strtol)
+WRAP_FUNC(__isoc23_sscanf)
+WRAP_FUNC(__errno_location)
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(vsnprintf)
 WRAP_BIG_FUNC(fprintf)
