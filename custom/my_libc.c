@@ -2,22 +2,18 @@
 #include <sys/unistd.h>
 
 // just call main and return
-__attribute__((naked)) void my___libc_start_main(
-    int (*main)(int, char **, char **),
-    int argc, char** argv,
-    void (*init)(void), void (*fini)(void),
-    void (*rtld_fini)(void), void* stack_end)
-{
-    asm volatile(
-        "mov sp, x28\n"
-        "mov x7, x0\n"
-        "mov x0, x1\n"
-        "mov x1, x2\n"
-        "bl x7\n"
-        "mov x0, #0\n"
-        "b _exit\n"
-    );
-}
+__asm__(
+    ".global my___libc_start_main\n"
+    ".type my___libc_start_main, @function\n"
+    "my___libc_start_main:\n"
+    "mov sp, x28\n"
+    "mov x7, x0\n"
+    "mov x0, x1\n"
+    "mov x1, x2\n"
+    "bl x7\n"
+    "mov x0, #0\n"
+    "b _exit\n"
+);
 WRAP_FUNC(__isoc23_strtol)
 WRAP_FUNC(__isoc23_sscanf)
 WRAP_FUNC(__errno_location)
