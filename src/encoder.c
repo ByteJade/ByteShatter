@@ -346,6 +346,7 @@ void encode(Context* context, Instruction* buf) {
             if (t0 == REG) {
                 if (r0 == RBP) {
                     emit32(context, POPP | (29<<10) | 30);
+                    emit_add_signed(context, 31, 28, 0);
                     break;
                 }
                 if (prev_instruction == POP) {
