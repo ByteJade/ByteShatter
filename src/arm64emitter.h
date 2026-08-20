@@ -67,6 +67,9 @@ static uint8_t x64_regs[] = {
 #define FMOVR_NEON 0x9E670000
 #define MOV_NEON 0x4EA01C00
 
+#define STP 0xa9000000
+#define LDP 0xa9400000
+
 #define PUSHP 0xa9bf03e0
 #define POPP 0xa8c103e0
 
