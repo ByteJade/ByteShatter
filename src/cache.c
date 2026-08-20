@@ -50,6 +50,7 @@ void cache_clear(void) {
 }
 void cache_block_start(Context* context) {
     CacheUnit* block = anchor->blocks + anchor->blocks_p;
+    print("start block %x", anchor->blocks_p);
     block->offsets = 0;
     block->offsetssz = 0;
     block->end = 0;
