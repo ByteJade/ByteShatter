@@ -6,6 +6,7 @@
 #define WRAP_FUNC(func) \
     void my_##func() { \
         asm volatile( \
+            "mov sp, x28\n" \
             "mov x20, x30\n" \
             "bl " #func "\n" \
             "mov x30, x20\n" \
@@ -15,6 +16,7 @@
 #define WRAP_MED_FUNC(func) \
     void my_##func() { \
         asm volatile( \
+            "mov sp, x28\n" \
             "mov x20, x30\n" \
             "ldp x6, x7, [sp]\n" \
             "bl " #func "\n" \
@@ -25,6 +27,7 @@
 #define WRAP_BIG_FUNC(func) \
     void my_##func() { \
         asm volatile( \
+            "mov sp, x28\n" \
             "mov x20, x30\n" \
             "ldp x21, x22, [sp]\n" \
             "ldp x6, x7, [sp], #16\n" \

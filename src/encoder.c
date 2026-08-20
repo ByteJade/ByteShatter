@@ -355,15 +355,11 @@ void encode(Context* context, Instruction* buf) {
                 if (prev_instruction == POP) {
                     prev_instruction = NOP;
                     patch(context, 3);
-                    emit32(context, SF|ADD_IMM | (31 << 5) | SC2R);
-                    emit32(context, LDP | (x64_regs[r0]<<10) | (prev_register));
-                    emit_add_signed(context, 31, SC2R, 16);
+                    emit32(context, PUSHP | (x64_regs[r0]<<10) | (prev_register));
                 } else {
                     prev_instruction = POP;
                     prev_register = x64_regs[r0];
-                    emit32(context, SF|ADD_IMM | (31<<5) | SC2R);
-                    emit32(context, MFT|LDR32_REG | x64_regs[r0]);
-                    emit_add_signed(context, 31, SC2R, 8);
+                    emit32(context, POPP | x64_regs[r0]);
                 }
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
@@ -379,19 +375,16 @@ void encode(Context* context, Instruction* buf) {
                 r0 = SC1;
             }else if (r0 == RBP) {
                 emit32(context, PUSHP | (29<<10) | 30);
+                emit32(context,SF|ADD_IMM | (31 << 5) | x64_regs[RSP]);
                 break;
             }
             if (prev_instruction == PUSH) {
                 prev_instruction = NOP;
-                emit_sub_signed(context, SC2R, 31, 16);
-                emit32(context, STP | (prev_register<<10) | (SC2R<<5) | (x64_regs[r0]));
-                emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
+                emit32(context, PUSHP | (prev_register<<10) | (x64_regs[r0]));
             } else {
                 prev_instruction = PUSH;
                 prev_register = x64_regs[r0];
-                emit_sub_signed(context, SC2R, 31, 8);
-                emit32(context, MFT|STR32_REG|(SC2R<<5)|prev_register);
-                emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
+                emit32(context, PUSHR | prev_register);
             }
         } break;
         case LEAVE: {
