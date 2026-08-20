@@ -1,7 +1,9 @@
 #ifdef __aarch64__
 #define WRAP_FUNC_VOID(func) \
     void my_##func() { \
-        asm volatile("b " #func); \
+        asm volatile(\
+            "mov sp, x28\n" \
+            "b " #func); \
     }
 #define WRAP_FUNC(func) \
     void my_##func() { \
