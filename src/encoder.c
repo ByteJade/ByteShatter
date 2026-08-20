@@ -93,7 +93,7 @@ mov64:
     emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
     emit32(context, MOVK_IMM | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
     emit32(context, MOVK_IMM | (2<<21) | (((imm>>32)&0xFFFF) << 5) | rd);
-    emit32(context, MOVK_IMM | (3<<21) | ((imm>>48) << 5) | rd);
+    emit32(context, MOVK_IMM | (3<<21) | (((imm>>48)&0xFFFF) << 5) | rd);
 }
 void emit_neon(Context* context, Instruction* buf, int opcode) {
     uint8_t r0 = buf->a.reg;
