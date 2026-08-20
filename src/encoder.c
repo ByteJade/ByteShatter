@@ -339,11 +339,7 @@ void encode(Context* context, Instruction* buf) {
                 t1 = REG;
             }
             if (t0 == REG && t1 == REG) {
-                if (r0 == RSP) {
-                    emit32(context, SF|ADD_IMM | SC1R | (31 << 5));
-                    emit32(context, sf|_construct_r_r_r(AND_REG, SC1, SC1, r1));
-                    emit32(context, SF|ADD_IMM | 31 | (SC1R << 5));
-                } else emit32(context, sf|_construct_r_r_r(AND_REG, r0, r0, r1));
+                emit32(context, sf|_construct_r_r_r(AND_REG, r0, r0, r1));
             } else panic("ENCODER::UNHANDLED_AND");
         } break;
         case POP:{
