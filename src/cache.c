@@ -10,7 +10,7 @@
 #include <string.h>
 
 #define MAX_BLOCKS 512
-#define MAX_JUMPS 512
+#define MAX_JUMPS 256
 #define MAX_OFFSETS 24576
 
 Anchor* anchor;
@@ -76,8 +76,9 @@ void cache_block_point(struct Context* context) {
     offset->goff = goff;
     offset->hoff = hogg;
     context->loffp++;
+    if (anchor->offsets_p + context->loffp >= anchor->offsets_c)
+        panic("CACHE::OFFSET_OVERFLOW");
     if (context->loffp == UINT8_MAX) {
-        warning("CACHE::OFFSET::OVERFLOW");
         cache_block_end(context);
         cache_block_start(context);
     }
