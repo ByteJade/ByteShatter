@@ -24,6 +24,7 @@ static uint8_t x64_regs[] = {
 #define ANDS_REG 0x6A000000 // Only Flags!
 #define SMUL_REG 0x9b207c00
 #define MOVZ_IMM 0x52800000
+#define MOVK_IMM 0x72800000
 #define BR_IMM 0x14000000
 #define BR_REG 0xD61F0000
 #define BLR_IMM 0x94000000
@@ -90,9 +91,6 @@ static uint8_t x64_regs[] = {
     emit32(context, 0xD2800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
 #define emit_movn(rd, imm, shift) \
     emit32(context, 0x92800000 | (shift << 21) | (imm << 5) | x64_regs[rd])
-#define emit_mov32(rd, imm) \
-    emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | x64_regs[rd]); \
-    emit32(context, 0x72800000 | (1<<21) | (((imm>>16)&0xFFFF) << 5) | x64_regs[rd])
 #define emit_sub_imm(rd, rn, imm) \
     emit32(context, _construct_r_r_imm(0xD1000000, rd, rn, imm))
 #define emit_sub_reg(rd, rn, rm) \
