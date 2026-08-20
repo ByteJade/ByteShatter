@@ -351,6 +351,10 @@ void encode(Context* context, Instruction* buf) {
                 if (r0 == RBP) {
                     emit32(context, POPP | (29<<10) | 30);
                     break;
+                } else if (r0 == RSP) {
+                    emit32(context, SF|ADD_IMM | (31<<5) | SC1R);
+                    r0 = SC1;
+                    break;
                 }
                 if (prev_instruction == POP) {
                     prev_instruction = NOP;
@@ -377,8 +381,12 @@ void encode(Context* context, Instruction* buf) {
             } else if (t0&MEM) {
                 emit_load(context, SC1R,&buf->a, sf, buf->prefix);
                 r0 = SC1;
-            }else if (r0 == RBP) {
+            } else if (r0 == RBP) {
                 emit32(context, PUSHP | (29<<10) | 30);
+                break;
+            } else if (r0 == RSP) {
+                emit32(context, SF|ADD_IMM | (31<<5) | SC1R);
+                r0 = SC1;
                 break;
             }
             if (prev_instruction == PUSH) {
