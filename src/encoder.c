@@ -351,11 +351,11 @@ void encode(Context* context, Instruction* buf) {
                 if (prev_instruction == POP) {
                     prev_instruction = NOP;
                     patch(context, 1);
-                    emit32(context, PUSHP | (x64_regs[r0]<<10) | (prev_register));
+                    emit32(context, POPP | (x64_regs[r0]<<10) | (prev_register));
                 } else {
                     prev_instruction = POP;
                     prev_register = x64_regs[r0];
-                    emit32(context, POPP | x64_regs[r0]);
+                    emit32(context, POPR | x64_regs[r0]);
                 }
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
