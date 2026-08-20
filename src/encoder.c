@@ -370,8 +370,8 @@ void encode(Context* context, Instruction* buf) {
                 emit_load(context, SC1R,&buf->a, sf, buf->prefix);
                 r0 = SC1;
             }else if (r0 == RBP) {
-                emit32(context, PUSHP | (29<<10) | 30);
                 emit32(context,SF|ADD_IMM | (31 << 5) | x64_regs[RSP]);
+                emit32(context, PUSHP | (29<<10) | 30);
                 break;
             }
             if (prev_instruction == PUSH) {
@@ -386,6 +386,7 @@ void encode(Context* context, Instruction* buf) {
         case LEAVE: {
             emit_add_imm(RSP, RBP, 0);
             emit32(context, POPP | (29<<10) | 30);
+                emit32(context,SF|ADD_IMM | (x64_regs[RSP] << 5) | 31);
         } break;
         case CLTQ: {
             emit32(context, SXTW_REG | (x64_regs[RAX] << 5) | x64_regs[RAX]);
