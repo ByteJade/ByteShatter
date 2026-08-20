@@ -72,28 +72,22 @@ void emit_branch(Context* context, Instruction* buf, uint32_t code, uint8_t type
     }
 }
 void emit_imm(Context* context, int64_t imm, uint8_t rd) {
-    if (imm >= 0) {
-        if (imm <= INT16_MAX)
-            emit32(context, 0xD2800000 | (imm << 5) | rd);
-        else if (imm <= INT32_MAX) {
-            emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
-            emit32(context, MOVK_IMM | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
-        } else goto mov64;
-    } else {
-        if (~imm <= INT16_MAX)
-            emit32(context, 0x92800000 | (~imm << 5) | rd);
-        else if(~imm <= INT32_MAX) {
-            emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
-            emit32(context, MOVK_IMM | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
+    if (imm >= 0 && imm <= INT16_MAX) {
+        emit32(context, MOVZ_IMM | (imm << 5) | rd);
+    } else if (imm < 0 && ~imm <= INT16_MAX) {
+        emit32(context, 0x92800000 | (~imm << 5) | rd);
+    }else if (imm >= INT16_MIN && imm <= INT32_MAX) {
+        emit32(context, MOVZ_IMM | ((imm & 0xFFFF) << 5) | rd);
+        emit32(context, MOVK_IMM | (1 << 21) | (((imm >> 16) & 0xFFFF) << 5) | rd);
+        if (imm < 0) {
             emit32(context, SXTW_REG | (rd << 5) | rd);
-        } else goto mov64;
+        }
+    } else {
+        emit32(context, MOVZ_IMM | ((imm & 0xFFFF) << 5) | rd);
+        emit32(context, MOVK_IMM | (1 << 21) | (((imm >> 16) & 0xFFFF) << 5) | rd);
+        emit32(context, MOVK_IMM | (2 << 21) | (((imm >> 32) & 0xFFFF) << 5) | rd);
+        emit32(context, MOVK_IMM | (3 << 21) | (((imm >> 48) & 0xFFFF) << 5) | rd);
     }
-    return;
-mov64:
-    emit32(context, 0xD2800000 | ((imm&0xFFFF) << 5) | rd);
-    emit32(context, MOVK_IMM | (1<<21) | (((imm>>16)&0xFFFF) << 5) | rd);
-    emit32(context, MOVK_IMM | (2<<21) | (((imm>>32)&0xFFFF) << 5) | rd);
-    emit32(context, MOVK_IMM | (3<<21) | (((imm>>48)&0xFFFF) << 5) | rd);
 }
 void emit_neon(Context* context, Instruction* buf, int opcode) {
     uint8_t r0 = buf->a.reg;
