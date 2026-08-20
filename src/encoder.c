@@ -350,7 +350,7 @@ void encode(Context* context, Instruction* buf) {
                 }
                 if (prev_instruction == POP) {
                     prev_instruction = NOP;
-                    patch(context, 3);
+                    patch(context, 1);
                     emit32(context, PUSHP | (x64_regs[r0]<<10) | (prev_register));
                 } else {
                     prev_instruction = POP;
@@ -361,7 +361,7 @@ void encode(Context* context, Instruction* buf) {
         } break;
         case PUSH:{
             if (prev_instruction == PUSH) {
-                patch(context, 3);
+                patch(context, 1);
             }
             if (t0 == IMM) {
                 emit_imm(context, buf->a.imm, SC1R);
