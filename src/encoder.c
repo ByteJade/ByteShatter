@@ -352,8 +352,19 @@ void encode(Context* context, Instruction* buf) {
                     emit32(context, POPP | (29<<10) | 30);
                     break;
                 }
-                prev_instruction = NOP;
-                emit32(context, POPR | x64_regs[r0]);
+                if (prev_instruction == POP) {
+                    prev_instruction = NOP;
+                    patch(context, 3);
+                    emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
+                    emit32(context, LDP | (x64_regs[r0]<<10) | (prev_register));
+                    emit_add_signed(context, SC2R, 31, 16);
+                } else {
+                    prev_instruction = POP;
+                    prev_register = x64_regs[r0];
+                    emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
+                    emit32(context, POPR | x64_regs[r0]);
+                    emit_add_signed(context, SC2R, 31, 8);
+                }
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
@@ -371,10 +382,10 @@ void encode(Context* context, Instruction* buf) {
                 break;
             }
             if (prev_instruction == PUSH) {
+                prev_instruction = NOP;
                 emit_sub_signed(context, SC2R, 31, 16);
                 emit32(context, STP | (prev_register<<10) | (SC2R<<5) | (x64_regs[r0]));
                 emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
-                prev_instruction = NOP;
             } else {
                 prev_instruction = PUSH;
                 prev_register = x64_regs[r0];
