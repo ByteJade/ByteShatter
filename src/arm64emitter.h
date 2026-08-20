@@ -24,7 +24,7 @@ static uint8_t x64_regs[] = {
 #define ANDS_REG 0x6A000000 // Only Flags!
 #define SMUL_REG 0x9b207c00
 #define MOVZ_IMM 0x52800000
-#define MOVK_IMM 0x72800000
+#define MOVK_IMM 0xF2800000
 #define BR_IMM 0x14000000
 #define BR_REG 0xD61F0000
 #define BLR_IMM 0x94000000
