@@ -354,7 +354,6 @@ void encode(Context* context, Instruction* buf) {
                 } else if (r0 == RSP) {
                     emit32(context, SF|ADD_IMM | (31<<5) | SC1R);
                     r0 = SC1;
-                    break;
                 }
                 if (prev_instruction == POP) {
                     prev_instruction = NOP;
@@ -387,7 +386,6 @@ void encode(Context* context, Instruction* buf) {
             } else if (r0 == RSP) {
                 emit32(context, SF|ADD_IMM | (31<<5) | SC1R);
                 r0 = SC1;
-                break;
             }
             if (prev_instruction == PUSH) {
                 prev_instruction = NOP;
