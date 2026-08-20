@@ -5,14 +5,6 @@
 #include <stdint.h>
 #include <sys/mman.h>
 
-static uint32_t* host = NULL;
-/*
-TODO: for multithreading,
-local hp and gp for each thread
-and host mutex
-*/
-uint32_t hostsz = 0;
-
 void setup_context(Context* context, uint64_t gp) {
     Anchor* current = cache_get_anchor(gp);
     context->block = NULL;
