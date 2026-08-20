@@ -15,6 +15,7 @@ static struct sigcontext* sc;
 static int memory_check = 0;
 
 uint64_t get_reg(const char* name) {
+    if (strcmp(name, "rsp") == 0) return sc->sp;
     for (int i = 0; i < 16; i++) {
         if (strcmp(name, regs64[i]) == 0)
             return sc->regs[x64_regs[i]];
@@ -146,7 +147,6 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
             decode(sc->pc);
         }
         sc->pc = (uint64_t)target;
-        sc->regs[28] = sc->sp;
         return;
     }
     uint32_t* code = (uint32_t*)sc->pc;

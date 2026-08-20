@@ -339,30 +339,37 @@ void encode(Context* context, Instruction* buf) {
                 t1 = REG;
             }
             if (t0 == REG && t1 == REG) {
-                emit32(context, sf|_construct_r_r_r(AND_REG, r0, r0, r1));
+                if (r0 == RSP) {
+                    emit32(context, SF|ADD_IMM | SC1R | (31 << 5));
+                    emit32(context, sf|_construct_r_r_r(AND_REG, SC1, SC1, r1));
+                    emit32(context, SF|ADD_IMM | 31 | (SC1R << 5));
+                } else emit32(context, sf|_construct_r_r_r(AND_REG, r0, r0, r1));
             } else panic("ENCODER::UNHANDLED_AND");
         } break;
         case POP:{
             if (t0 == REG) {
                 if (r0 == RBP) {
                     emit32(context, POPP | (29<<10) | 30);
-                    emit_add_signed(context, 31, 28, 0);
                     break;
                 }
                 if (prev_instruction == POP) {
                     prev_instruction = NOP;
-                    patch(context, 1);
-                    emit32(context, POPP | (x64_regs[r0]<<10) | (prev_register));
+                    patch(context, 3);
+                    emit32(context, SF|ADD_IMM | (31 << 5) | SC2R);
+                    emit32(context, LDP | (x64_regs[r0]<<10) | (prev_register));
+                    emit_add_signed(context, 31, SC2R, 16);
                 } else {
                     prev_instruction = POP;
                     prev_register = x64_regs[r0];
-                    emit32(context, POPR | x64_regs[r0]);
+                    emit32(context, SF|ADD_IMM | (31<<5) | SC2R);
+                    emit32(context, MFT|LDR32_REG | x64_regs[r0]);
+                    emit_add_signed(context, 31, SC2R, 8);
                 }
             } else panic("ENCODER::UNHANDLED_POP");
         } break;
         case PUSH:{
             if (prev_instruction == PUSH) {
-                patch(context, 1);
+                patch(context, 3);
             }
             if (t0 == IMM) {
                 emit_imm(context, buf->a.imm, SC1R);
@@ -371,22 +378,25 @@ void encode(Context* context, Instruction* buf) {
                 emit_load(context, SC1R,&buf->a, sf, buf->prefix);
                 r0 = SC1;
             }else if (r0 == RBP) {
-                emit32(context,SF|ADD_IMM | (31 << 5) | x64_regs[RSP]);
                 emit32(context, PUSHP | (29<<10) | 30);
                 break;
             }
             if (prev_instruction == PUSH) {
                 prev_instruction = NOP;
-                emit32(context, PUSHP | (prev_register<<10) | (x64_regs[r0]));
+                emit_sub_signed(context, SC2R, 31, 16);
+                emit32(context, STP | (prev_register<<10) | (SC2R<<5) | (x64_regs[r0]));
+                emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
             } else {
                 prev_instruction = PUSH;
                 prev_register = x64_regs[r0];
-                emit32(context, PUSHR | prev_register);
+                emit_sub_signed(context, SC2R, 31, 8);
+                emit32(context, MFT|STR32_REG|(SC2R<<5)|prev_register);
+                emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
             }
         } break;
         case LEAVE: {
-            emit32(context, SF | ADD_IMM | (31 << 5) | x64_regs[RBP]);
-            emit32(context, 0xA8C10000 | (29 << 10) | (31<<5) | 30);
+            emit_add_imm(RSP, RBP, 0);
+            emit32(context, POPP | (29<<10) | 30);
         } break;
         case CLTQ: {
             emit32(context, SXTW_REG | (x64_regs[RAX] << 5) | x64_regs[RAX]);

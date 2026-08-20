@@ -5,7 +5,7 @@
 
 static uint8_t x64_regs[] = {
     9,3,2,14,
-    28,29,1,0,
+    31,29,1,0,
     4,5,10,11,
     16,17,18,19,
     12, 13, 30,
@@ -70,11 +70,11 @@ static uint8_t x64_regs[] = {
 #define STP 0xa9000000
 #define LDP 0xa9400000
 
-#define PUSHP 0xa9bf0380
-#define POPP 0xa8c10380
+#define PUSHP 0xa9bf03e0
+#define POPP 0xa8c103e0
 
-#define PUSHR 0xf81f8f80
-#define POPR 0xf8408780
+#define PUSHR 0xf81f8fe0
+#define POPR 0xf84087e0
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
     ((op) | ((imm) << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
