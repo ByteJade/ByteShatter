@@ -384,9 +384,8 @@ void encode(Context* context, Instruction* buf) {
             }
         } break;
         case LEAVE: {
-            emit_add_imm(RSP, RBP, 0);
-            emit32(context, POPP | (29<<10) | 30);
-                emit32(context,SF|ADD_IMM | (x64_regs[RSP] << 5) | 31);
+            emit32(context, SF | ADD_IMM | (31 << 5) | x64_regs[RBP]);
+            emit32(context, 0xA8C10000 | (29 << 10) | 30);
         } break;
         case CLTQ: {
             emit32(context, SXTW_REG | (x64_regs[RAX] << 5) | x64_regs[RAX]);
