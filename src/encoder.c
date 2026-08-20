@@ -382,14 +382,14 @@ void encode(Context* context, Instruction* buf) {
             if (prev_instruction == PUSH) {
                 emit_sub_signed(context, SC1R, 31, 16);
                 emit32(context, STP | (prev_register<<10) | (SC1R<<5) | (x64_regs[r0]));
-                emit32(context, sf|ADD_IMM | 31 | (SC1R << 5));
+                emit32(context, SF|ADD_IMM | 31 | (SC1R << 5));
                 prev_instruction = NOP;
             } else {
                 prev_instruction = PUSH;
                 prev_register = x64_regs[r0];
                 emit_sub_signed(context, SC1R, 31, 8);
                 emit32(context, MFT|STR32_REG|(SC1R<<5)|prev_register);
-                emit32(context, sf|ADD_IMM | 31 | (SC1R << 5));
+                emit32(context, SF|ADD_IMM | 31 | (SC1R << 5));
             }
         } break;
         case LEAVE: {
