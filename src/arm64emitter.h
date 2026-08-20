@@ -70,10 +70,10 @@ static uint8_t x64_regs[] = {
 #define STP 0xa9000000
 #define LDP 0xa9400000
 
-#define PUSHP 0xa9810380
+#define PUSHP 0xa9bf0380
 #define POPP 0xa8c10380
 
-#define PUSHR 0xf8008f80
+#define PUSHR 0xf81f8f80
 #define POPR 0xf8408780
 
 #define _construct_r_r_imm(op, rd, rn, imm) \
