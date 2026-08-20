@@ -61,7 +61,7 @@ uint32_t* cache_search(uint32_t gp);
 /* get pointer to host instruction at guest pointer */
 uint32_t cache_search_block(uint32_t hp);
 /* get pointer to patch data */
-PatchUnit* cache_get_patch(uint32_t patch_id);
+PatchUnit cache_get_patch(uint32_t patch_id);
 /* get pointer to block data */
 CacheUnit* cache_get_block(uint32_t block_id);
 

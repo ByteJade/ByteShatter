@@ -45,6 +45,7 @@ void cache_clear(void) {
     anchor->offsets_p = 0;
     anchor->blocks_p = 0;
     anchor->jumps_p = 0;
+    anchor->jumps_reuse_p = 0;
     anchor->host_p = 0;
 }
 void cache_block_start(Context* context) {
@@ -150,13 +151,13 @@ uint32_t cache_search_block(uint32_t hp) {
     }
     return UINT32_MAX;
 }
-PatchUnit* cache_get_patch(uint32_t patch_id) {
+PatchUnit cache_get_patch(uint32_t patch_id) {
     patch_id--;
     anchor->jumps_reuse[anchor->jumps_reuse_p++] = patch_id;
     print("push to reuse patch %x", patch_id);
     if (anchor->jumps_reuse_p == anchor->jumps_reuse_c)
         panic("CACHE::REUSE_OVERFLOW");
-    return anchor->jumps + patch_id;
+    return anchor->jumps[patch_id];
 }
 CacheUnit* cache_get_block(uint32_t block_id) {
     if (block_id >= anchor->blocks_p) {

@@ -71,8 +71,8 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     }
     print("ret: %x", ret);
     Anchor* anchor = cache_get_anchor((uint64_t)pc);
-    PatchUnit* patch = cache_get_patch(ret);
-    uint64_t addr = ((uint64_t)anchor->gp_hi<<32)+patch->guest_off;
+    PatchUnit patch = cache_get_patch(ret);
+    uint64_t addr = ((uint64_t)anchor->gp_hi<<32)+patch.guest_off;
     print("patch: %lx", addr);
     const uint32_t* block = cache_search(addr);
     if (block == NULL) {
@@ -82,7 +82,7 @@ void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     }
     int32_t offset = (block - pc);
     print("offset: %i", offset);
-    switch (patch->type) {
+    switch (patch.type) {
         case JL:
             print("patch JL");
             *pc = BLT_IMM | ((offset & 0x7FFFF) << 5);
