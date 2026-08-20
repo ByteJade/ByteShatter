@@ -10,7 +10,7 @@ __asm__(
     "mov x7, x0\n"
     "mov x0, x1\n"
     "mov x1, x2\n"
-    "bl x7\n"
+    "blr x7\n"
     "mov x0, #0\n"
     "b _exit\n"
 );
