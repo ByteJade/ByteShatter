@@ -362,7 +362,7 @@ void encode(Context* context, Instruction* buf) {
                     prev_instruction = POP;
                     prev_register = x64_regs[r0];
                     emit32(context, SF|ADD_IMM | 31 | (SC2R << 5));
-                    emit32(context, POPR | x64_regs[r0]);
+                    emit32(context, MFT|LDR32_REG | x64_regs[r0]);
                     emit_add_signed(context, SC2R, 31, 8);
                 }
             } else panic("ENCODER::UNHANDLED_POP");
