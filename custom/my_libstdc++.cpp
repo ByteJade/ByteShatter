@@ -17,7 +17,6 @@ extern "C" {
     WRAP_FUNC(_ZNSt10filesystem7__cxx114path5_ListC1ERKS2_)
     WRAP_FUNC(_ZNKSt10filesystem7__cxx1118directory_iteratordeEv)
     WRAP_FUNC(_ZNSt12shared_ptrINSt10filesystem7cxx114_DirELN9gnu_cxx12_Lock_policyE2EEC1EOS5_)
-    WRAP_FUNC(_ZNSt12__shared_ptrINSt10filesystem7__cxx114_DirELN9__gnu_cxx12_Lock_policyE2EEC1Ev)
     WRAP_FUNC(_ZNSt10filesystem7__cxx1118directory_iteratorC1ERKNS0_4pathENS_17directory_optionsEPSt10error_code)
     WRAP_FUNC(_ZNKSt10filesystem7cxx114path7compareERKS1_)
     WRAP_FUNC(_ZNSt10filesystem7cxx114path14_M_split_cmptsEv)
