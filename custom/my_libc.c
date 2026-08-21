@@ -15,7 +15,7 @@ void my___libc_start_main(
 }
 WRAP_FUNC(__isoc23_strtol)
 WRAP_FUNC(__isoc23_sscanf)
-WRAP_FUNC(my___errno_location)
+WRAP_FUNC(__errno_location)
 WRAP_BIG_FUNC(printf)
 WRAP_BIG_FUNC(vsnprintf)
 WRAP_BIG_FUNC(fprintf)
