@@ -53,7 +53,7 @@ extern "C" {
     WRAP_FUNC_VOID(_ZNSt14basic_ifstreamIcSt11char_traitsIcEED1Ev)
     WRAP_FUNC(_ZNKSi6gcountEv)
     WRAP_FUNC(_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_h)
-    WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St13_Setprecigion)
+    WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St13_Setprecision)
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St8_SetfillIS3_E)
     WRAP_FUNC_VOID(_ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev)
     WRAP_FUNC_VOID(_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEC1ERKNS_12basic_stringIcS2_S3_EESt13_Ios_Openmode)
