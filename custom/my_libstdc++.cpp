@@ -11,6 +11,7 @@ extern "C" {
     WRAP_FUNC(_ZNKSt9basic_iosIcSt11char_traitsIcEE3eofEv)
     WRAP_FUNC(_ZNKSt9basic_iosIcSt11char_traitsIcEEntEv)
     WRAP_FUNC_VOID(_ZNSt9basic_iosIcSt11char_traitsIcEE5clearESt12_Ios_Iostate)
+    WRAP_FUNC(_ZNKSt9basic_iosIcSt11char_traitsIcEEcvbEv)
 
     WRAP_FUNC(_ZNSt10filesystem7__cxx114path5_ListC1ERKS2_)
     WRAP_FUNC(_ZNKSt10filesystem7__cxx1118directory_iteratordeEv)
@@ -45,6 +46,7 @@ extern "C" {
     WRAP_FUNC(_ZNSirsERj)
     WRAP_FUNC(_ZNSirsERt)
     WRAP_FUNC(_ZNSirsERm)
+    WRAP_FUNC(_ZStrsIcSt11char_traitsIcEERSt13basic_istreamIT_T0_ES6_St8_Setbase)
     WRAP_FUNC(_ZSt7getlineIcSt11char_traitsIcESaIcEERSt13basic_istreamIT_T0_ES7_RNSt7__cxx1112basic_stringIS4_S5_T1_EE)
     WRAP_FUNC(_ZSt7getlineIcSt11char_traitsIcESaIcEERSt13basic_istreamIT_T0_ES7_RNSt7__cxx1112basic_stringIS4_S5_T1_EES4_)
     WRAP_FUNC(_ZNSt14basic_ofstreamIcSt11char_traitsIcEEC1ERKNSt7__cxx1112basic_stringIcS1_SaIcEEESt13_Ios_Openmode)
@@ -52,12 +54,16 @@ extern "C" {
     WRAP_FUNC(_ZNSt14basic_ifstreamIcSt11char_traitsIcEEC1EPKcSt13_Ios_Openmode)
     WRAP_FUNC_VOID(_ZNSt14basic_ifstreamIcSt11char_traitsIcEED1Ev)
     WRAP_FUNC(_ZNKSi6gcountEv)
+    WRAP_FUNC(_ZNSi5seekgElSt12_Ios_Seekdir)
     WRAP_FUNC(_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_h)
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St13_Setprecision)
     WRAP_FUNC(_ZStlsIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_St8_SetfillIS3_E)
     WRAP_FUNC_VOID(_ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEED1Ev)
+    WRAP_FUNC(_ZNSt7__cxx1119basic_ostringstreamIcSt11char_traitsIcESaIcEEC1ERKNS_12basic_stringIcS2_S3_EESt13_Ios_Openmode)
     WRAP_FUNC_VOID(_ZNSt7__cxx1118basic_stringstreamIcSt11char_traitsIcESaIcEEC1ERKNS_12basic_stringIcS2_S3_EESt13_Ios_Openmode)
     WRAP_FUNC_VOID(_ZNSo5flushEv)
+
+    WRAP_FUNC(_ZNSt6chrono3_V212steady_clock3nowEv)
 
     WRAP_FUNC_VOID(_Unwind_Resume)
     WRAP_FUNC_VOID(__cxa_end_catch)
