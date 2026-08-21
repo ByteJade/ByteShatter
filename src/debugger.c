@@ -17,10 +17,12 @@ static uint32_t* prev_instrp = NULL;
 static uint32_t current_block = UINT32_MAX;
 static uint32_t break_block = UINT32_MAX;
 static uint64_t break_pc = UINT64_MAX;
+static uint8_t* base;
 
-void debug_enable(void) {
+void debug_enable(Elf* elf) {
     enabled = 1;
     break_block = 0;
+    base = elf->base;
 }
 int debug_enabled(void) {
     return enabled;
@@ -125,7 +127,7 @@ void debug_wait(void) {
                 break_block = strtol(arg, NULL, 10);
                 printf("Set break point in block %X\n", break_block);
             } else if (strcmp(com, "brk") == 0) {
-                break_pc = strtol(arg, NULL, 16);
+                break_pc = (uint64_t)base + strtol(arg, NULL, 16);
                 printf("Set break point in pc %lX\n", break_pc);
             } else if (strcmp(com, "print") == 0) {
                 handle_print(arg);

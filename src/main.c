@@ -52,7 +52,7 @@ int main(int argc, char** argv, const char** envp) {
     }
     push_argc();
     
-    if (debug) debug_enable();
+    if (debug) debug_enable(elf);
     execute((uint64_t)elf->base + elf->head.e_entry);
 
     elf_close(elf);
