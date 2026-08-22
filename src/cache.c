@@ -19,20 +19,20 @@ void cahce_init(uint64_t guest, uint32_t* host, uint32_t size) {
     anchor = (Anchor*) malloc(sizeof(Anchor));
     anchor->gp_hi = guest >> 32;
     anchor->offsets_p = 0;
-    anchor->offsets_c = MAX_OFFSETS * sizeof(OffsetUnit);
-    anchor->offsets = (OffsetUnit*) malloc(anchor->offsets_c);
+    anchor->offsets_c = MAX_OFFSETS;
+    anchor->offsets = (OffsetUnit*) malloc(anchor->offsets_c * sizeof(OffsetUnit));
     anchor->blocks_p = 0;
-    anchor->blocks_c = MAX_BLOCKS * sizeof(CacheUnit);
-    anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c);
+    anchor->blocks_c = MAX_BLOCKS;
+    anchor->blocks = (CacheUnit*) malloc(anchor->blocks_c * sizeof(CacheUnit));
     anchor->host_p = 0;
     anchor->host_c = size;
     anchor->host = host;
     anchor->jumps_p = 0;
-    anchor->jumps_c = MAX_JUMPS * sizeof(PatchUnit);
-    anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c);
+    anchor->jumps_c = MAX_JUMPS;
+    anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c * sizeof(PatchUnit));
     anchor->jumps_reuse_p = 0;
-    anchor->jumps_reuse_c = MAX_JUMPS * sizeof(uint32_t);
-    anchor->jumps_reuse = (uint32_t*) malloc(anchor->jumps_c);
+    anchor->jumps_reuse_c = MAX_JUMPS;
+    anchor->jumps_reuse = (uint32_t*) malloc(anchor->jumps_c * sizeof(uint32_t));
 }
 void cahce_fini(void) {
     if (anchor->blocks) free(anchor->blocks);
