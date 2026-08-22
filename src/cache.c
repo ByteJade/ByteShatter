@@ -133,14 +133,16 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
        which will cause this exception */
     return 0;
 }
-uint32_t* cache_search(uint32_t gp) {
+uint32_t* cache_search(uint64_t gp) {
     // TODO: better cache search
+    uint32_t gp_lo = gp;
+    Anchor* anchor = cache_get_anchor(gp);
     for (uint32_t i = 0; i < anchor->blocks_p; i++) {
         CacheUnit* cache = anchor->blocks + i;
-        if (gp == cache->gp_lo) return anchor->host + cache->hp;
+        if (gp_lo == cache->gp_lo) return anchor->host + cache->hp;
         if (cache->offsets == 0) continue;
-        if (gp > cache->gp_lo && gp < cache->gp_lo + cache->end) {
-            return anchor->host + block_cache_search(gp, cache);
+        if (gp_lo >= cache->gp_lo && gp_lo <= cache->gp_lo + cache->end) {
+            return anchor->host + block_cache_search(gp_lo, cache);
         }
     }
     return NULL;
