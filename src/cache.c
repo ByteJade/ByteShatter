@@ -65,6 +65,7 @@ void cache_block_start(Context* context) {
     CacheUnit* block = anchor->blocks + insert_pos;
     block->offsets = 0;
     block->offsetssz = 0;
+    block->end = 1;
     block->gp_lo = context->gp;
     block->hp = context->hp;
     anchor->blocks_p++;
@@ -88,12 +89,13 @@ void cache_block_point(struct Context* context) {
     context->loffp++;
     if (anchor->offsets_p + context->loffp >= anchor->offsets_c)
         panic("CACHE::OFFSET_OVERFLOW");
-    if (context->loffp == UINT16_MAX) {
+    if (context->loffp == UINT8_MAX) {
         cache_block_end(context);
         cache_block_start(context);
     }
 }
 void cache_block_end(struct Context* context) {
+    context->block->end = context->hp - context->block->hp;
     context->block->offsets = anchor->offsets_p;
     context->block->offsetssz = context->loffp;
     anchor->offsets_p += context->loffp;
@@ -163,9 +165,12 @@ uint32_t* cache_search(uint64_t gp) {
     if (!loff) return NULL;
     return anchor->host + loff;
 }
-uint32_t cache_search_block(uint32_t hp) {
-    for (int i = anchor->blocks_p-1; i >= 0; i--) {
-        if (hp >= anchor->blocks[i].hp) return i;
+uint32_t cache_search_block(uint64_t hp) {
+    hp -= (uint64_t)anchor->host;
+    for (int i = 0; i < anchor->blocks_p; i++) {
+        uint32_t start = anchor->blocks[i].hp;
+        uint32_t end = start + anchor->blocks[i].end;
+        if (hp >= start && hp < end) return i;
     }
     return UINT32_MAX;
 }
@@ -207,7 +212,7 @@ void cache_print(int block) {
         decode_instr(&context, &buf);
         char out[64];
         int end;
-        if (x == unit->offsetssz) end = start+4;
+        if (x == unit->offsetssz) end = start + unit->end;
         else end = offsets[x].hoff;
         for (int y = start; y < end; y++) {
             sprint_arm(out, host[y]);

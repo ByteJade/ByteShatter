@@ -17,7 +17,8 @@ typedef struct {
     uint32_t gp_lo;
     uint32_t hp;
     uint32_t offsets;
-    uint16_t offsetssz;
+    uint8_t offsetssz;
+    uint8_t end;
 } CacheUnit;
 
 typedef struct {
@@ -58,7 +59,7 @@ uint32_t cache_patch_point(Context* context, uint8_t type, int offset);
 /* get pointer to host instruction at guest pointer */
 uint32_t* cache_search(uint64_t gp);
 /* get pointer to host instruction at guest pointer */
-uint32_t cache_search_block(uint32_t hp);
+uint32_t cache_search_block(uint64_t hp);
 /* get pointer to patch data */
 PatchUnit cache_get_patch(uint32_t patch_id);
 /* get pointer to block data */
