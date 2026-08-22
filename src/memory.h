@@ -11,7 +11,7 @@ typedef struct Context {
    uint32_t* host;
    uint32_t gp;
    uint32_t hp;
-   uint8_t loffp;
+   uint16_t loffp;
 } Context;
 
 void setup_context(Context* context, uint64_t gp);

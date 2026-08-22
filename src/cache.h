@@ -17,8 +17,7 @@ typedef struct {
     uint32_t gp_lo;
     uint32_t hp;
     uint32_t offsets;
-    uint8_t end;
-    uint8_t offsetssz;
+    uint16_t offsetssz;
 } CacheUnit;
 
 typedef struct {
