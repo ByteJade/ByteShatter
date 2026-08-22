@@ -1,9 +1,7 @@
 #include "core.h"
-#include "cache.h"
 #include "elf_loader.h"
 #include "patcher.h"
 #include "stack.h"
-#include "executer.h"
 #include "debugger.h"
 #include <stdint.h>
 #include <stdlib.h>
@@ -53,10 +51,5 @@ int main(int argc, char** argv, const char** envp) {
     push_argc();
     
     if (debug) debug_enable(elf);
-    execute((uint64_t)elf->base + elf->head.e_entry);
-
-    elf_close(elf);
-    cahce_fini();
-    stack_fini();
-    success("anythink");
+    ((void(*)(void))elf->base + elf->head.e_entry)();
 }
