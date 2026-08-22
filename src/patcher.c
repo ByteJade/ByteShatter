@@ -184,13 +184,13 @@ void segi_handler(int sig, siginfo_t* info, void* ucontext) {
     } else _exit(0);
 }
 void patcher_init(void) {
-    struct sigaction sa_trap;
+    struct sigaction sa_trap = {0};
     sa_trap.sa_sigaction = brk_handler;
     sa_trap.sa_flags = SA_SIGINFO;
-    struct sigaction sa_segv;
+    struct sigaction sa_segv = {0};
     sa_segv.sa_sigaction = segv_handler;
     sa_segv.sa_flags = SA_SIGINFO;
-    struct sigaction sa_segi;
+    struct sigaction sa_segi = {0};
     sa_segi.sa_sigaction = segi_handler;
     sa_segi.sa_flags = SA_SIGINFO;
     sigaction(SIGTRAP, &sa_trap, NULL);
