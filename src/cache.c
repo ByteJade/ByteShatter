@@ -106,6 +106,9 @@ void cache_block_end(struct Context* context) {
     print("flush cache %x-%x;", context->block->hp, end - anchor->host);
     __builtin___clear_cache(start, end);
     anchor->host_p = context->hp;
+    if (anchor->host_p >= anchor->host_c) {
+        panic("host overflow");
+    }
 }
 uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
     uint32_t ret;
