@@ -7,9 +7,9 @@
 #include <sys/wait.h>
 
 void execute(uint64_t address) {
-    pthread_t thread;
     void* sp = get_sp();
-    int flags = CLONE_VM | CLONE_SIGHAND | CLONE_THREAD | CLONE_FS | CLONE_FILES;
+    int flags = CLONE_VM | CLONE_SIGHAND | CLONE_THREAD | 
+                CLONE_FS | CLONE_FILES | CLONE_SETTLS;
     pid_t pid = clone(((int(*)(void*))address), sp, flags, NULL);
     
     waitpid(pid, NULL, __WALL);
