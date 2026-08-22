@@ -145,6 +145,7 @@ uint32_t* cache_search(uint64_t gp) {
     // TODO: better cache search
     uint32_t gp_lo = gp;
     Anchor* anchor = cache_get_anchor(gp);
+    if (anchor->blocks_p == 0) return NULL;
     CacheUnit* cache = NULL;
     int left = 0, right = anchor->blocks_p - 1;
     while (left <= right) {
@@ -155,7 +156,8 @@ uint32_t* cache_search(uint64_t gp) {
         if (gp_lo > cache->gp_lo) left = mid + 1; 
         else right = mid - 1;
     }
-    if (!cache) cache = anchor->blocks + right;
+    if (right < 0) return NULL;
+    cache = anchor->blocks + right;
     if (cache->offsets == 0) return NULL;
     uint32_t loff = block_cache_search(gp_lo, cache);
     if (!loff) return NULL;
