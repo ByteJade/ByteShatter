@@ -36,11 +36,17 @@ void set_bp(uint32_t* instr) {
     break_pc = UINT64_MAX;
 }
 void debug_check_break() {
-    Anchor* anchor = cache_get_anchor(get_pc());
     CacheUnit* cache = cache_get_block(break_block);
-    if (cache) set_bp(anchor->host + cache->hp);
+    if (cache) {
+        Anchor* anchor = cache_get_anchor(get_pc());
+        set_bp(anchor->host + cache->hp);
+        print("break block found");
+    }
     uint32_t* instr = cache_search(break_pc);
-    if (instr) set_bp(instr);
+    if (instr) {
+        set_bp(instr);
+        print("break pc found");
+    }
 }
 void help(void) {
     printf("Commands:\n");
@@ -157,7 +163,7 @@ void debug_wait(void) {
                 break_block = current_block+1;
                 break;
             } else if (strcmp(com, "run") == 0) {
-                if (break_block || break_pc) 
+                if (break_block != UINT32_MAX || break_pc != UINT64_MAX) 
                     printf("Stop at break point\n");
                 break;
             } else if (strcmp(com, "exit") == 0) {
