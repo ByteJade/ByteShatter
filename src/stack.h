@@ -4,6 +4,8 @@
 #include <elf.h>
 #include "elf_manager.h"
 
+#define STACK_SIZE 2*1024*1024
+
 void stack_init(void);
 void stack_fini(void);
 

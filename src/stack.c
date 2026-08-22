@@ -6,8 +6,6 @@
 #include <sys/auxv.h>
 #include <unistd.h>
 
-#define STACK_SIZE 2*1024*1024
-
 uint8_t* stack = NULL;
 char* dp = NULL;
 uint64_t* sp = NULL;

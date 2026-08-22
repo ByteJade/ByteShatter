@@ -1,15 +1,16 @@
+#define _GNU_SOURCE
+
 #include "executer.h"
 #include "stack.h"
+#include <sched.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 void execute(uint64_t address) {
+    pthread_t thread;
     void* sp = get_sp();
-    #if defined(__aarch64__) || defined(_M_ARM64)
-    asm volatile(
-        "mov sp, %0\n"
-        : : "r" (sp)
-        :
-    );
-    #endif
-    ((void(*)(void))address)();
-    __builtin_unreachable();
+    int flags = CLONE_VM | CLONE_SIGHAND | CLONE_THREAD | CLONE_FS | CLONE_FILES;
+    pid_t pid = clone(((int(*)(void*))address), sp, flags, NULL);
+    
+    waitpid(pid, NULL, __WALL);
 }
