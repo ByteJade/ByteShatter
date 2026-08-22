@@ -141,7 +141,7 @@ uint32_t* cache_search(uint64_t gp) {
         CacheUnit* cache = anchor->blocks + i;
         if (gp_lo == cache->gp_lo) return anchor->host + cache->hp;
         if (cache->offsets == 0) continue;
-        if (gp_lo >= cache->gp_lo && gp_lo <= cache->gp_lo + cache->end) {
+        if (gp_lo >= cache->gp_lo && gp_lo < cache->gp_lo + cache->end) {
             return anchor->host + block_cache_search(gp_lo, cache);
         }
     }
