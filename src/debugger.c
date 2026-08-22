@@ -125,7 +125,7 @@ void debug_wait(void) {
         prev_instrp = NULL;
     }
     Anchor* anchor = cache_get_anchor(get_pc());
-    current_block = cache_search_block((uint32_t*)get_pc() - anchor->host);
+    current_block = cache_search_block(get_pc());
     while (1) {
         printf(" <- ");
         fgets(line, sizeof(line), stdin);
