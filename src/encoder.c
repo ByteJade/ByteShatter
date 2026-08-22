@@ -363,13 +363,13 @@ void encode(Context* context, Instruction* buf) {
                     prev_instruction = NOP;
                     patch(context, 3);
                     emit32(context, SF|ADD_IMM | (31 << 5) | SC2R);
-                    emit32(context, LDP | (x64_regs[r0]<<10) | (prev_register));
+                    emit32(context, LDP | (x64_regs[r0]<<10) | (SC2R<<5) | (prev_register));
                     emit_add_signed(context, 31, SC2R, 16);
                 } else {
                     prev_instruction = POP;
                     prev_register = x64_regs[r0];
                     emit32(context, SF|ADD_IMM | (31<<5) | SC2R);
-                    emit32(context, MFT|LDR32_REG | x64_regs[r0]);
+                    emit32(context, MFT|LDR32_REG | (SC2R<<5)| x64_regs[r0]);
                     emit_add_signed(context, 31, SC2R, 8);
                 }
             } else panic("ENCODER::UNHANDLED_POP");
