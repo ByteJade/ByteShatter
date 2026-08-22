@@ -173,7 +173,7 @@ void encode8bit(Context* context, Instruction* buf) {
         } break;
         case CMP:{
             if (t0 == REG) {
-                emit32(context, _construct_r_r_r(SUB_IMM|S, XZR, r0, buf->b.imm));
+                emit32(context, _construct_r_r_imm(SUB_IMM|S, XZR, r0, buf->b.imm));
             } else if (t0&MEM) {
                 emit_address_decode(context, &buf->a, SC1R, buf->prefix);
                 emit32(context, _construct_r_r_imm(LDR8_REG, SC1, SC1, 0));
