@@ -111,13 +111,13 @@ void cache_block_end(struct Context* context) {
     }
 }
 uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
-    uint32_t ret;
+    uint32_t ret = 0;
     if (anchor->jumps_reuse_p) {
         ret = anchor->jumps_reuse[--anchor->jumps_reuse_p];
     } else {
         ret = anchor->jumps_p;
         anchor->jumps_p++;
-        if (anchor->jumps_p == anchor->jumps_c)
+        if (anchor->jumps_p >= anchor->jumps_c)
             panic("CACHE::JUMPS_OVERFLOW");
     }
     PatchUnit* jump = anchor->jumps + ret;
