@@ -212,7 +212,7 @@ void cache_print(int block) {
         decode_instr(&context, &buf);
         char out[64];
         int end;
-        if (x == unit->offsetssz) end = start + unit->end;
+        if (x == unit->offsetssz) end = unit->end;
         else end = offsets[x].hoff;
         for (int y = start; y < end; y++) {
             sprint_arm(out, host[y]);
