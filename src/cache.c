@@ -40,13 +40,17 @@ void cahce_fini(void) {
     if (anchor->offsets) free(anchor->offsets);
     if (anchor) free(anchor);
 }
+void my_realloc(void** data, uint32_t* size, uint32_t element_size) {
+    *size *= 2;
+    *data = realloc(*data, (size_t)*size * element_size);
+}
 
 void cache_clear(void) {
     anchor->offsets_p = 0;
     anchor->blocks_p = 0;
+    anchor->host_p = 0;
     anchor->jumps_p = 0;
     anchor->jumps_reuse_p = 0;
-    anchor->host_p = 0;
 }
 void cache_block_start(Context* context) {
     if (anchor->blocks_p+1 >= anchor->blocks_c) {
@@ -118,7 +122,7 @@ uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
         ret = anchor->jumps_p;
         anchor->jumps_p++;
         if (anchor->jumps_p >= anchor->jumps_c)
-            panic("CACHE::JUMPS_OVERFLOW");
+            my_realloc((void*)&anchor->jumps, &anchor->jumps_c, sizeof(PatchUnit));
     }
     PatchUnit* jump = anchor->jumps + ret;
     jump->type = type;
