@@ -129,6 +129,9 @@ int emit_store(Context* context, uint8_t rd, Operand* op, uint32_t sf, uint8_t p
         op->imm < 255) {
         emit32(context, sf|STUR|((op->imm&0x1FF)<<12)|(x64_regs[op->reg]<<5)|(rd));
         return 1;
+    } else if (op->type == (MEM|REG)) {
+        emit32(context, sf|STR32_REG|(x64_regs[op->reg]<<5)|rd);
+        return 1;
     } else {
         if (address) emit_address_decode(context, op, SC1R, prefix);
         emit32(context, sf|STR32_REG|(SC1R<<5)|rd);
