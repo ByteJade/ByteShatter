@@ -14,4 +14,6 @@ void print_cpu(void);
 void print_native_cpu(void);
 void patcher_init(void);
 
+void execute_with_save(uint64_t address);
+
 #endif

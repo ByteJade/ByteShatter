@@ -3,6 +3,8 @@
 #include "elf_manager.h"
 #include "core.h"
 #include "memory.h"
+#include "patcher.h"
+#include <cstdint>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -197,13 +199,13 @@ void elf_read_dynamic(Elf* elf) {
 }
 void elf_init(Elf* elf) {
     if (elf->init) {
-        ((void(*)(void))elf->init)();
+        execute_with_save((uint64_t)elf->init);
     }
     if (elf->init_array) {
         size_t count = elf->init_arraysz / sizeof(Elf64_Addr);
         for (size_t i = 0; i < count; i++) {
             print("jump init_array[%i] (%p)", i, elf->init_array);
-            ((void(*)(void))elf->init_array[i])();
+            execute_with_save((uint64_t)elf->init_array[i]);
         }
     }
     cache_clear();

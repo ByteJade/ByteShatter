@@ -58,6 +58,20 @@ void print_native_cpu(void) {
     printf("sp: %llX\n", sc->sp);
     print_flags();
 }
+void execute_with_save(uint64_t address) {
+    asm volatile (
+        "stp x20, x21, [sp, #-16]!\n\t"
+        "stp x22, x30  [sp, #-16]!\n\t"
+
+        "blr %0\n\t"
+
+        "ldp x22, x30  [sp], #16\n\t"
+        "ldp x20, x21, [sp], #16\n\t"
+        :
+        : "r" (address)
+        : "memory"
+    );
+}
 void brk_handler(int sig, siginfo_t* info, void* ucontext) {
     ucontext_t* ctx = (ucontext_t*)ucontext;
     sc = (struct sigcontext*)&ctx->uc_mcontext;
