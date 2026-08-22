@@ -10,6 +10,8 @@ void test_string_data() {
     const char* ptr1 = str.c_str();
     const char* ptr2 = str.data();
     
+    std::cout << ptr1 << " " << ptr2 << "\n";
+
     assert(ptr1 == ptr2);
     assert(ptr1[0] == 'H');
     assert(ptr1[5] == '\0');
