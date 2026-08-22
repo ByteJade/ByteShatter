@@ -160,6 +160,11 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->a.imm = (int64_t)(int32_t)fetch32(context);
             buf->b.type = NONE;
             break;
+        case 0x69:
+            buf->type = IMUL;
+            decode_r_rm(context, buf);
+            buf->b.imm = (int64_t)(int32_t)fetch32(context);
+            break;
         case 0x6A:
             buf->type = PUSH;
             buf->a.type = IMM;
