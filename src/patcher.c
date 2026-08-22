@@ -138,7 +138,7 @@ void segv_handler(int sig, siginfo_t* info, void* ucontext) {
         return;
     }
     if (info->si_code == SEGV_ACCERR || sc->pc%4 != 0) {
-        success("found unhandled jump");
+        success("found unhandled jump %p", sc->pc);
         Anchor* anchor = cache_get_anchor(sc->pc);
         uint32_t* target = cache_search(sc->pc);
         if (target == NULL) {
