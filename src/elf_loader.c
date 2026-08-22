@@ -202,6 +202,7 @@ void elf_init(Elf* elf) {
     if (elf->init_array) {
         size_t count = elf->init_arraysz / sizeof(Elf64_Addr);
         for (size_t i = 0; i < count; i++) {
+            print("jump init_array[%i]", i);
             ((void(*)(void))elf->init_array[i])();
         }
     }
