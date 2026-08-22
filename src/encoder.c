@@ -310,21 +310,20 @@ void encode(Context* context, Instruction* buf) {
             } else panic("ENCODER::UNHANDLED_TST");
         } break;
         case CMP:{
-            if (t0 == REG && t1 == REG) {
+            if (t1&MEM) {
+                emit_load(context, SC2R, &buf->b, sf, buf->prefix);
+                r1 = SC2;
+                t1 = REG;
+            }else if (t0&MEM) {
+                emit_load(context, SC2R, &buf->a, sf, buf->prefix);
+                r0 = SC2;
+            }
+            if (t1 == REG) {
                 emit32(context, sf|_construct_r_r_r(SUB_REG|S, XZR, r0, r1));
-            } else if (t0 == REG && t1 == IMM) {
-                emit_imm(context, buf->b.imm, SC2R);
-                emit32(context, sf|_construct_r_r_r(SUB_REG|S, XZR, r0, SC2));
-            } else if (t1&MEM) {
-                emit_load(context, SC1R, &buf->b, sf, buf->prefix);
+            } else {
+                emit_imm(context, buf->b.imm, SC1R);
                 emit32(context, sf|_construct_r_r_r(SUB_REG|S, XZR, r0, SC1));
-            } else if (t0&MEM) {
-                emit_load(context, SC1R, &buf->a, sf, buf->prefix);
-                if (t1 == IMM) {
-                    emit_imm(context, buf->b.imm, SC2R);
-                    emit32(context, sf|_construct_r_r_r(SUB_REG|S, XZR, SC1, SC2));
-                } else emit32(context, sf|_construct_r_r_r(SUB_REG|S, XZR, SC1, r1));
-            } else panic("ENCODER::UNHANDLED_CMP");
+            }
         } break;
         case XOR:{
             if (t1 == IMM) {
