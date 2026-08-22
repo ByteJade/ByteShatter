@@ -135,7 +135,7 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
         else right = mid - 1;
     }
 
-    warning("CACHE::MISTMATCH");
+    // warning("CACHE::MISTMATCH");
     /* but some programs may jump
        to the center of instruction
        which will cause this exception */
