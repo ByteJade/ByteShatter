@@ -76,7 +76,7 @@ void emit_imm(Context* context, int64_t imm, uint8_t rd) {
         emit32(context, MOVZ_IMM | (imm << 5) | rd);
     } else if (imm < 0 && ~imm <= INT16_MAX) {
         emit32(context, 0x92800000 | (~imm << 5) | rd);
-    }else if (imm >= INT16_MIN && imm <= INT32_MAX) {
+    }else if (imm >= INT32_MIN && imm <= INT32_MAX) {
         emit32(context, MOVZ_IMM | ((imm & 0xFFFF) << 5) | rd);
         emit32(context, MOVK_IMM | (1 << 21) | (((imm >> 16) & 0xFFFF) << 5) | rd);
         if (imm < 0) {
