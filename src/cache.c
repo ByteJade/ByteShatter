@@ -4,7 +4,6 @@
 #include "decoder.h"
 #include "patcher.h"
 #include "printer_arm.h"
-#include <cstdint>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
