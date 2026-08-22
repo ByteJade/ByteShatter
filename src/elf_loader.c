@@ -4,7 +4,6 @@
 #include "core.h"
 #include "memory.h"
 #include "patcher.h"
-#include <cstdint>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
