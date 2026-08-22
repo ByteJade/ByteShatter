@@ -49,17 +49,26 @@ void cache_clear(void) {
     anchor->host_p = 0;
 }
 void cache_block_start(Context* context) {
-    CacheUnit* block = anchor->blocks + anchor->blocks_p;
-    print("start block %x", anchor->blocks_p);
+    if (anchor->blocks_p+1 >= anchor->blocks_c) {
+        panic("CACHE::BLOCKS::OVERFLOW");
+    }
+    // sort array
+    uint32_t insert_pos = 0;
+    while (insert_pos < anchor->blocks_p && 
+           anchor->blocks[insert_pos].gp_lo < context->gp) {
+        insert_pos++;
+    }
+    for (uint32_t rp = anchor->blocks_p; rp > insert_pos; rp--) {
+        anchor->blocks[rp] = anchor->blocks[rp-1];
+    }
+    print("start block %x", insert_pos);
+    CacheUnit* block = anchor->blocks + insert_pos;
     block->offsets = 0;
     block->offsetssz = 0;
-    block->end = 0;
     block->gp_lo = context->gp;
     block->hp = context->hp;
     anchor->blocks_p++;
-    if (anchor->blocks_p >= anchor->blocks_c) {
-        panic("CACHE::BLOCKS::OVERFLOW");
-    }
+    
     context->block = block;
 }
 void cache_block_point(struct Context* context) {
@@ -79,13 +88,12 @@ void cache_block_point(struct Context* context) {
     context->loffp++;
     if (anchor->offsets_p + context->loffp >= anchor->offsets_c)
         panic("CACHE::OFFSET_OVERFLOW");
-    if (context->loffp == UINT8_MAX) {
+    if (context->loffp == UINT16_MAX) {
         cache_block_end(context);
         cache_block_start(context);
     }
 }
 void cache_block_end(struct Context* context) {
-    context->block->end = context->gp - context->block->gp_lo;
     context->block->offsets = anchor->offsets_p;
     context->block->offsetssz = context->loffp;
     anchor->offsets_p += context->loffp;
@@ -141,7 +149,7 @@ uint32_t* cache_search(uint64_t gp) {
         CacheUnit* cache = anchor->blocks + i;
         if (gp_lo == cache->gp_lo) return anchor->host + cache->hp;
         if (cache->offsets == 0) continue;
-        if (gp_lo >= cache->gp_lo && gp_lo < cache->gp_lo + cache->end) {
+        if (gp_lo >= cache->gp_lo) {
             return anchor->host + block_cache_search(gp_lo, cache);
         }
     }
