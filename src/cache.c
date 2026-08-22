@@ -4,6 +4,7 @@
 #include "decoder.h"
 #include "patcher.h"
 #include "printer_arm.h"
+#include <cstdint>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -135,7 +136,7 @@ uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
         else right = mid - 1;
     }
 
-    panic("CACHE::MISTMATCH");
+    warning("CACHE::MISTMATCH");
     /* but some programs may jump
        to the center of instruction
        which will cause this exception */
@@ -150,7 +151,9 @@ uint32_t* cache_search(uint64_t gp) {
         if (gp_lo == cache->gp_lo) return anchor->host + cache->hp;
         if (cache->offsets == 0) continue;
         if (gp_lo >= cache->gp_lo) {
-            return anchor->host + block_cache_search(gp_lo, cache);
+            uint32_t loff = block_cache_search(gp_lo, cache);
+            if (!loff) return NULL;
+            return anchor->host + loff;
         }
     }
     return NULL;
