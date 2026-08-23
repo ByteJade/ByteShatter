@@ -299,12 +299,18 @@ int decode_instr(Context* context, Instruction* buf) {
             ret = 1;
             break;
         case 0xF7: {
-            uint8_t byte = fetch8(context);
-            if ((byte&0b11111000) == 0xF8) {
+            uint8_t modrm = fetch8(context);
+            uint8_t code = (modrm >> 3) & 7;
+            if (code == 7) {
                 buf->type = IDIV;
                 buf->a.type = REG;
-                buf->a.reg = byte&0x7;
-                buf->b.reg = NONE;
+                buf->a.reg = RAX;
+                decode_rm(context, &buf->b, modrm);
+            } else if (code == 5) {
+                buf->type = IMUL;
+                buf->a.type = REG;
+                buf->a.reg = RAX;
+                decode_rm(context, &buf->b, modrm);
             } else panic("Unhandled F7");
         } break;
         case 0xFE:

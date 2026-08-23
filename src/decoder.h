@@ -68,6 +68,7 @@ enum InstrTypes {
     MOVSBL, MOVZBL,
     MOVSWL, MOVZWL,
 };
+
 typedef struct {
     uint8_t type;
     uint8_t reg;

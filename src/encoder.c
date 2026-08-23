@@ -475,12 +475,14 @@ void encode(Context* context, Instruction* buf) {
         } break;
         case CLTD: {
             emit32(context, SXTW_REG | (x64_regs[RAX] << 5) | x64_regs[RAX]);
-            emit32(context, 0x937ffd22); // asr x2, x9, #63
+            emit32(context, 0x937ffc02 | (x64_regs[RAX] << 5)); // asr x2, x8, #63
         } break;
         case IDIV: {
-            emit_add_imm(SC1R, x64_regs[RAX], 0);
-            emit32(context, 0x9ac00d89 | (x64_regs[r0]<<16)); // sdiv	x9, x12, r0
-            emit32(context, 0x9b00b122 | (x64_regs[r0]<<16)); // msub	x2, x9, r0, x12
+            if (t0 == REG && t1 == REG) {
+                emit_add_imm(SC1R, x64_regs[r0], 0);
+                emit32(context, 0x9ac00d80 | (x64_regs[r1]<<16) | (x64_regs[r0])); // sdiv	nn, x12, r0
+                emit32(context, 0x9b00b002 | (x64_regs[r1]<<16) | (x64_regs[r0] << 5)); // msub	x2, nn, r0, x12
+            } else panic("ENCODER::UNHANDLED_DIV");
         } break;
         case IMUL: {
             if (t0 == REG && t1 == REG) {
