@@ -4,6 +4,7 @@
 #include "core.h"
 #include "memory.h"
 #include "patcher.h"
+#include "overrides.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -101,6 +102,7 @@ void reloc_rela(Elf* elf, Elf64_Rela* rela, int relasz) {
             case R_X86_64_JUMP_SLOT:
             case R_X86_64_GLOB_DAT: {
                 void *sym_addr = get_symbol_wrapped(symname);
+                if (!sym_addr) sym_addr = sym_override(symname);
                 if (!sym_addr) {
                     warning("LOADER::USING_NATIVE %s", symname);
                     sym_addr = get_symbol(symname);

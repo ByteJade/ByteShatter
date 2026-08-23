@@ -3,17 +3,12 @@
 #include "decoder.h"
 #include "cache.h"
 #include "arm64emitter.h"
+#include "overrides.h"
 #include <stdint.h>
 
 #define SC1R 12
 #define SC2R 13
 
-static uint8_t syscall_override[] = {
-    [0] = 63,
-    [1] = 64,
-    [9] = 222,
-    [11] = 215,
-};
 /*
 TODO:
 - encoding for 8, 16 and 32 bit instructions
