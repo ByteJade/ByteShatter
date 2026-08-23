@@ -8,9 +8,9 @@ void my___libc_start_main(
     void (*init)(void), void (*fini)(void),
     void (*rtld_fini)(void), void* stack_end)
 {
-    if (init) init();
+    // if (init) init();
     int out = main(argc, argv, NULL);
-    if (fini) fini();
+    // if (fini) fini();
     _exit(0);
 }
 WRAP_FUNC(__isoc23_strtol)
