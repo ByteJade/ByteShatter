@@ -53,7 +53,7 @@ int main(int argc, char** argv, const char** envp) {
     if (debug) debug_enable(elf);
     void* sp = get_sp();
     void* entry = elf->base + elf->head.e_entry;
-    #ifdef __AARCH64__
+    #ifdef __aarch64__
     asm volatile (
         "mov sp, %0\n"
         "br %1"
