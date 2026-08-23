@@ -5,9 +5,11 @@ int main(int argc, char** argv) {
     for (int i = 0; i < argc; i++) {
         int argp = 0;
         char* arg = argv[i];
+        std::cout<<"start copy" << arg << "\n";
         do {
             new_arg[argp] = arg[argp];
         } while (arg[argp++]);
+        std::cout<<"copied " << argp << " bytes\n";
         std::cout << "arg " << i << ": " << new_arg << std::endl;
     }
     delete[] new_arg;
