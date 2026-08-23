@@ -47,7 +47,7 @@ static uint8_t x64_regs[] = {
 #define GET_FS 0xD53BD040
 
 #define ASR_REG 0x1ac02800
-#define ASR_IMM 0x93600000
+#define ASR_IMM 0x93400000
 
 #define LSL_REG 0x1ac12000
 #define LSL_IMM 0xD370F800
