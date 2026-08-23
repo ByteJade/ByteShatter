@@ -152,7 +152,7 @@ void encode8bit(Context* context, Instruction* buf) {
                 if (t1 == REG){
                     emit32(context, _construct_r_r_imm(STRB_REG, r1, SC1, 0));
                 } else {
-                    emit_movz(SC2, buf->b.imm, 0);
+                    emit_imm(context, buf->b.imm, SC2R);
                     emit32(context, _construct_r_r_imm(STRB_REG, SC2, SC1, 0));
                 }
             } else panic("ENCODER::UNHANDLED_MOV");
@@ -169,7 +169,7 @@ void encode8bit(Context* context, Instruction* buf) {
                 }
             } else if (t0 == REG && t1 == IMM) {
                 emit32(context, 0x12001c00 | (x64_regs[r0]<<5) | (SC1R)); 
-                emit_movz(SC2, buf->b.imm, 0);
+                emit_imm(context, buf->b.imm, SC2R);
                 emit32(context, _construct_r_r_r(ANDS_REG, XZR, SC1, SC2));
             } else panic("ENCODER::UNHANDLED_TST");
         } break;
