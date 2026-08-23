@@ -66,6 +66,7 @@ enum InstrTypes {
     CLTQ, CLTD, SYSCALL,
 
     MOVSBL, MOVZBL,
+    MOVSWL, MOVZWL,
 };
 typedef struct {
     uint8_t type;

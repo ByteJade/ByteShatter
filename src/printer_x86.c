@@ -38,6 +38,7 @@ const char* instr_types[] = {
     "idiv", "imul",
     "cltq", "cltd", "syscall",
     "movsbl", "movzbl",
+    "movswl", "movzwl",
 };
 const char* regs64[] = {
     "rax", "rcx", "rdx", "rbx",
