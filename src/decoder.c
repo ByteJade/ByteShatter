@@ -274,7 +274,10 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->type = MOV;
             decode_rm(context, &buf->a, fetch8(context));
             buf->b.type = IMM;
-            buf->b.imm = (int64_t)(int32_t)fetch32(context);
+            if (buf->prefix == OS) {
+                buf->b.imm = (int64_t)(int32_t)fetch16(context);
+                buf->size = 16;
+            } else buf->b.imm = (int64_t)(int32_t)fetch32(context);
             break;
         case 0xC9:
             buf->type = LEAVE;
