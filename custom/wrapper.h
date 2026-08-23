@@ -9,7 +9,7 @@
             "stp x29, x30, [sp, #-16]!\n" \
             "bl " #func "\n" \
             "ldp x29, x30, [sp], #16\n" \
-            "mov x9, x0\n" \
+            "mov x8, x0\n" \
         ); \
     }
 #define WRAP_MED_FUNC(func) \
@@ -19,7 +19,7 @@
             "ldp x6, x7, [sp]\n" \
             "bl " #func "\n" \
             "ldp x29, x30, [sp], #16\n" \
-            "mov x9, x0\n" \
+            "mov x8, x0\n" \
         ); \
     }
 #define WRAP_BIG_FUNC(func) \
@@ -31,7 +31,7 @@
             "bl " #func "\n" \
             "stp x21, x22, [sp, #-16]!\n" \
             "mov x30, x20\n" \
-            "mov x9, x0\n" \
+            "mov x8, x0\n" \
         ); \
     }
 #else
