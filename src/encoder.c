@@ -516,6 +516,9 @@ void encode(Context* context, Instruction* buf) {
         case MOVAPD:
             emit32(context, sf|MOV_NEON | (r0) | (r1 << 5) | (r1 << 16));
             break;
+        case SYSCALL:
+            emit32(context, 0xd4000001);
+            break;
         default:
             panic("ENCODER::UNKNOWN_INSTRUCTION: %i", buf->type);
     }
