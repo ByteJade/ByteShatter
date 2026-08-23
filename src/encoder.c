@@ -268,6 +268,8 @@ void encode(Context* context, Instruction* buf) {
         case SHL:{
             if (t0 == REG && t1 == IMM)
                 emit_lsl_imm(r0, r0, buf->b.imm);
+            else if (t0 == REG && t1 == REG)
+                emit32(context, _construct_r_r_r(sf|LSL_REG, r0, r0, r1));
             else panic("ENCODER::UNHANDLED_SHL");  
         } break;
         case SHR:{

@@ -32,7 +32,6 @@ static uint8_t x64_regs[] = {
 #define BLR_REG 0xD63F0000
 #define BLT_IMM 0x5400000B
 #define SXTW_REG 0x93407C00
-#define LSL_IMM 0xD370F800
 #define LDR8_REG 0x39400000
 #define LDR32_REG 0xB9400000
 #define LDR64_REG 0xF9400000
@@ -45,6 +44,9 @@ static uint8_t x64_regs[] = {
 
 #define ASR_REG 0x1ac02800
 #define ASR_IMM 0x93600000
+
+#define LSL_REG 0x1ac12000
+#define LSL_IMM 0xD370F800
 
 #define CSELHI 0x1A808000
 #define CSELMI 0x1A804000
