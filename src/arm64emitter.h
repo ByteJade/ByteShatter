@@ -42,6 +42,10 @@ static uint8_t x64_regs[] = {
 #define STUR 0xB8000000
 #define LDUR 0xB8400000
 #define GET_FS 0xD53BD040
+
+#define ASR_REG 0x1ac02800
+#define ASR_IMM 0x93600000
+
 #define CSELHI 0x1A808000
 #define CSELMI 0x1A804000
 
@@ -89,7 +93,7 @@ static uint8_t x64_regs[] = {
 #define emit_lsr_imm(rd, rn, shift) \
     emit32(context, 0xD3600000 | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
 #define emit_asr_imm(rd, rn, shift) \
-    emit32(context, 0x93600000 | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
+    emit32(context, ASR_IMM | ((shift & 0x3F) << 16) | (63 << 10) | (x64_regs[rn] << 5) | x64_regs[rd])
 
 #define emit_adrp(rd, delta) \
     emit32(context, 0x90000000 | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | x64_regs[rd])
