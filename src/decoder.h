@@ -62,8 +62,10 @@ enum InstrTypes {
     COMIS, MOVS,
     MOVQ, MOVAPD,
     CVTSD2SI, CVTSI2S,
-    MOVZX, IDIV, IMUL,
+    IDIV, IMUL,
     CLTQ, CLTD, SYSCALL,
+
+    MOVSBL, MOVZBL,
 };
 typedef struct {
     uint8_t type;

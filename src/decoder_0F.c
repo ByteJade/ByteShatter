@@ -110,7 +110,11 @@ void decode_0F(Context* context, Instruction* buf) {
             if ((buf->b.type&IMM) == 0) buf->b.imm = 0;
             break;
         case 0xB6:
-            buf->type = MOVZX;
+            buf->type = MOVZBL;
+            decode_r_rm(context, buf);
+            break;
+        case 0xBE:
+            buf->type = MOVSBL;
             decode_r_rm(context, buf);
             break;
         default: panic("DECODER::UNKNOWN_0F_SYMBOL: 0x%X", byte);
