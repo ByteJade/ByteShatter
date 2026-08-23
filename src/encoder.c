@@ -7,6 +7,13 @@
 
 #define SC1R 12
 #define SC2R 13
+
+static uint8_t syscall_override[] = {
+    [0] = 63,
+    [1] = 64,
+    [9] = 222,
+    [11] = 215,
+};
 /*
 TODO:
 - encoding for 8, 16 and 32 bit instructions
@@ -205,8 +212,12 @@ void encode8bit(Context* context, Instruction* buf) {
             panic("ENCODER::UNKNOWN_8BIT_INSTRUCTION: %x", buf->type);
     }
 }
+// pop/push/mov optimizer
 static int prev_instruction = NOP;
 static int prev_register = NOP;
+// syscall override
+static uint32_t* prev_mov_rax_instr = 0;
+static uint32_t prev_rax = 0;
 
 void encode(Context* context, Instruction* buf) {
     if (buf->size == 8) {
@@ -284,6 +295,10 @@ void encode(Context* context, Instruction* buf) {
             if (t0 == REG && t1 == REG) {
                 emit32(context, sf|ADD_IMM | x64_regs[r0] | (x64_regs[r1] << 5));
             }else if (t0 == REG && t1 == IMM){
+                if (r0 == RAX) {
+                    prev_mov_rax_instr = context->host + context->hp;
+                    prev_rax = buf->b.imm;
+                }
                 emit_imm(context, buf->b.imm, x64_regs[r0]);
             } else if (t1&MEM) {
                 emit_load(context, x64_regs[r0], &buf->b, sf, buf->prefix);
@@ -514,6 +529,7 @@ void encode(Context* context, Instruction* buf) {
             else emit32(context, FMOVR_NEON | (r0) | (x64_regs[r1] << 5));
             break;
         case MOVAPD:
+            *prev_mov_rax_instr = MOVZ_IMM  | (syscall_override[prev_rax] << 5) | x64_regs[RAX];
             emit32(context, sf|MOV_NEON | (r0) | (r1 << 5) | (r1 << 16));
             break;
         case SYSCALL:
