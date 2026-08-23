@@ -9,18 +9,17 @@ int syscall_override[] = {
 };
 
 void my_syscall(long num, long arg1, long arg2, long arg3, long arg4, long arg5, long arg6) {
-    long ret;
     num = syscall_override[num];
     
     #ifdef __aarch64__
     asm volatile (
-        "mov x8, %1\n"
-        "mov x0, %2\n"
-        "mov x1, %3\n"
-        "mov x2, %4\n"
-        "mov x3, %5\n"
-        "mov x4, %6\n"
-        "mov x5, %7\n"
+        "mov x8, %0\n"
+        "mov x0, %1\n"
+        "mov x1, %2\n"
+        "mov x2, %3\n"
+        "mov x3, %4\n"
+        "mov x4, %5\n"
+        "mov x5, %6\n"
         "svc #0\n"
         "mov x9, x0\n"
         "ret x30\n"
