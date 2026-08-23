@@ -6,6 +6,11 @@
 void decode_0F(Context* context, Instruction* buf) {
     uint8_t byte = fetch8(context);
     switch (byte) {
+        case 0x05:
+            buf->prefix = 0;
+            buf->type = SYSCALL;
+            buf->a.type = NONE;
+            break;
         case 0x1E:
             buf->prefix = 0;
             buf->type = EBR;
