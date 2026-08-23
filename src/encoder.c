@@ -443,11 +443,11 @@ void encode(Context* context, Instruction* buf) {
             if (t0 == REG && t1 == REG) {
                 if (buf->b.imm) {
                     emit_imm(context, buf->b.imm, SC1R);
-                    emit32(context, SMUL_REG | (x64_regs[r0]<<16) | (x64_regs[r1]<<5) | SC1R);
-                } else emit32(context, SMUL_REG | (x64_regs[r0]<<16) | (x64_regs[r0]<<5) | (x64_regs[r1]));
+                    emit32(context, SMUL_REG | (SC1R<<16) | (x64_regs[r1]<<5) | x64_regs[r0]);
+                } else emit32(context, SMUL_REG | (x64_regs[r1]<<16) | (x64_regs[r0]<<5) | (x64_regs[r0]));
             } else if (t1&IMM) {
                 emit_load(context, SC2R, &buf->b, sf, buf->prefix);
-                emit32(context, SMUL_REG | (x64_regs[r0]<<16) | (x64_regs[r0]<<5) | SC2R);
+                emit32(context, SMUL_REG | (SC2R<<16) | (x64_regs[r0]<<5) | x64_regs[r0]);
             } else panic("ENCODER::UNHANDLED_IMUL");
         } break;
         case JG:
