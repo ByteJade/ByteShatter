@@ -289,6 +289,26 @@ void encode(Context* context, Instruction* buf) {
                 emit32(context, 0x93407c00 | (x64_regs[r1]<<5) | (x64_regs[r0]));
             }else panic("ENCODER::UNHANDLED_MOVSLQ");
         } break;
+        case MOVZWL:{
+            if (t0 == REG && t1 == REG) {
+                emit32(context, sf|ADD_IMM | x64_regs[r0] | (x64_regs[r1] << 5));
+            }else if (t0 == REG && t1 == IMM){
+                emit_imm(context, buf->b.imm, x64_regs[r0]);
+            } else if (t1&MEM) {
+                emit_address_decode(context, &buf->b, SC1R, buf->prefix);
+                emit32(context, _construct_r_r_imm(LDRH_REG, r0, SC1, 0));
+            } else panic("ENCODER::UNHANDLED_MOVZWL");
+        } break;
+        case MOVSWL:{
+            if (t0 == REG && t1 == REG) {
+                emit32(context, sf|ADD_IMM | x64_regs[r0] | (x64_regs[r1] << 5));
+            }else if (t0 == REG && t1 == IMM){
+                emit_imm(context, buf->b.imm, x64_regs[r0]);
+            } else if (t1&MEM) {
+                emit_address_decode(context, &buf->b, SC1R, buf->prefix);
+                emit32(context, _construct_r_r_imm(LDRSH_REG, r0, SC1, 0));
+            } else panic("ENCODER::UNHANDLED_MOVSWL");
+        } break;
         case MOVZBL:{
             if (t0 == REG && t1 == REG) {
                 emit32(context, sf|ADD_IMM | x64_regs[r0] | (x64_regs[r1] << 5));
@@ -297,18 +317,7 @@ void encode(Context* context, Instruction* buf) {
             } else if (t1&MEM) {
                 emit_address_decode(context, &buf->b, SC1R, buf->prefix);
                 emit32(context, _construct_r_r_imm(LDRB_REG, r0, SC1, 0));
-            } else if (t0&MEM) {
-                if (t1 == IMM){
-                    if (buf->b.imm == 0) {
-                        r1 = XZR;
-                    } else {
-                        emit_imm(context, buf->b.imm, SC2R);
-                        r1 = SC2;
-                    }
-                }
-                emit_address_decode(context, &buf->a, SC1R, buf->prefix);
-                emit32(context, _construct_r_r_imm(STRB_REG, r1, SC1, 0));
-            } else panic("ENCODER::UNHANDLED_MOV");
+            } else panic("ENCODER::UNHANDLED_MOVZBL");
         } break;
         case MOVSBL:{
             if (t0 == REG && t1 == REG) {
@@ -318,18 +327,7 @@ void encode(Context* context, Instruction* buf) {
             } else if (t1&MEM) {
                 emit_address_decode(context, &buf->b, SC1R, buf->prefix);
                 emit32(context, _construct_r_r_imm(LDRSB_REG, r0, SC1, 0));
-            } else if (t0&MEM) {
-                if (t1 == IMM){
-                    if (buf->b.imm == 0) {
-                        r1 = XZR;
-                    } else {
-                        emit_imm(context, buf->b.imm, SC2R);
-                        r1 = SC2;
-                    }
-                }
-                emit_address_decode(context, &buf->a, SC1R, buf->prefix);
-                emit32(context, _construct_r_r_imm(STRB_REG, r1, SC1, 0));
-            } else panic("ENCODER::UNHANDLED_MOV");
+            } else panic("ENCODER::UNHANDLED_MOVSBL");
         } break;
         case MOV:{
             if (t0 == REG && t1 == REG) {
