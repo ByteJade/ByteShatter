@@ -51,5 +51,21 @@ int main(int argc, char** argv, const char** envp) {
     push_argc();
     
     if (debug) debug_enable(elf);
-    ((void(*)(void))elf->base + elf->head.e_entry)();
+    void* sp = get_sp();
+    void* entry = elf->base + elf->head.e_entry;
+    #ifdef __AARCH64__
+    asm volatile (
+        "mov sp, %0\n"
+        "br %1"
+        : : "r"(sp), "r"(entry)
+        : "memory"
+    );
+    #else 
+    asm volatile (
+        "mov rsp, %0\n"
+        "jmp *%1"
+        : : "r"(sp), "r"(entry)
+        : "memory"
+    );
+    #endif
 }
