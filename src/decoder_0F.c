@@ -107,7 +107,7 @@ void decode_0F(Context* context, Instruction* buf) {
         case 0xAF:
             buf->type = IMUL;
             decode_r_rm(context, buf);
-            buf->b.imm = 0;
+            if ((buf->b.type&IMM) == 0) buf->b.imm = 0;
             break;
         case 0xB6:
             buf->type = MOVZX;
