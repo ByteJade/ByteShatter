@@ -174,6 +174,7 @@ uint32_t* cache_search(uint64_t gp) {
 }
 uint32_t cache_search_block(uint64_t hp) {
     hp -= (uint64_t)anchor->host;
+    hp /= 4;
     for (int i = 0; i < anchor->blocks_p; i++) {
         uint32_t start = anchor->blocks[i].hp;
         uint32_t end = start + anchor->blocks[i].end;
