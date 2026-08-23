@@ -17,6 +17,12 @@ void decode_0F(Context* context, Instruction* buf) {
             buf->a.type = NONE;
             fetch8(context);
             break;
+        case 0x1F:
+            buf->prefix = 0;
+            buf->type = NOP;
+            buf->a.type = NONE;
+            fetch8(context);
+            break;
         case 0x11:
             buf->type = MOVS;
             decode_rm_r(context, buf);
