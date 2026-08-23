@@ -529,10 +529,10 @@ void encode(Context* context, Instruction* buf) {
             else emit32(context, FMOVR_NEON | (r0) | (x64_regs[r1] << 5));
             break;
         case MOVAPD:
-            *prev_mov_rax_instr = MOVZ_IMM  | (syscall_override[prev_rax] << 5) | x64_regs[RAX];
             emit32(context, sf|MOV_NEON | (r0) | (r1 << 5) | (r1 << 16));
             break;
         case SYSCALL:
+            *prev_mov_rax_instr = MOVZ_IMM  | (syscall_override[prev_rax] << 5) | x64_regs[RAX];
             emit32(context, 0xd4000001);
             break;
         default:
