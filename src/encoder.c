@@ -468,6 +468,11 @@ void encode(Context* context, Instruction* buf) {
                 emit32(context, _construct_r_r_r(CSELHI, r0, r1, r0));
             }  else panic("ENCODER::UNHANDLED_CMOVA");
         } break;
+        case CMOVS: {
+            if (t0 == REG && t1 == REG) {
+                emit32(context, _construct_r_r_r(CSELMI, r0, r1, r0));
+            }  else panic("ENCODER::UNHANDLED_CMOVS");
+        } break;
         case MULS:
             emit_neon(context, buf, MUL_NEON);
             break;

@@ -41,7 +41,9 @@ static uint8_t x64_regs[] = {
 #define STUR 0xB8000000
 #define LDUR 0xB8400000
 #define GET_FS 0xD53BD040
-#define CSELHI 0x9A808000
+#define CSELHI 0x1A808000
+#define CSELMI 0x1A804000
+
 #define CSETNE 0x1a9f07e0
 #define CSETLO 0x1a9f27e0
 #define CSETEQ 0x1a9f17e0
