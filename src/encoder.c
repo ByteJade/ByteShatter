@@ -359,6 +359,16 @@ void encode(Context* context, Instruction* buf) {
                 } else emit32(context, sf|_construct_r_r_r(AND_REG, r0, r0, r1));
             } else panic("ENCODER::UNHANDLED_AND");
         } break;
+        case OR:{
+            if (t1 == IMM) {
+                emit_imm(context, buf->b.imm, SC2R);
+                r1 = SC2;
+                t1 = REG;
+            }
+            if (t0 == REG && t1 == REG) {
+                emit32(context, sf|_construct_r_r_r(ORR_REG, r0, r0, r1));
+            } else panic("ENCODER::UNHANDLED_OR");
+        } break;
         case POP:{
             if (t0 == REG) {
                 if (r0 == RBP) {
@@ -465,12 +475,12 @@ void encode(Context* context, Instruction* buf) {
         } break;
         case CMOVA: {
             if (t0 == REG && t1 == REG) {
-                emit32(context, _construct_r_r_r(CSELHI, r0, r1, r0));
+                emit32(context, _construct_r_r_r(sf|CSELHI, r0, r1, r0));
             }  else panic("ENCODER::UNHANDLED_CMOVA");
         } break;
         case CMOVS: {
             if (t0 == REG && t1 == REG) {
-                emit32(context, _construct_r_r_r(CSELMI, r0, r1, r0));
+                emit32(context, _construct_r_r_r(sf|CSELMI, r0, r1, r0));
             }  else panic("ENCODER::UNHANDLED_CMOVS");
         } break;
         case MULS:

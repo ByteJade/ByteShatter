@@ -22,6 +22,7 @@ static uint8_t x64_regs[] = {
 #define EOR_REG 0x4A000000 // No Flags!
 #define AND_REG 0x0A000000 // No Flags!
 #define ANDS_REG 0x6A000000 // Only Flags!
+#define ORR_REG 0xaa000000
 #define SMUL_REG 0x9b207c00
 #define MOVZ_IMM 0x52800000
 #define MOVK_IMM 0xF2800000
