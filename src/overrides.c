@@ -21,7 +21,7 @@ void my_syscall(long num, long arg1, long arg2, long arg3, long arg4, long arg5,
         "mov x4, %5\n"
         "mov x5, %6\n"
         "svc #0\n"
-        "mov x9, x0\n"
+        "mov x8, x0\n"
         "ret x30\n"
         : : "r"(num), "r"(arg1), "r"(arg2), "r"(arg3), "r"(arg4), "r"(arg5), "r"(arg6)
         : "memory"
