@@ -29,9 +29,7 @@ void emit_address_decode(Context* context, Operand* op, uint8_t reg, uint8_t pre
     if (prefix==FS) {
         emit32(context, GET_FS | reg);
         emit_add_signed(context, reg, reg, op->imm);
-        return;
-    }
-    if (t == (MEM|IMM)) {
+    } else if (t == (MEM|IMM)) {
         uint64_t full = (uint64_t)(context->guest + context->gp + op->imm);
         int64_t target = full & ~0xFFF;
         int64_t current = (uint64_t)(context->host + context->hp) & ~0xFFF;
@@ -40,10 +38,8 @@ void emit_address_decode(Context* context, Operand* op, uint8_t reg, uint8_t pre
             panic("ENCODER::TOO_LARGE_DISTANCE");
         }
         emit32(context, 0x90000000 | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | reg);
-        emit32(context, ((0x91000000) | ((full & 0xFFF) << 10) | (reg << 5) | reg));
-        return;
-    }
-    if (t&IDX) {
+        emit32(context, (0x91000000 | ((full & 0xFFF) << 10) | (reg << 5) | reg));
+    } else if (t&IDX) {
         if (op->scale != 0) {
             emit32(context, 0xD3400000 | ((-(op->scale) & 0x3F) << 16) |
             (((63 - op->scale) & 0x3F) << 10) | (x64_regs[op->idx] << 5) | reg);
@@ -67,7 +63,7 @@ void emit_branch(Context* context, Instruction* buf, uint32_t code, uint8_t type
         emit32(context, code | (x64_regs[buf->a.reg] << 5));
     } else if (buf->a.type == IMM) {
         emit32(context, 0xD4200000 | (cache_patch_point(context, type, buf->a.imm) << 5));
-    } else if (buf->a.type&MEM) {
+    } else {
         emit_address_decode(context, &buf->a, SC1R, 0);
         emit32(context, (LDR64_REG | (SC1R << 5) | SC1R));
         emit32(context, code | (SC1R << 5));
@@ -563,8 +559,7 @@ void encode(Context* context, Instruction* buf) {
             if (buf->prefix == REPN) instr = SCVTD_NEON;
             else instr = SCVTF_NEON;
             if (t1&MEM) {
-                emit_address_decode(context, &buf->b, SC1R, buf->prefix);
-                emit32(context, _construct_r_r_imm(LDR32_REG, SC1, SC1, 0));
+                emit_load(context, SC1R, &buf->b, 0, buf->prefix);
                 emit32(context, instr | (r0) | (SC1R << 5));
             } else if (t1 == REG) {
                 emit32(context, instr | (r0) | (x64_regs[r1]<<5));
