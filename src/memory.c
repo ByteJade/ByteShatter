@@ -12,6 +12,12 @@ static int max_process = 0;
 
 void context_init() {
     max_process = sysconf(_SC_NPROCESSORS_ONLN);
+    if (max_process) {
+        success("Setup %i contexts");
+    } else {
+        warning("_SC_NPROCESSORS_ONLN failed. Setup only 1 context");
+        max_process = 1;
+    }
     contexts = (Context*)malloc(sizeof(Context)*max_process);
 }
 Context* context_search() {
