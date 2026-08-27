@@ -205,6 +205,13 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->type = LEA;
             decode_r_rm(context, buf);
             break;
+        case 0x8F:
+            buf->size = 64;
+            buf->reverse = 1;
+            buf->type = POP;
+            decode_rm(context, &buf->a, fetch8(context));
+            buf->b.type = NONE;
+            break;
         case 0x90: 
             buf->type = NOP;
             buf->a.type = NONE;
@@ -216,13 +223,6 @@ int decode_instr(Context* context, Instruction* buf) {
         case 0x99:
             buf->type = CLTD;
             buf->a.type = NONE;
-            break;
-        case 0x9F:
-            buf->size = 64;
-            buf->reverse = 1;
-            buf->type = POP;
-            decode_rm(context, &buf->a, fetch8(context));
-            buf->b.type = NONE;
             break;
         case 0xB0 ... 0xBF:
             buf->reverse = 1;
@@ -336,28 +336,27 @@ int decode_instr(Context* context, Instruction* buf) {
 }
 void decode(uint64_t gp) {
     print("Start decode %lx", gp);
-    Context context;
-    setup_context(&context, gp);
-    cache_block_start(&context);
+    Context* context = context_pull(gp);
+    cache_block_start(context);
     while (1) {
-        cache_block_point(&context);
+        cache_block_point(context);
         Instruction buf;
-        uint8_t jump = decode_instr(&context, &buf);
-        encode(&context, &buf);
+        uint8_t jump = decode_instr(context, &buf);
+        encode(context, &buf);
         if (jump) break;
         /*
         TODO: Static analysis of block jumps. 
         Cache lookups are resource-intensive.
         */
-        const uint32_t* blockp = cache_search((uint64_t)context.guest + context.gp);
+        const uint32_t* blockp = cache_search((uint64_t)context->guest + context->gp);
         if (blockp) {
-            int32_t offset = (uint64_t)blockp - (uint64_t)(context.host+context.hp);
+            int32_t offset = (uint64_t)blockp - (uint64_t)(context->host+context->hp);
             warning("DECODER::DUPLICATION %i", offset);
-            cache_block_point(&context);
-            emit32(&context, 0x14000000 | ((offset/4) & 0x3FFFFFF));
+            cache_block_point(context);
+            emit32(context, 0x14000000 | ((offset/4) & 0x3FFFFFF));
             break;
         }
     }
-    cache_block_end(&context);
+    cache_block_end(context);
     if (debug_enabled()) debug_check_break();
 }

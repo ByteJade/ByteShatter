@@ -149,13 +149,12 @@ void debug_wait(void) {
                 OffsetUnit* offsets = unit->offsets + cache_offsets();
                 for (int x = 0; x < unit->offsetssz; x++) {
                     if ((uint32_t*)get_pc() - anchor->host == unit->hp + offsets[x].hoff) {
-                        Context context;
-                        setup_context(&context, 
+                        Context* context = context_pull(
                             ((uint64_t)anchor->gp_hi<<32) +
                             unit->gp_lo + offsets[x].goff
                         );
                         Instruction buf;
-                        decode_instr(&context, &buf);
+                        decode_instr(context, &buf);
                     }
                 }
                 set_bp((uint32_t*)(get_pc() + 4));

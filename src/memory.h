@@ -2,6 +2,7 @@
 #define MEMORY_H
 
 #include <stdint.h>
+#include <stdatomic.h>
 #include "cache.h"
 
 typedef struct Context {
@@ -12,9 +13,13 @@ typedef struct Context {
    uint32_t gp;
    uint32_t hp;
    uint8_t loffp;
+   atomic_bool in_use;
 } Context;
 
-void setup_context(Context* context, uint64_t gp);
+void context_init();
+
+Context* context_pull(uint64_t gp);
+void context_free(Context* context);
 
 void* mmap_guest(uint32_t guest_size);
 
