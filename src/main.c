@@ -3,6 +3,7 @@
 #include "patcher.h"
 #include "stack.h"
 #include "debugger.h"
+#include "memory.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,6 +36,7 @@ int read_argv(int argc, char** argv) {
 
 int main(int argc, char** argv, const char** envp) {
     stack_init();
+    context_init();
     set_envp(envp);
     int end = read_argv(argc, argv);
     Elf* elf = elf_load(argv[end]);
