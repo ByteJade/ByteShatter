@@ -232,6 +232,7 @@ void cache_print(int block) {
         }
         start = end;
     }
+    context_free(context);
 }
 int cache_bp(void) {
     return anchor->blocks_p;

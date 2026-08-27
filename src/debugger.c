@@ -155,6 +155,7 @@ void debug_wait(void) {
                         );
                         Instruction buf;
                         decode_instr(context, &buf);
+                        context_free(context);
                     }
                 }
                 set_bp((uint32_t*)(get_pc() + 4));

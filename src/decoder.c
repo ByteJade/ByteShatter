@@ -358,5 +358,6 @@ void decode(uint64_t gp) {
         }
     }
     cache_block_end(context);
+    context_free(context);
     if (debug_enabled()) debug_check_break();
 }
