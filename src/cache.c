@@ -211,13 +211,14 @@ void cache_print(int block) {
     CacheUnit* unit = anchor->blocks + block;
     printf("%X Block: %i\n", unit->hp, block);
     uint32_t* host = anchor->host + unit->hp;
-    Context context;
-    setup_context(&context,((uint64_t)anchor->gp_hi<<32) + unit->gp_lo);
+    Context* context = context_pull(
+        ((uint64_t)anchor->gp_hi<<32) + unit->gp_lo
+    );
     int start = 0;
     for (int x = 0; x <= unit->offsetssz; x++) {
         OffsetUnit* offsets = (anchor->offsets + unit->offsets);
         Instruction buf;
-        decode_instr(&context, &buf);
+        decode_instr(context, &buf);
         char out[64];
         int end;
         if (x == unit->offsetssz) end = unit->end;
