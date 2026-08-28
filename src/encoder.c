@@ -32,13 +32,13 @@ void emit_address_decode(Context* context, Operand* op, uint8_t reg, uint8_t pre
     } else if (t == (MEM|IMM)) {
         uint64_t full = (uint64_t)(context->guest + context->gp + op->imm);
         int64_t target = full & ~0xFFF;
-        int64_t current = (uint64_t)(context->host + context->hp) & ~0xFFF;
-        int64_t delta = (target - current) >> 12;
-        if (delta < -4294967296LL || delta > 4294967296LL) {
-            panic("ENCODER::TOO_LARGE_DISTANCE");
-        }
-        emit32(context, 0x90000000 | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | reg);
-        emit32(context, (0x91000000 | ((full & 0xFFF) << 10) | (reg << 5) | reg));
+        //int64_t current = (uint64_t)(context->host + context->hp) & ~0xFFF;
+        //int64_t delta = (target - current) >> 12;
+        //if (delta < -4294967296LL || delta > 4294967296LL) {
+        //    panic("ENCODER::TOO_LARGE_DISTANCE");
+        //}
+        //emit32(context, 0x90000000 | ((delta & 0x3) << 29) | (((delta >> 2) & 0x7FFFF) << 5) | reg);
+        //emit32(context, (0x91000000 | ((full & 0xFFF) << 10) | (reg << 5) | reg));
     } else if (t&IDX) {
         if (op->scale != 0) {
             emit32(context, 0xD3400000 | ((-(op->scale) & 0x3F) << 16) |
@@ -330,7 +330,7 @@ void encode(Context* context, Instruction* buf) {
                 emit32(context, sf|ADD_IMM | x64_regs[r0] | (x64_regs[r1] << 5));
             }else if (t0 == REG && t1 == IMM){
                 if (r0 == RAX) {
-                    prev_mov_rax_instr = context->host + context->hp;
+                    //prev_mov_rax_instr = context->host + context->hp;
                     prev_rax = buf->b.imm;
                 }
                 emit_imm(context, buf->b.imm, x64_regs[r0]);
