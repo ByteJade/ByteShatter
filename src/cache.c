@@ -10,6 +10,7 @@
 #include <string.h>
 
 #define MAX_JUMPS 256
+#define MAX_BLOCKS 256
 
 Anchor* anchor;
 
@@ -19,15 +20,19 @@ void cahce_init(uint64_t guest, uint32_t* host, uint32_t size) {
     anchor->host_p = 0;
     anchor->host_c = size;
     anchor->host = host;
+    anchor->blocks_p = 0;
+    anchor->blocks_c = MAX_BLOCKS;
+    anchor->blocks = (Block*) malloc(anchor->blocks_c * sizeof(Block));
     anchor->jumps_p = 0;
     anchor->jumps_c = MAX_JUMPS;
     anchor->jumps = (PatchUnit*) malloc(anchor->jumps_c * sizeof(PatchUnit));
     anchor->jumps_reuse_p = 0;
     anchor->jumps_reuse_c = MAX_JUMPS;
-    anchor->jumps_reuse = (uint32_t*) malloc(anchor->jumps_c * sizeof(uint32_t));
+    anchor->jumps_reuse = (uint32_t*) malloc(anchor->jumps_reuse_c* sizeof(uint32_t));
 }
 void cahce_fini(void) {
     if (anchor->jumps) free(anchor->jumps);
+    if (anchor->blocks) free(anchor->blocks);
     if (anchor) free(anchor);
 }
 void my_realloc(void** data, uint32_t* size, uint32_t element_size) {
@@ -38,6 +43,7 @@ void my_realloc(void** data, uint32_t* size, uint32_t element_size) {
 void cache_clear(void) {
     anchor->host_p = 0;
     anchor->jumps_p = 0;
+    anchor->blocks_p = 0;
     anchor->jumps_reuse_p = 0;
 }
 uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
@@ -57,50 +63,42 @@ uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
     
     return ret+1;
 }
-uint32_t block_cache_search(uint32_t gp, CacheUnit* cache) {
-    gp -= cache->gp_lo;
-    /*
-    OffsetUnit* offsets = anchor->offsets + cache->offsets;
-    // binary search
-    int left = 0, right = cache->offsetssz - 1;
-    while (left <= right) {
-        int mid = (left + right) / 2;
-        uint8_t goff = offsets[mid].goff;
-        if (goff == gp) return cache->hp + offsets[mid].hoff;
-        if (goff < gp) left = mid + 1; 
-        else right = mid - 1;
+void cache_create_block(Context* context) {
+    if (anchor->blocks_p+1 >= anchor->blocks_c) {
+        panic("CONTEXT::BLOCKS::OVERFLOW");
     }
-    */
-
-    // warning("CACHE::MISTMATCH");
-    /* but some programs may jump
-       to the center of instruction
-       which will cause this exception */
-    return 0;
+    // sort array
+    uint32_t insert_pos = 0;
+    while (insert_pos < anchor->blocks_p && 
+           anchor->blocks[insert_pos].gp_lo < context->gp) {
+        insert_pos++;
+    }
+    for (uint32_t rp = anchor->blocks_p; rp > insert_pos; rp--) {
+        anchor->blocks[rp] = anchor->blocks[rp-1];
+    }
+    print("start cache block %x", insert_pos);
+    Block* block = anchor->blocks + insert_pos;
+    block->gp_lo = context->gp;
+    block->hp_lo = context->hp;
+    anchor->blocks_p++;
+    context->host = anchor->host;
+    context->hp = anchor->host_p;
 }
 uint32_t* cache_search(uint64_t gp) {
     // TODO: better cache search
-    /*
     uint32_t gp_lo = gp;
     Anchor* anchor = cache_get_anchor(gp);
     if (anchor->blocks_p == 0) return NULL;
-    CacheUnit* cache = NULL;
+    Block* cache = NULL;
     int left = 0, right = anchor->blocks_p - 1;
     while (left <= right) {
         int mid = (left + right) / 2;
         cache = anchor->blocks + mid;
         if (gp_lo == cache->gp_lo)
-            return anchor->host + cache->hp;
+            return anchor->host + cache->hp_lo;
         if (gp_lo > cache->gp_lo) left = mid + 1; 
         else right = mid - 1;
     }
-    if (right < 0) return NULL;
-    cache = anchor->blocks + right;
-    if (cache->offsets == 0) return NULL;
-    uint32_t loff = block_cache_search(gp_lo, cache);
-    if (!loff) return NULL;
-    return anchor->host + loff;
-    */
     return NULL;
 }
 uint32_t cache_search_block(uint64_t hp) {

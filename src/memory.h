@@ -23,6 +23,7 @@ typedef struct Context {
     uint8_t* guest;
     uint32_t gp;
     uint32_t* host;
+    uint32_t hp;
     atomic_bool in_use;
 /* to switch to static compilation*/
     Instruction* buffer;

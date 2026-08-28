@@ -61,6 +61,7 @@ Context* context_pull(uint64_t gp) {
     context->guest = (uint8_t*)(gp & (~(uint64_t)UINT32_MAX));
     context->host = current->host;
     context->gp = gp;
+    context->hp = current->host_p;
     print("Setup context %p-%x", context->guest, context->gp);
     return context;
 }

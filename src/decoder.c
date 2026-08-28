@@ -353,6 +353,10 @@ void decode(uint64_t gp) {
             context_block_start(context);
         }
     }
+    cache_create_block(context);
+    for (int i = 0; i < context->buffer_p; i++) {
+        encode(context, context->buffer + i);
+    }
     context_free(context);
     if (debug_enabled()) debug_check_break();
 }

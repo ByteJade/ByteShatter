@@ -18,6 +18,9 @@ typedef struct {
     uint32_t* host;
     uint32_t host_p;
     uint32_t host_c;
+    Block* blocks;
+    uint32_t blocks_p;
+    uint32_t blocks_c;
     PatchUnit* jumps;
     uint32_t jumps_p;
     uint32_t jumps_c;
@@ -33,6 +36,7 @@ typedef struct Context Context;
 /* clear all data */
 void cache_clear(void);
 uint32_t cache_patch_point(Context* context, uint8_t type, int offset);
+void cache_create_block(Context* context);
 
 /* get pointer to host instruction at guest pointer */
 uint32_t* cache_search(uint64_t gp);
