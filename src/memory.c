@@ -168,7 +168,6 @@ void context_block_guest_point(Context* context) {
 }
 void context_block_host_point(Context* context, CacheUnit* cache) {
     uint16_t hoff = context->hp - cache->hp_lo;
-    if (hoff == 0) return;
     if (hoff > UINT8_MAX) {
         panic("CACHE::BLOCKS::BAD_OFFSET");
     }
