@@ -334,7 +334,7 @@ void decode(uint64_t gp) {
     Context* context = context_pull(gp);
     context_block_start(context);
     while (1) {
-        context_block_point(context);
+        context_block_guest_point(context);
         Instruction* buf = context_pull_buffer(context);
         decode_instr(context, buf);
         if (buf->type >= JO && buf->type <= JG) {
@@ -354,8 +354,18 @@ void decode(uint64_t gp) {
         }
     }
     cache_start_block(context);
-    for (int i = 0; i < context->buffer_p; i++) {
-        encode(context, context->buffer + i);
+    for (int i = 0; i < context->blocks_p; i++) {
+        CacheUnit* cache = context->blocks+i;
+        cache->hp_lo = context->hp;
+        uint32_t buffer = cache->buffer;
+        for (int x = 0; x < cache->buffer_end; x++) {
+            context_block_host_point(context, cache);
+            encode(context, context->buffer + buffer + i);
+        }
+        OffsetUnit* offsets = context->offsets + cache->offsets;
+        for (int x = 0; x < cache->offsetssz; x++) {
+            print("offset %i: %i %i", x, offsets[x].goff, offsets[x].hoff);
+        }
     }
     cache_end_block(context);
     context_free(context);

@@ -13,10 +13,13 @@ typedef struct {
 
 typedef struct {
     uint32_t gp_lo;
-    uint32_t hp;
+    uint32_t hp_lo;
+    uint32_t buffer;
     uint32_t offsets;
     uint8_t offsetssz;
-    uint8_t end;
+    uint8_t buffer_end;
+    uint8_t gp_end;
+    uint8_t hp_end;
 } CacheUnit;
 
 typedef struct Context {
@@ -53,7 +56,8 @@ uint32_t* context_pull_jump(Context* context);
 Instruction* context_pull_buffer(Context* context);
 
 void context_block_start(Context* context);
-void context_block_point(Context* context);
+void context_block_guest_point(Context* context);
+void context_block_host_point(Context* context, CacheUnit* cache);
 void context_block_end(Context* context);
 
 void* mmap_guest(uint32_t guest_size);
@@ -62,7 +66,7 @@ void* mmap_guest(uint32_t guest_size);
 inline void emit32(Context* cotnext, uint32_t data) {
     cotnext->host[cotnext->hp++] = data;
 }
-/* replace 32 bytes */
+/* replace n bytes */
 inline void patch(Context* cotnext, uint32_t n) {
     cotnext->hp -= n;
 }
