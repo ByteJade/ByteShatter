@@ -9,6 +9,7 @@
 
 static Context* contexts = NULL;
 static int max_process = 0;
+static int usage = 0;
 
 void context_init() {
     max_process = sysconf(_SC_NPROCESSORS_ONLN);
@@ -18,7 +19,8 @@ void context_init() {
         warning("_SC_NPROCESSORS_ONLN failed. Setup only 1 context");
         max_process = 1;
     }
-    contexts = (Context*)malloc(sizeof(Context)*max_process);
+    usage += sizeof(Context)*max_process;
+    contexts = (Context*)malloc(usage);
 }
 Context* context_search() {
     for (int i = 0; i < max_process; i++) {
@@ -46,6 +48,9 @@ Context* context_pull(uint64_t gp) {
 }
 void context_free(Context* context) {
     atomic_store(&context->in_use, 0);
+}
+int context_usage() {
+    return usage;
 }
 
 void* mmap_guest(uint32_t guest_size) {

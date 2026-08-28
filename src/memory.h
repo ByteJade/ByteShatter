@@ -6,20 +6,32 @@
 #include "cache.h"
 
 typedef struct Context {
-   CacheUnit* block;
-   OffsetUnit* offsets;
-   uint8_t* guest;
-   uint32_t* host;
-   uint32_t gp;
-   uint32_t hp;
-   uint8_t loffp;
-   atomic_bool in_use;
+    CacheUnit* block;
+    OffsetUnit* offsets;
+    uint8_t* guest;
+    uint32_t* host;
+    uint32_t gp;
+    uint32_t hp;
+    uint8_t loffp;
+    atomic_bool in_use;
+/* to switch to static compilation
+    Instruction* buffer;
+    uint32_t buffer_p;
+    uint32_t buffer_c;
+    uint32_t* jumps;
+    uint32_t jumps_p;
+    uint32_t jumps_c;
+    OffsetUnit* offsets;
+    uint32_t offsets_p;
+    uint32_t offsets_c;
+*/
 } Context;
 
 void context_init();
 
 Context* context_pull(uint64_t gp);
 void context_free(Context* context);
+int context_usage();
 
 void* mmap_guest(uint32_t guest_size);
 

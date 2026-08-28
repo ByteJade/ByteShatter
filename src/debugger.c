@@ -108,6 +108,7 @@ void handle_print(char* arg) {
         } else if (strcmp(arg, "usage") == 0) {
             Anchor* anchor = cache_get_anchor(get_pc());
             printf("cache usage: %i bytes\n", cache_usage());
+            printf("context usage: %i bytes\n", context_usage());
             printf("host usage: %i bytes\n", anchor->host_p*4);
         } else {
             printf("\033[34m%s\033[0m: %lX\n", arg, get_reg(arg));
