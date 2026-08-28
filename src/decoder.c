@@ -360,7 +360,7 @@ void decode(uint64_t gp) {
         uint32_t buffer = cache->buffer;
         for (int x = 0; x < cache->buffer_end; x++) {
             context_block_host_point(context, cache);
-            encode(context, context->buffer + buffer + i);
+            encode(context, &context->buffer[buffer + x]);
         }
         OffsetUnit* offsets = context->offsets + cache->offsets;
         for (int x = 0; x < cache->offsetssz; x++) {
