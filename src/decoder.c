@@ -335,17 +335,22 @@ void decode(uint64_t gp) {
     context_block_start(context);
     while (1) {
         context_block_point(context);
-        Instruction buf;
-        decode_instr(context, &buf);
-        if (buf.type >= JO && buf.type <= JG) {
-            context_push_jump(context, context->gp);
-        } else if (buf.type == JMP) {
-            context_push_jump(context, context->gp);
+        Instruction* buf = context_pull_buffer(context);
+        decode_instr(context, buf);
+        if (buf->type >= JO && buf->type <= JG) {
+            context_push_jump(context, context->gp + buf->a.imm);
+        } else if (buf->type == JMP) {
+            if (buf->a.type == IMM)
+                context_push_jump(context, context->gp + buf->a.imm);
             goto parse;
-        } else if (buf.type == RET) {
+        } else if (buf->type == RET) {
         parse:
             context_block_end(context);
-            break;
+            uint32_t* gp = context_pull_jump(context);
+            if (!gp) break;
+            context->gp = *gp;
+            print("new gp: %x", *gp);
+            context_block_start(context);
         }
     }
     context_free(context);

@@ -65,6 +65,10 @@ Context* context_pull(uint64_t gp) {
     return context;
 }
 void context_free(Context* context) {
+    context->blocks_p = 0;
+    context->offsets_p = 0;
+    context->buffer_p = 0;
+    context->jumps_p = 0;
     atomic_store(&context->in_use, 0);
 }
 int context_usage() {
@@ -74,18 +78,19 @@ int context_usage() {
 CacheUnit* context_search_block(Context* context, uint64_t gp) {
     uint32_t gp_lo = gp;
     if (context->blocks_p == 0) return NULL;
-    CacheUnit* cache = NULL;
+    int result = -1;
     int left = 0, right = context->blocks_p - 1;
     while (left <= right) {
-        int mid = (left + right) / 2;
-        cache = context->blocks + mid;
-        if (gp_lo == cache->gp_lo)
-            return cache;
-        if (gp_lo > cache->gp_lo) left = mid + 1; 
-        else right = mid - 1;
+        int mid = left + (right - left) / 2;
+        CacheUnit* cache = context->blocks + mid;
+        if (cache->gp_lo <= gp_lo) {
+            result = mid;
+            left = mid+1;
+        } else right = mid - 1;
     }
-    if (right < 0) return NULL;
-    cache = context->blocks + right;
+    if (result == -1) return NULL;
+    CacheUnit* cache = context->blocks + result;
+    if (gp > cache->gp_lo + cache->end) return NULL;
     return cache;
 }
 void context_push_jump(Context* context, uint32_t jump) {
@@ -99,9 +104,12 @@ void context_push_jump(Context* context, uint32_t jump) {
     context->jumps[context->jumps_p++] = jump;
 }
 uint32_t* context_pull_jump(Context* context) {
-    if (context->jumps_p) {
-        context->jumps_p--;
-        return context->jumps + context->jumps_p;
+    while (context->jumps_p--) {
+        uint32_t* gp = context->jumps + context->jumps_p;
+        if (!context_search_block(context, *gp)) {
+            print("pull jump: %x", context->jumps_p);
+            return gp;
+        }
     }
     return NULL;
 }
