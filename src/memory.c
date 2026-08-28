@@ -1,6 +1,7 @@
 #include "memory.h"
 #include "cache.h"
 #include "core.h"
+#include "decoder.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -8,7 +9,9 @@
 #include <unistd.h> 
 
 #define START_OFFSETS 256
+#define START_BUFFER 256
 #define START_BLOCKS 256
+#define START_JUMPS 256
 
 static Context* contexts = NULL;
 static int max_process = 0;
@@ -47,6 +50,14 @@ Context* context_pull(uint64_t gp) {
         context->blocks_c = START_OFFSETS;
         contexts->blocks = (CacheUnit*)malloc(START_BLOCKS*sizeof(CacheUnit));
     }
+    if (!contexts->jumps) {
+        context->jumps_c = START_OFFSETS;
+        contexts->jumps = (uint32_t*)malloc(START_JUMPS*sizeof(uint32_t));
+    }
+    if (!contexts->buffer) {
+        context->buffer_c = START_OFFSETS;
+        contexts->buffer = (Instruction*)malloc(START_BUFFER*sizeof(Instruction));
+    }
     context->guest = (uint8_t*)(gp & (~(uint64_t)UINT32_MAX));
     context->host = current->host;
     context->gp = gp;
@@ -55,6 +66,27 @@ Context* context_pull(uint64_t gp) {
 }
 void context_free(Context* context) {
     atomic_store(&context->in_use, 0);
+}
+int context_usage() {
+    return usage;
+}
+
+CacheUnit* context_search_block(Context* context, uint64_t gp) {
+    uint32_t gp_lo = gp;
+    if (context->blocks_p == 0) return NULL;
+    CacheUnit* cache = NULL;
+    int left = 0, right = context->blocks_p - 1;
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        cache = context->blocks + mid;
+        if (gp_lo == cache->gp_lo)
+            return cache;
+        if (gp_lo > cache->gp_lo) left = mid + 1; 
+        else right = mid - 1;
+    }
+    if (right < 0) return NULL;
+    cache = context->blocks + right;
+    return cache;
 }
 void context_push_jump(Context* context, uint32_t jump) {
     if (context->jumps_p == context->jumps_c) {
@@ -66,10 +98,23 @@ void context_push_jump(Context* context, uint32_t jump) {
     }
     context->jumps[context->jumps_p++] = jump;
 }
-int context_usage() {
-    return usage;
+uint32_t* context_pull_jump(Context* context) {
+    if (context->jumps_p) {
+        context->jumps_p--;
+        return context->jumps + context->jumps_p;
+    }
+    return NULL;
 }
-
+Instruction* context_pull_buffer(Context* context) {
+    if (context->buffer_p == context->buffer_c) {
+        context->buffer_c *= 2;
+        context->buffer = realloc(
+            context->buffer,
+            context->buffer_c*sizeof(uint32_t)
+        );
+    }
+    return context->buffer + context->buffer_p++;
+}
 void context_block_start(Context* context) {
     if (context->blocks_p+1 >= context->blocks_c) {
         panic("CONTEXT::BLOCKS::OVERFLOW");
