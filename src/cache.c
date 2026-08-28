@@ -76,13 +76,14 @@ void cache_create_block(Context* context) {
     for (uint32_t rp = anchor->blocks_p; rp > insert_pos; rp--) {
         anchor->blocks[rp] = anchor->blocks[rp-1];
     }
-    print("start cache block %x", insert_pos);
     Block* block = anchor->blocks + insert_pos;
     block->gp_lo = context->gp;
     block->hp_lo = context->hp;
     anchor->blocks_p++;
     context->host = anchor->host;
     context->hp = anchor->host_p;
+    print("create cache block %x (%x %x)",
+        insert_pos, block->gp_lo, block->hp_lo);
 }
 uint32_t* cache_search(uint64_t gp) {
     // TODO: better cache search
@@ -94,9 +95,10 @@ uint32_t* cache_search(uint64_t gp) {
     while (left <= right) {
         int mid = (left + right) / 2;
         cache = anchor->blocks + mid;
-        if (gp_lo == cache->gp_lo)
+        if (gp_lo == cache->gp_lo){
+            print("found block %x", mid);
             return anchor->host + cache->hp_lo;
-        if (gp_lo > cache->gp_lo) left = mid + 1; 
+        } if (gp_lo > cache->gp_lo) left = mid + 1; 
         else right = mid - 1;
     }
     return NULL;
