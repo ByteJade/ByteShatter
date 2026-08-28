@@ -499,7 +499,8 @@ void encode(Context* context, Instruction* buf) {
         case JBE:
         case JAE:
         case JE:{
-            emit_brk(cache_patch_point(context, buf->type, buf->a.imm));
+            context_patch_point(context, buf->type);
+            emit32(context, buf->a.imm);
         } break;
         case JMP:{
             emit_branch(context, buf, BR_REG, JMP);
