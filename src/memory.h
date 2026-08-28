@@ -60,11 +60,11 @@ void* mmap_guest(uint32_t guest_size);
 
 /* emit 4 bytes to host memory */
 inline void emit32(Context* cotnext, uint32_t data) {
-    //cotnext->host[cotnext->hp++] = data;
+    cotnext->host[cotnext->hp++] = data;
 }
 /* replace 32 bytes */
 inline void patch(Context* cotnext, uint32_t n) {
-    //cotnext->hp -= n;
+    cotnext->hp -= n;
 }
 
 /* fetch byte from guest memory */
