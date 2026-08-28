@@ -150,7 +150,6 @@ void context_block_start(Context* context) {
 }
 void context_block_guest_point(Context* context) {
     uint16_t goff = context->gp - context->block->gp_lo;
-    if (goff == 0) return;
     if (goff > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
         context_block_end(context);
