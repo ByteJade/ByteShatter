@@ -166,14 +166,24 @@ void context_block_guest_point(Context* context) {
         context_block_start(context);
     }
 }
-void context_block_host_point(Context* context) {
-
+void context_block_host_point(Context* context, CacheUnit* cache) {
+    uint16_t hoff = context->hp - cache->hp_lo;
+    if (hoff == 0) return;
+    if (hoff > UINT8_MAX) {
+        panic("CACHE::BLOCKS::BAD_OFFSET");
+    }
+    OffsetUnit* offset = &context->offsets[cache->offsets+cache->offsetssz];
+    cache->offsetssz++;
+    offset->hoff = hoff;
+    if (cache->offsetssz >= UINT8_MAX) {
+        panic("CACHE::BLOCKS::BAD_OFFSETS");
+    }
 }
 void context_block_end(Context* context) {
     CacheUnit* block = context->block;
     block->gp_end = context->gp - block->gp_lo;
     block->buffer_end = context->buffer_p - block->buffer;
-    block->offsetssz = context->offsets_p - block->offsets;
+    //block->offsetssz = context->offsets_p - block->offsets;
 }
 
 void* mmap_guest(uint32_t guest_size) {
