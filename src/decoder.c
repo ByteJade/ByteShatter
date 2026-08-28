@@ -357,17 +357,18 @@ void decode(uint64_t gp) {
     for (int i = 0; i < context->blocks_p; i++) {
         CacheUnit* cache = context->blocks+i;
         cache->hp_lo = context->hp;
+        context->block = cache;
         uint32_t buffer = cache->buffer;
         for (int x = 0; x < cache->buffer_end; x++) {
-            context_block_host_point(context, cache);
+            context_block_host_point(context);
             encode(context, &context->buffer[buffer + x]);
-        }
-        OffsetUnit* offsets = context->offsets + cache->offsets;
-        for (int x = 0; x < cache->offsetssz; x++) {
-            print("offset %i: %i %i", x, offsets[x].goff, offsets[x].hoff);
         }
     }
     cache_end_block(context);
+    for (int i = 0; i < context->patch_p; i++) {
+        Patch* patch = context->patch + i;
+        print("%i patch: %x %i", i, patch->host_off, patch->type);
+    }
     context_free(context);
     if (debug_enabled()) debug_check_break();
 }

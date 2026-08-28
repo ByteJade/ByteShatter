@@ -58,6 +58,10 @@ Context* context_pull(uint64_t gp) {
         context->buffer_c = START_OFFSETS;
         contexts->buffer = (Instruction*)malloc(START_BUFFER*sizeof(Instruction));
     }
+    if (!contexts->patch) {
+        context->patch_c = START_OFFSETS;
+        contexts->patch = (Patch*)malloc(START_JUMPS*sizeof(Patch));
+    }
     context->guest = (uint8_t*)(gp & (~(uint64_t)UINT32_MAX));
     context->host = current->host;
     context->gp = gp;
@@ -70,6 +74,7 @@ void context_free(Context* context) {
     context->offsets_p = 0;
     context->buffer_p = 0;
     context->jumps_p = 0;
+    context->patch_p = 0;
     atomic_store(&context->in_use, 0);
 }
 int context_usage() {
@@ -93,6 +98,19 @@ CacheUnit* context_search_block(Context* context, uint64_t gp) {
     CacheUnit* cache = context->blocks + result;
     if (gp > cache->gp_lo + cache->gp_end) return NULL;
     return cache;
+}
+
+void context_patch_point(Context* context, uint8_t type) {
+    if (context->patch_p == context->patch_c) {
+        context->patch_c *= 2;
+        context->patch = realloc(
+            context->patch,
+            context->patch_c*sizeof(Patch)
+        );
+    }
+    Patch* patch = context->patch + context->patch_p++;
+    patch->type = type;
+    patch->host_off = context->hp;
 }
 void context_push_jump(Context* context, uint32_t jump) {
     if (context->jumps_p == context->jumps_c) {
@@ -149,31 +167,33 @@ void context_block_start(Context* context) {
     context->blocks_p++;
 }
 void context_block_guest_point(Context* context) {
-    uint16_t goff = context->gp - context->block->gp_lo;
+    CacheUnit* block = context->block;
+    uint16_t goff = context->gp - block->gp_lo;
     if (goff > UINT8_MAX) {
         warning("CACHE::BLOCKS::BAD_OFFSET");
         context_block_end(context);
         context_block_start(context);
-        goff = context->gp - context->block->gp_lo;
+        goff = context->gp - block->gp_lo;
     }
     OffsetUnit* offset = &context->offsets[context->offsets_p++];
     offset->goff = goff;
     if (context->offsets_p >= context->offsets_c)
         panic("CACHE::OFFSET_OVERFLOW");
-    if (context->offsets_p - context->block->offsets >= UINT8_MAX) {
+    if (context->offsets_p - block->offsets >= UINT8_MAX) {
         context_block_end(context);
         context_block_start(context);
     }
 }
-void context_block_host_point(Context* context, CacheUnit* cache) {
-    uint16_t hoff = context->hp - cache->hp_lo;
+void context_block_host_point(Context* context) {
+    CacheUnit* block = context->block;
+    uint16_t hoff = context->hp - block->hp_lo;
     if (hoff > UINT8_MAX) {
         panic("CACHE::BLOCKS::BAD_OFFSET");
     }
-    OffsetUnit* offset = &context->offsets[cache->offsets+cache->offsetssz];
-    cache->offsetssz++;
+    OffsetUnit* offset = &context->offsets[block->offsets+block->offsetssz];
+    block->offsetssz++;
     offset->hoff = hoff;
-    if (cache->offsetssz >= UINT8_MAX) {
+    if (block->offsetssz >= UINT8_MAX) {
         panic("CACHE::BLOCKS::BAD_OFFSETS");
     }
 }
