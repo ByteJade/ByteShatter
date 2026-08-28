@@ -36,7 +36,7 @@ void set_bp(uint32_t* instr) {
     break_pc = UINT64_MAX;
 }
 void debug_check_break() {
-    CacheUnit* cache = cache_get_block(break_block);
+    /*CacheUnit* cache = cache_get_block(break_block);
     if (cache) {
         Anchor* anchor = cache_get_anchor(get_pc());
         set_bp(anchor->host + cache->hp);
@@ -46,7 +46,7 @@ void debug_check_break() {
     if (instr) {
         set_bp(instr);
         print("break pc found");
-    }
+    }*/
 }
 void help(void) {
     printf("Commands:\n");
@@ -146,7 +146,7 @@ void debug_wait(void) {
             }
         } else {
             if (strcmp(com, "si") == 0) {
-                CacheUnit* unit = cache_get_block(current_block);
+                /*CacheUnit* unit = cache_get_block(current_block);
                 OffsetUnit* offsets = unit->offsets + cache_offsets();
                 for (int x = 0; x < unit->offsetssz; x++) {
                     if ((uint32_t*)get_pc() - anchor->host == unit->hp + offsets[x].hoff) {
@@ -159,7 +159,7 @@ void debug_wait(void) {
                         context_free(context);
                     }
                 }
-                set_bp((uint32_t*)(get_pc() + 4));
+                set_bp((uint32_t*)(get_pc() + 4));*/
                 break;
             } else if (strcmp(com, "sb") == 0) {
                 break_block = current_block+1;
