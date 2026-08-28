@@ -36,7 +36,8 @@ typedef struct Context Context;
 /* clear all data */
 void cache_clear(void);
 uint32_t cache_patch_point(Context* context, uint8_t type, int offset);
-void cache_create_block(Context* context);
+void cache_start_block(Context* context);
+void cache_end_block(Context* context);
 
 /* get pointer to host instruction at guest pointer */
 uint32_t* cache_search(uint64_t gp);

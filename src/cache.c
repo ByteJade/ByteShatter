@@ -63,7 +63,7 @@ uint32_t cache_patch_point(Context* context, uint8_t type, int offset) {
     
     return ret+1;
 }
-void cache_create_block(Context* context) {
+void cache_start_block(Context* context) {
     if (anchor->blocks_p+1 >= anchor->blocks_c) {
         panic("CONTEXT::BLOCKS::OVERFLOW");
     }
@@ -80,10 +80,16 @@ void cache_create_block(Context* context) {
     block->gp_lo = context->gp;
     block->hp_lo = context->hp;
     anchor->blocks_p++;
+    context->c_block = block;
     context->host = anchor->host;
     context->hp = anchor->host_p;
     print("create cache block %x (%x %x)",
         insert_pos, block->gp_lo, block->hp_lo);
+}
+void cache_end_block(Context* context) {
+    uint32_t* start = context->host + context->c_block->hp_lo;
+    uint32_t* end = context->host + context->hp;
+    __builtin___clear_cache(start, end);
 }
 uint32_t* cache_search(uint64_t gp) {
     // TODO: better cache search

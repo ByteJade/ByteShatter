@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdatomic.h>
+#include "cache.h"
 #include "decoder.h"
 
 typedef struct {
@@ -19,11 +20,12 @@ typedef struct {
 } CacheUnit;
 
 typedef struct Context {
-    CacheUnit* block;
     uint8_t* guest;
     uint32_t gp;
     uint32_t* host;
     uint32_t hp;
+    CacheUnit* block;
+    Block* c_block;
     atomic_bool in_use;
 /* to switch to static compilation*/
     Instruction* buffer;
