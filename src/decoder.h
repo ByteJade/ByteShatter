@@ -1,7 +1,7 @@
 #ifndef DECODER_H
 #define DECODER_H
 
-#include "memory.h"
+#include "cache.h"
 #include <stdint.h>
 
 enum Prefixes {
@@ -86,11 +86,13 @@ typedef struct {
     Operand b;
 } Instruction;
 
-void decode_r_rm(Context* context, Instruction* buf);
-void decode_rm_r(Context* context, Instruction* buf);
-void decode_rm(Context* context, Operand* op, uint8_t modrm);
-void decode_0F(Context* context, Instruction* buf);
-int decode_instr(Context* context, Instruction* buf);
+typedef struct Context Context;
+
+void decode_r_rm(struct Context* context, Instruction* buf);
+void decode_rm_r(struct Context* context, Instruction* buf);
+void decode_rm(struct Context* context, Operand* op, uint8_t modrm);
+void decode_0F(struct Context* context, Instruction* buf);
+void decode_instr(struct Context* context, Instruction* buf);
 void decode(uint64_t gp);
 
 #endif

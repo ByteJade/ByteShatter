@@ -3,18 +3,28 @@
 
 #include <stdint.h>
 #include <stdatomic.h>
-#include "cache.h"
+#include "decoder.h"
+
+typedef struct {
+    uint8_t hoff;
+    uint8_t goff;
+} OffsetUnit;
+
+typedef struct {
+    uint32_t gp_lo;
+    uint32_t hp;
+    uint32_t offsets;
+    uint8_t offsetssz;
+    uint8_t end;
+} CacheUnit;
 
 typedef struct Context {
     CacheUnit* block;
-    OffsetUnit* offsets;
     uint8_t* guest;
-    uint32_t* host;
     uint32_t gp;
-    uint32_t hp;
-    uint8_t loffp;
+    uint32_t* host;
     atomic_bool in_use;
-/* to switch to static compilation
+/* to switch to static compilation*/
     Instruction* buffer;
     uint32_t buffer_p;
     uint32_t buffer_c;
@@ -24,7 +34,9 @@ typedef struct Context {
     OffsetUnit* offsets;
     uint32_t offsets_p;
     uint32_t offsets_c;
-*/
+    CacheUnit* blocks;
+    uint32_t blocks_p;
+    uint32_t blocks_c;
 } Context;
 
 void context_init();
@@ -33,15 +45,23 @@ Context* context_pull(uint64_t gp);
 void context_free(Context* context);
 int context_usage();
 
+void context_push_jump(Context* context, uint32_t jump);
+uint32_t* context_pull_jump(Context* context);
+Instruction* context_pull_buffer(Context* context);
+
+void context_block_start(Context* context);
+void context_block_point(Context* context);
+void context_block_end(Context* context);
+
 void* mmap_guest(uint32_t guest_size);
 
 /* emit 4 bytes to host memory */
 inline void emit32(Context* cotnext, uint32_t data) {
-    cotnext->host[cotnext->hp++] = data;
+    //cotnext->host[cotnext->hp++] = data;
 }
 /* replace 32 bytes */
 inline void patch(Context* cotnext, uint32_t n) {
-    cotnext->hp -= n;
+    //cotnext->hp -= n;
 }
 
 /* fetch byte from guest memory */

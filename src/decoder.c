@@ -110,11 +110,11 @@ void decode_GRP3(Instruction* buf, uint8_t code) {
     }
 }
 
-int decode_instr(Context* context, Instruction* buf) {
+
+void decode_instr(Context* context, Instruction* buf) {
     buf->prefix = 0;
     buf->size = 32;
     uint8_t rex = 0;
-    uint8_t ret = 0;
     uint8_t byte = fetch8(context);
     if ((byte >= FS && byte <= OS) ||
     (byte >= REPN && byte <= REPE)) {
@@ -259,7 +259,6 @@ int decode_instr(Context* context, Instruction* buf) {
         case 0xC3:
             buf->type = RET;
             buf->a.type = NONE;
-            ret = 1;
             break;
         case 0xC6:
             buf->size = 8;
@@ -289,14 +288,12 @@ int decode_instr(Context* context, Instruction* buf) {
             buf->a.type = IMM;
             buf->a.imm = (int64_t)(int32_t)fetch32(context);
             buf->b.type = NONE;
-            if (buf->type == JMP) ret = 1;
             break;
         case 0xEB:
             buf->type = JMP;
             buf->a.type = IMM;
             buf->a.imm = (int64_t)(int8_t)fetch8(context);
             buf->b.type = NONE;
-            ret = 1;
             break;
         case 0xF7: {
             uint8_t modrm = fetch8(context);
@@ -322,7 +319,6 @@ int decode_instr(Context* context, Instruction* buf) {
             uint8_t code = (modrm >> 3) & 7;
             decode_rm(context, &buf->a, modrm);
             decode_GRP3(buf, code);
-            if (buf->type == JMP) ret = 1;
         } break;
         default: panic("DECODER::UNKNOWN_SYMBOL: 0x%X", byte);
     }
@@ -332,32 +328,26 @@ int decode_instr(Context* context, Instruction* buf) {
         sprint_x86_64(buf, out);
         print("%s", out);
     }
-    return ret;
 }
 void decode(uint64_t gp) {
     print("Start decode %lx", gp);
     Context* context = context_pull(gp);
-    cache_block_start(context);
+    context_block_start(context);
     while (1) {
-        cache_block_point(context);
+        context_block_point(context);
         Instruction buf;
-        uint8_t jump = decode_instr(context, &buf);
-        encode(context, &buf);
-        if (jump) break;
-        /*
-        TODO: Static analysis of block jumps. 
-        Cache lookups are resource-intensive.
-        */
-        const uint32_t* blockp = cache_search((uint64_t)context->guest + context->gp);
-        if (blockp) {
-            int32_t offset = (uint64_t)blockp - (uint64_t)(context->host+context->hp);
-            warning("DECODER::DUPLICATION %i", offset);
-            cache_block_point(context);
-            emit32(context, 0x14000000 | ((offset/4) & 0x3FFFFFF));
+        decode_instr(context, &buf);
+        if (buf.type >= JO && buf.type <= JG) {
+            context_push_jump(context, context->gp);
+        } else if (buf.type == JMP) {
+            context_push_jump(context, context->gp);
+            goto parse;
+        } else if (buf.type == RET) {
+        parse:
+            context_block_end(context);
             break;
         }
     }
-    cache_block_end(context);
     context_free(context);
     if (debug_enabled()) debug_check_break();
 }
